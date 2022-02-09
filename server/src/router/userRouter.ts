@@ -1,7 +1,13 @@
 import express from "express";
-import nodemailer from "nodemailer";
 
-import { deleteJoin, login, nickCheck, postCertify, postJoin } from "../controllers/userController";
+import {
+  deleteJoin,
+  login,
+  mypage,
+  nickCheck,
+  postCertify,
+  postJoin,
+} from "../controllers/userController";
 const userRouter = express.Router();
 
 userRouter.route("/join").post(postJoin);
@@ -11,6 +17,6 @@ userRouter.route("/nickcheck").post(nickCheck);
 userRouter.route("/login").post(login);
 userRouter.route("/logout").get();
 userRouter.route("/delete").delete(deleteJoin);
-userRouter.route("/mypage").get();
+userRouter.route("/mypage").get(mypage);
 
 export default userRouter;

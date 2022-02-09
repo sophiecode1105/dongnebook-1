@@ -3,7 +3,6 @@ import client from "../client";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { stringify } from "querystring";
 
 export const postCertify = async (req: express.Request, res: express.Response) => {
   try {
@@ -142,11 +141,40 @@ export const login = async (req: express.Request, res: express.Response) => {
 export const deleteJoin = async (req: express.Request, res: express.Response) => {
   try {
     const { token } = req.body;
-    const userInfo = jwt.verify(token, process.env.ACCESS_SECRET);
+    let tokenInfo: {};
+    try {
+      tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
+    } catch {
+      return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
+    }
 
-    await client.user.delete({ where: { email: userInfo["email"] } });
+    await client.user.delete({ where: { email: tokenInfo["email"] } });
 
     return res.status(200).json({ message: "회원탈퇴 완료", state: true });
+  } catch {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  }
+};
+
+export const mypage = async (req: express.Request, res: express.Response) => {
+  try {
+    const { token } = req.body;
+    let tokenInfo: {};
+    try {
+      tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
+    } catch {
+      return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
+    }
+    const userInfo = await client.user.findUnique({
+      where: {
+        email: tokenInfo["email"],
+      },
+      include: {
+        products: true,
+      },
+    });
+    delete userInfo.password;
+    return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }

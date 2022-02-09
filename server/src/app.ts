@@ -3,6 +3,7 @@ import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./router/userRouter";
+import locationRouter from "./router/locationRouter";
 
 const app = express();
 const logger = morgan("dev");
@@ -24,7 +25,7 @@ app.use(
 );
 
 app.use(logger);
-
+app.use("/location", locationRouter);
 app.use("/user", userRouter);
 // db.sequelize.sync();
 
