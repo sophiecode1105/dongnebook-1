@@ -1,6 +1,4 @@
 import express from "express";
-import nodemailer from "nodemailer";
-
 import { deleteJoin, login, nickCheck, postCertify, postJoin } from "../controllers/userController";
 const userRouter = express.Router();
 

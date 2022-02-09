@@ -3,15 +3,12 @@ import client from "../client";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { stringify } from "querystring";
 
 export const postCertify = async (req: express.Request, res: express.Response) => {
   try {
     const { email, nickname, password } = req.body;
     if (!email || !nickname || !password) {
-      return res
-        .status(400)
-        .json({ message: "이메일 또는 닉네임, 비밀번호를 모두 입력해주세요.", state: false });
+      return res.status(400).json({ message: "이메일 또는 닉네임, 비밀번호를 모두 입력해주세요.", state: false });
     }
     const existUser = await client.user.findUnique({
       where: {

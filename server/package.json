@@ -30,6 +30,7 @@
     "@types/morgan": "^1.9.3",
     "@types/nodemailer": "^6.4.4",
     "axios": "^0.25.0",
+    "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
