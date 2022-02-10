@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import lock from "../../img/lock.png";
@@ -24,7 +24,6 @@ const SignupBox = styled.div`
 `;
 
 const SignupTitle = styled.div`
-  /* border: 1px solid blue; */
   color: black;
   font-weight: bold;
   font-size: 23px;
@@ -50,7 +49,6 @@ const Input = styled.input<ErrorProps>`
   padding: 20px 20px;
   font-size: 15px;
   border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
-  /* margin: 10px; */
   &:focus {
     outline: none;
   }
@@ -70,7 +68,6 @@ const Label = styled.label`
   margin-bottom: 3px;
   color: grey;
   font-weight: bold;
-  /* border: 1px solid red; */
 `;
 
 const Wrap = styled.div`
@@ -140,7 +137,6 @@ const Signup = () => {
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
   const [certificationNum, setCertificationNum] = useState(0);
-  // const goodNicks = ["abc"];
 
   const {
     register,
@@ -151,7 +147,7 @@ const Signup = () => {
   } = useForm<FormData>({ mode: "onChange" });
 
   const onSubmit = async (data: FormData) => {
-    if (nickCheck == "") {
+    if (nickCheck === "") {
       Swal.fire({
         text: "닉네임 중복확인이 필요합니다",
         confirmButtonText: "확인",
@@ -245,7 +241,7 @@ const Signup = () => {
         <Label>닉네임</Label>
         <Wrap>
           <NarrowInput
-            type="text"
+            type='text'
             error={errors.nickname?.message}
             {...register("nickname", {
               required: "닉네임을 입력해주세요",
@@ -259,22 +255,24 @@ const Signup = () => {
               shouldUnregister: true,
             })}
           />
-          <NarrowButton type="button" onClick={getNick}>
+          <NarrowButton type='button' onClick={getNick}>
             중복확인
           </NarrowButton>
         </Wrap>
-        <Errorbox nickValid={nickValid}>{errors.nickname?.message ? errors.nickname.message : nickCheck}</Errorbox>
+        <Errorbox nickValid={nickValid}>
+          {errors.nickname?.message ? errors.nickname.message : nickCheck}
+        </Errorbox>
         <Label>이메일</Label>
         <Wrap>
           <NarrowInput
-            type="text"
+            type='text'
             error={errors.email?.message}
             {...register("email", {
               required: "이메일을 입력해주세요",
               pattern: myPattern,
             })}
           />
-          <NarrowButton type="button" onClick={postEmail}>
+          <NarrowButton type='button' onClick={postEmail}>
             인증요청
           </NarrowButton>
         </Wrap>
@@ -282,7 +280,7 @@ const Signup = () => {
         <Label>인증번호</Label>
         <InputContainer>
           <WideInput
-            type="text"
+            type='text'
             error={errors.certification?.message}
             {...register("certification", {
               required: "인증번호를 입력해주세요",
@@ -290,7 +288,10 @@ const Signup = () => {
                 matchPassword: (value: number) => {
                   console.log("인증", certificationNum);
                   console.log("value", value);
-                  return certificationNum == value || "인증번호가 일치하지 않습니다.";
+                  return (
+                    certificationNum === value ||
+                    "인증번호가 일치하지 않습니다."
+                  );
                 },
               },
             })}
@@ -300,7 +301,7 @@ const Signup = () => {
         <Label>비밀번호</Label>
         <InputContainer>
           <WideInput
-            type="password"
+            type='password'
             error={errors.password?.message}
             {...register("password", {
               required: "비밀번호를 입력해주세요",
@@ -313,7 +314,7 @@ const Signup = () => {
         <Label>비밀번호 재확인</Label>
         <InputContainer>
           <WideInput
-            type="password"
+            type='password'
             error={errors.password2?.message}
             {...register("password2", {
               required: "비밀번호를 입력해주세요",
@@ -328,7 +329,7 @@ const Signup = () => {
           <Img src={lockcheck} />
         </InputContainer>
         <Errorbox>{errors.password2?.message}</Errorbox>
-        <SignupButton type="submit">가입하기</SignupButton>
+        <SignupButton type='submit'>가입하기</SignupButton>
       </SignupForm>
     </Container>
   );
