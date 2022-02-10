@@ -26,9 +26,9 @@ export const postEmailcheck = async (body: EmailCheck) => {
   }
 };
 
-type Signup = { email: string; password: string; nickname: string };
+type Userinfo = { email: string; password: string; nickname?: string };
 
-export const postSignup = async (body: Signup) => {
+export const postSignup = async (body: Userinfo) => {
   try {
     const {
       data: {
@@ -38,5 +38,20 @@ export const postSignup = async (body: Signup) => {
     return id;
   } catch (e) {
     console.error(e);
+    throw e;
+  }
+};
+
+type A = { id: number | undefined; admin: boolean | undefined };
+export const postSignin = async (body: Userinfo): Promise<A> => {
+  try {
+    const {
+      data: {
+        createUser: { id, admin },
+      },
+    } = await axios.post(`${URL}/user/login`, body);
+    return { id, admin };
+  } catch (e) {
+    throw e;
   }
 };

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { postSignin } from "../../api";
 
 const Container = styled.div`
   display: flex;
@@ -11,7 +12,7 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 100px;
+  padding-top: 180px;
 `;
 
 const LoginBox = styled.div`
@@ -145,6 +146,8 @@ type FormData = {
 
 const Signin = () => {
   const [ischeck, setIscheck] = useState(false);
+  const [Invalid, setInvalid] = useState(true);
+
   const handleCheckChange = () => {
     setIscheck(!ischeck);
   };
@@ -157,10 +160,30 @@ const Signin = () => {
   } = useForm<FormData>({ mode: "onChange" });
 
   const getUser = async () => {
-    const { email } = getValues();
+    const { email, password } = getValues();
+    try {
+      const { id, admin } = await postSignin({ email, password });
+      localStorage.setItem("userId", String(id));
+      if (admin) {
+        localStorage.setItem("admin", String(admin));
+      }
+      return id;
+    } catch (e) {
+      throw e;
+    }
   };
-  const handlelogin = (data: FormData) => {
-    console.log(data);
+  const handlelogin = async (e: any) => {
+    // e.preventDefault();
+    try {
+      const id = await getUser();
+      if (id) {
+        localStorage.setItem("isLogin", String(true));
+      }
+    } catch (e) {
+      // console.log("이건왜안찍혀");
+      alert("로그인 실패");
+      setInvalid(false);
+    }
   };
 
   const myPattern: ValidationRule<RegExp> = {
@@ -186,7 +209,8 @@ const Signin = () => {
             pattern: myPattern,
           })}
         />
-        <Errorbox>{errors.email?.message}</Errorbox>
+        {Invalid ? <Errorbox>{errors.email?.message}</Errorbox> : <Errorbox>이메일을 다시 확인해주세요</Errorbox>}
+
         <LoginInput
           type="password"
           placeholder="비밀번호"
@@ -196,7 +220,7 @@ const Signin = () => {
             pattern: passwordPattern,
           })}
         />
-        <Errorbox>{errors.password?.message}</Errorbox>
+        {Invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>비밀번호를 다시 확인해주세요</Errorbox>}
         <LoginState check={ischeck}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지

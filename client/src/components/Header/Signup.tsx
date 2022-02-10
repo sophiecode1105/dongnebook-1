@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import lock from "../../img/lock.png";
@@ -13,7 +13,7 @@ const Container = styled.div`
   height: 100vh;
   width: 100%;
   margin: 0 auto;
-  padding-top: 100px;
+  padding-top: 120px;
   max-width: 360px;
 `;
 
@@ -140,7 +140,6 @@ const Signup = () => {
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
   const [certificationNum, setCertificationNum] = useState(0);
-  // const goodNicks = ["abc"];
 
   const {
     register,
@@ -196,8 +195,6 @@ const Signup = () => {
       const { nickname } = getValues();
       //현시간 동기화가 안된다. 빠깥에 선언해주면 안된다.
       // TODO: 아래 부분은 실제 API call로 대체 해야함
-      // let valid = goodNicks.includes(nickname);
-      // console.log("current", nickname, "valid", valid, "goodNicks", goodNicks);
       let valid = await postNickcheck({ nickname });
       if (valid) {
         setNickValid(true);
