@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { postSignin } from "../../api";
+import { useSetRecoilState } from "recoil";
+import { adminState, loginState, userId } from "../../state";
 
 const Container = styled.div`
   display: flex;
@@ -11,7 +14,7 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 100px;
+  padding-top: 180px;
 `;
 
 const LoginBox = styled.div`
@@ -41,9 +44,9 @@ interface ErrorProps {
 }
 
 const LoginInput = styled.input<ErrorProps>`
-  width: 90%;
+  width: 100%;
   text-decoration: none;
-  margin-bottom: 20px;
+  /* margin-bottom: 1px; */
   border: none;
   padding: 20px 20px;
   font-size: 15px;
@@ -56,7 +59,7 @@ const LoginInput = styled.input<ErrorProps>`
 
 const Errorbox = styled.div`
   color: red;
-  margin-bottom: 15px;
+  margin: 10px 0px;
   font-weight: bold;
   font-size: 12px;
 `;
@@ -144,9 +147,17 @@ type FormData = {
 };
 
 const Signin = () => {
-  const [ischeck, setIscheck] = useState(false);
+  const navigate = useNavigate();
+
+  const [keep, setKeep] = useState(true);
+  const [invalid, setInvalid] = useState(true);
+  const [infoCheck, setInfoCheck] = useState("");
+  const setUserId = useSetRecoilState(userId);
+  const setLoginStatus = useSetRecoilState(loginState);
+  const setAdminStatus = useSetRecoilState(adminState);
+
   const handleCheckChange = () => {
-    setIscheck(!ischeck);
+    setKeep(!keep);
   };
 
   const {
@@ -157,10 +168,34 @@ const Signin = () => {
   } = useForm<FormData>({ mode: "onChange" });
 
   const getUser = async () => {
-    const { email } = getValues();
+    const { email, password } = getValues();
+    try {
+      const { id, admin } = await postSignin({ email, password, keep });
+      localStorage.setItem("userId", String(id));
+      setUserId(String(id));
+      if (admin) {
+        localStorage.setItem("admin", String(admin));
+        setAdminStatus(true);
+      }
+      return id;
+    } catch (e) {
+      throw e;
+    }
   };
-  const handlelogin = (data: FormData) => {
-    console.log(data);
+  const handlelogin = async (e: any) => {
+    // e.preventDefault();
+    try {
+      const id = await getUser();
+      if (id) {
+        localStorage.setItem("isLogin", String(true));
+        setLoginStatus(true);
+
+        navigate("/");
+      }
+    } catch (e) {
+      setInfoCheck("이메일 혹은 비밀번호가 일치하지 않습니다");
+      setInvalid(false);
+    }
   };
 
   const myPattern: ValidationRule<RegExp> = {
@@ -194,10 +229,14 @@ const Signin = () => {
           {...register("password", {
             required: "비밀번호를 입력해주세요",
             pattern: passwordPattern,
+            onChange: () => {
+              setInfoCheck("");
+              setInvalid(true);
+            },
           })}
         />
-        <Errorbox>{errors.password?.message}</Errorbox>
-        <LoginState check={ischeck}>
+        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
+        <LoginState check={keep}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지
         </LoginState>
