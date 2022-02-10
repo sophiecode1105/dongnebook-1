@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import lock from "../../img/lock.png";
@@ -24,7 +24,6 @@ const SignupBox = styled.div`
 `;
 
 const SignupTitle = styled.div`
-  /* border: 1px solid blue; */
   color: black;
   font-weight: bold;
   font-size: 23px;
@@ -50,7 +49,6 @@ const Input = styled.input<ErrorProps>`
   padding: 20px 20px;
   font-size: 15px;
   border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
-  /* margin: 10px; */
   &:focus {
     outline: none;
   }
@@ -70,7 +68,6 @@ const Label = styled.label`
   margin-bottom: 3px;
   color: grey;
   font-weight: bold;
-  /* border: 1px solid red; */
 `;
 
 const Wrap = styled.div`
@@ -150,7 +147,7 @@ const Signup = () => {
   } = useForm<FormData>({ mode: "onChange" });
 
   const onSubmit = async (data: FormData) => {
-    if (nickCheck == "") {
+    if (nickCheck === "") {
       Swal.fire({
         text: "닉네임 중복확인이 필요합니다",
         confirmButtonText: "확인",
@@ -287,7 +284,7 @@ const Signup = () => {
                 matchPassword: (value: number) => {
                   console.log("인증", certificationNum);
                   console.log("value", value);
-                  return certificationNum == value || "인증번호가 일치하지 않습니다.";
+                  return certificationNum === value || "인증번호가 일치하지 않습니다.";
                 },
               },
             })}
