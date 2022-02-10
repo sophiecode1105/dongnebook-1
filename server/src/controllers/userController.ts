@@ -80,7 +80,7 @@ export const nickCheck = async (req: express.Request, res: express.Response) => 
 
 export const postJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { email, nickname, password, products } = req.body;
+    const { email, nickname, password } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 3);
 
@@ -90,10 +90,8 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
         admin: false,
         password: hashPassword,
         email,
-        products,
       },
     });
-
     return res.status(201).json({ message: "회원가입 완료", createUser, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
@@ -139,16 +137,33 @@ export const login = async (req: express.Request, res: express.Response) => {
 export const deleteJoin = async (req: express.Request, res: express.Response) => {
   try {
     const { token } = req.body;
-    let tokenInfo: {};
-    try {
-      tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
-    } catch {
-      return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
-    }
 
-    await client.user.delete({ where: { email: tokenInfo["email"] } });
-
-    return res.status(200).json({ message: "회원탈퇴 완료", state: true });
+    jwt.verify(
+      token,
+      process.env.ACCESS_SECRET,
+      async (err: jwt.JsonWebTokenError, decoded: string | jwt.JwtPayload) => {
+        try {
+          if (err) {
+            return res.status(500).json({ message: "로그인을 다시 해주세요." });
+          } else {
+            const deleteProduct = client.product.deleteMany({
+              where: {
+                userNickname: decoded["nickname"],
+              },
+            });
+            const deleteUser = client.user.delete({
+              where: {
+                email: decoded["email"],
+              },
+            });
+            await client.$transaction([deleteProduct, deleteUser]);
+            return res.status(200).json({ message: "회원탈퇴 완료", state: true });
+          }
+        } catch (err) {
+          return res.status(500).json({ message: "존재하지 않는 회원입니다.", err });
+        }
+      }
+    );
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
@@ -157,7 +172,7 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
     const { token } = req.body;
-    let tokenInfo: {};
+    let tokenInfo: string | jwt.JwtPayload;
     try {
       tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
     } catch {
