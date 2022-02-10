@@ -128,7 +128,7 @@ const Img = styled.img`
 type FormData = {
   nickname: string;
   email: string;
-  certification: number;
+  certification: string | undefined;
   password: string;
   password2: string;
 };
@@ -136,7 +136,7 @@ type FormData = {
 const Signup = () => {
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
-  const [certificationNum, setCertificationNum] = useState(0);
+  const [certificationNum, setCertificationNum] = useState<string | undefined>("");
 
   const {
     register,
@@ -210,7 +210,6 @@ const Signup = () => {
       const { email } = getValues();
       const certificationNumber = await postEmailcheck({ email });
       setCertificationNum(certificationNumber);
-
       if (!certificationNumber) {
         Swal.fire({
           text: "이미 가입된 회원입니다",
@@ -281,7 +280,7 @@ const Signup = () => {
             {...register("certification", {
               required: "인증번호를 입력해주세요",
               validate: {
-                matchPassword: (value: number) => {
+                matchPassword: (value: string | undefined) => {
                   console.log("인증", certificationNum);
                   console.log("value", value);
                   return certificationNum === value || "인증번호가 일치하지 않습니다.";

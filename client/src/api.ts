@@ -14,19 +14,29 @@ export const postNickcheck = async (body: Nick) => {
   }
 };
 
-type EmailCheck = { email: string };
-export const postEmailcheck = async (body: EmailCheck) => {
+type EmailCheckRequest = { email: string };
+type EmailCheckResponse = {
+  number: string | undefined;
+};
+export const postEmailcheck = async (body: EmailCheckRequest): Promise<string | undefined> => {
   try {
     const {
       data: { number },
-    } = await axios.post(`${URL}/user/certify`, body);
-    return number;
+    } = await axios.post<EmailCheckResponse>(`${URL}/user/certify`, body);
+    if (number !== undefined) {
+      return String(number);
+    }
   } catch (e) {
     console.error(e);
+    throw e;
   }
 };
 
-type Userinfo = { email: string; password: string; nickname?: string };
+interface Userinfo {
+  email: string;
+  password: string;
+  nickname?: string;
+}
 
 export const postSignup = async (body: Userinfo) => {
   try {
@@ -42,12 +52,16 @@ export const postSignup = async (body: Userinfo) => {
   }
 };
 
+interface LoginInfo extends Userinfo {
+  keep: boolean;
+}
+
 type A = { id: number | undefined; admin: boolean | undefined };
-export const postSignin = async (body: Userinfo): Promise<A> => {
+export const postSignin = async (body: LoginInfo): Promise<A> => {
   try {
     const {
       data: {
-        createUser: { id, admin },
+        userInfo: { id, admin },
       },
     } = await axios.post(`${URL}/user/login`, body);
     return { id, admin };
