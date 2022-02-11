@@ -8,7 +8,7 @@ export const postCertify = async (req: express.Request, res: express.Response) =
   try {
     const { email, nickname, password } = req.body;
     if (!email || !nickname || !password) {
-      return res.status(400).json({ message: "이메일 또는 닉네임, 비밀번호를 모두 입력해주세요.", state: false });
+      return res.status(400).json({ message: "이메일을 입력해주세요.", state: false });
     }
     const existUser = await client.user.findUnique({
       where: {
@@ -118,7 +118,7 @@ export const login = async (req: express.Request, res: express.Response) => {
           },
           process.env.ACCESS_SECRET,
           {
-            expiresIn: "5h",
+            expiresIn: "24h",
           }
         );
         delete userInfo.password;
