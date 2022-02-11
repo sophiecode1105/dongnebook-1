@@ -18,7 +18,7 @@ const Container = styled.div`
 `;
 
 const SignupBox = styled.div`
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
   width: 100%;
 `;

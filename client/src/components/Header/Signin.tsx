@@ -19,7 +19,7 @@ const Container = styled.div`
 
 const LoginBox = styled.div`
   width: 100%;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
 `;
 
@@ -105,7 +105,7 @@ const Signup = styled(Link)`
 `;
 
 const ButtonContainer = styled.div`
-  max-width: 280px;
+  /* max-width: 280px; */
   width: 100%;
   height: 200px;
   display: flex;
