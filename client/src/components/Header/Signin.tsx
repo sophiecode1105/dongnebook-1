@@ -14,7 +14,7 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 180px;
+  padding-top: 70px;
 `;
 
 const LoginBox = styled.div`
@@ -24,7 +24,6 @@ const LoginBox = styled.div`
 `;
 
 const LoginTitle = styled.div`
-  /* border: 1px solid blue; */
   color: black;
   font-weight: bold;
   font-size: 23px;
@@ -46,12 +45,10 @@ interface ErrorProps {
 const LoginInput = styled.input<ErrorProps>`
   width: 100%;
   text-decoration: none;
-  /* margin-bottom: 1px; */
   border: none;
   padding: 20px 20px;
   font-size: 15px;
   border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
-  /* margin: 10px; */
   &:focus {
     outline: none;
   }
@@ -87,7 +84,6 @@ const LoginState = styled.div<CheckProps>`
   width: 100%;
   padding-bottom: 10px;
   margin-bottom: 30px;
-  /* border-bottom: 1px solid rgba(0, 0, 0, 0.2); */
   color: grey;
   i {
     color: ${(props) => (props.check ? "green" : null)};
@@ -183,7 +179,6 @@ const Signin = () => {
     }
   };
   const handlelogin = async (e: any) => {
-    // e.preventDefault();
     try {
       const id = await getUser();
       if (id) {
@@ -207,14 +202,14 @@ const Signin = () => {
     message: "8자이상 / 영문 / 숫자 / 특수문자를 조합해주세요",
   };
   return (
-    <Container>
+    <Container className='px-5'>
       <LoginBox>
         <LoginTitle>로그인</LoginTitle>
       </LoginBox>
       <LoginForm onSubmit={handleSubmit(handlelogin)}>
         <LoginInput
-          type="text"
-          placeholder="이메일"
+          type='text'
+          placeholder='이메일'
           error={errors.email?.message}
           {...register("email", {
             required: "이메일을 입력해주세요",
@@ -223,8 +218,8 @@ const Signin = () => {
         />
         <Errorbox>{errors.email?.message}</Errorbox>
         <LoginInput
-          type="password"
-          placeholder="비밀번호"
+          type='password'
+          placeholder='비밀번호'
           error={errors.password?.message}
           {...register("password", {
             required: "비밀번호를 입력해주세요",
@@ -235,22 +230,26 @@ const Signin = () => {
             },
           })}
         />
-        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
+        {invalid ? (
+          <Errorbox>{errors.password?.message}</Errorbox>
+        ) : (
+          <Errorbox>{infoCheck}</Errorbox>
+        )}
         <LoginState check={keep}>
-          <i onClick={handleCheckChange} className="far fa-check-circle"></i>
+          <i onClick={handleCheckChange} className='far fa-check-circle'></i>
           &nbsp; 로그인 상태 유지
         </LoginState>
-        <LoginButton type="submit">로그인</LoginButton>
+        <LoginButton type='submit'>로그인</LoginButton>
       </LoginForm>
 
-      <Signup to="/signup">회원가입</Signup>
+      <Signup to='/signup'>회원가입</Signup>
       <ButtonContainer>
         <OauthButton>
-          <i className="fab fa-google"></i>
+          <i className='fab fa-google'></i>
           Google로 로그인
         </OauthButton>
         <OauthButton>
-          <i className="fab fa-github"></i>
+          <i className='fab fa-github'></i>
           Github로 로그인
         </OauthButton>
       </ButtonContainer>
