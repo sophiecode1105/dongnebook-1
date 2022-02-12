@@ -1,8 +1,10 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useForm, ValidationRule } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
+import { contentStorage, imageStorage, titleStorage } from "../../state";
 
 const DisplayRow = styled.div`
   display: flex;
@@ -220,21 +222,31 @@ type FormData = {
 
 const Upload = () => {
   const [imgList, setImgList] = useState<string[]>([]);
+  const setTitle = useSetRecoilState(titleStorage);
+  const setContent = useSetRecoilState(contentStorage);
+  const setImg = useSetRecoilState(imageStorage);
 
   const {
     register,
     getValues,
     watch,
+    handleSubmit,
     formState: { errors },
   } = useForm<FormData>({ mode: "onChange" });
   const { title } = watch();
   const { content } = watch();
 
   console.log(content);
+  const onSubmit = () => {
+    const { title, content, img } = getValues();
+    setTitle(title);
+    setContent(content);
+    setImg(img);
+  };
 
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <TitleBox>
           <Title>도서 등록</Title>
         </TitleBox>

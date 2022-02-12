@@ -14,3 +14,18 @@ export const adminState = atom({
   key: "admin",
   default: false,
 });
+
+export const titleStorage = atom({
+  key: "title",
+  default: "",
+});
+
+export const contentStorage = atom({
+  key: "title",
+  default: "",
+});
+
+export const imageStorage = atom({
+  key: "title",
+  default: {},
+});
