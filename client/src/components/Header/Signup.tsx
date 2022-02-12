@@ -10,17 +10,19 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
   width: 100%;
-  margin: 0 auto;
-  padding-top: 120px;
   max-width: 360px;
+  margin: auto;
+  padding-top: 20px;
 `;
 
 const SignupBox = styled.div`
   border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
   width: 100%;
+  margin-bottom: 10px;
 `;
 
 const SignupTitle = styled.div`
@@ -33,7 +35,6 @@ const SignupForm = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px 0px;
   width: 100%;
   background-color: white;
 `;
@@ -44,7 +45,6 @@ interface ErrorProps {
 
 const Input = styled.input<ErrorProps>`
   text-decoration: none;
-  margin-bottom: 20px;
   border: none;
   padding: 20px 20px;
   font-size: 15px;
@@ -56,10 +56,12 @@ const Input = styled.input<ErrorProps>`
 
 const NarrowInput = styled(Input)`
   width: 80%;
+  border-radius: 5px;
 `;
 
 const WideInput = styled(Input)`
   width: 100%;
+  border-radius: 5px;
 `;
 
 const Label = styled.label`
@@ -74,6 +76,7 @@ const Wrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const Button = styled.button`
@@ -91,14 +94,17 @@ const Button = styled.button`
 `;
 
 const NarrowButton = styled(Button)`
-  width: 18%;
   font-size: 15px;
-  padding: 3px;
+  border-radius: 5px;
+  transition: 0.3s;
+  padding: 0 5px;
 `;
 
 const SignupButton = styled(Button)`
   width: 100%;
   font-size: 20px;
+  border-radius: 5px;
+  transition: 0.3s;
 `;
 
 interface Nickprops {
@@ -119,8 +125,8 @@ const InputContainer = styled.div`
 
 const Img = styled.img`
   position: absolute;
-  top: 14px;
-  left: 315px;
+  top: 15px;
+  right: 1px;
   width: 38px;
   height: 38px;
 `;
@@ -136,7 +142,9 @@ type FormData = {
 const Signup = () => {
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
-  const [certificationNum, setCertificationNum] = useState<string | undefined>("");
+  const [certificationNum, setCertificationNum] = useState<string | undefined>(
+    ""
+  );
 
   const {
     register,
@@ -230,7 +238,7 @@ const Signup = () => {
   };
 
   return (
-    <Container>
+    <Container className='px-2'>
       <SignupBox>
         <SignupTitle>회원가입</SignupTitle>
       </SignupBox>
@@ -238,7 +246,7 @@ const Signup = () => {
         <Label>닉네임</Label>
         <Wrap>
           <NarrowInput
-            type="text"
+            type='text'
             error={errors.nickname?.message}
             {...register("nickname", {
               required: "닉네임을 입력해주세요",
@@ -252,22 +260,24 @@ const Signup = () => {
               shouldUnregister: true,
             })}
           />
-          <NarrowButton type="button" onClick={getNick}>
+          <NarrowButton type='button' onClick={getNick}>
             중복확인
           </NarrowButton>
         </Wrap>
-        <Errorbox nickValid={nickValid}>{errors.nickname?.message ? errors.nickname.message : nickCheck}</Errorbox>
+        <Errorbox nickValid={nickValid}>
+          {errors.nickname?.message ? errors.nickname.message : nickCheck}
+        </Errorbox>
         <Label>이메일</Label>
         <Wrap>
           <NarrowInput
-            type="text"
+            type='text'
             error={errors.email?.message}
             {...register("email", {
               required: "이메일을 입력해주세요",
               pattern: myPattern,
             })}
           />
-          <NarrowButton type="button" onClick={postEmail}>
+          <NarrowButton type='button' onClick={postEmail}>
             인증요청
           </NarrowButton>
         </Wrap>
@@ -275,15 +285,16 @@ const Signup = () => {
         <Label>인증번호</Label>
         <InputContainer>
           <WideInput
-            type="text"
+            type='text'
             error={errors.certification?.message}
             {...register("certification", {
               required: "인증번호를 입력해주세요",
               validate: {
                 matchPassword: (value: string | undefined) => {
-                  console.log("인증", certificationNum);
-                  console.log("value", value);
-                  return certificationNum === value || "인증번호가 일치하지 않습니다.";
+                  return (
+                    certificationNum === value ||
+                    "인증번호가 일치하지 않습니다."
+                  );
                 },
               },
             })}
@@ -293,7 +304,7 @@ const Signup = () => {
         <Label>비밀번호</Label>
         <InputContainer>
           <WideInput
-            type="password"
+            type='password'
             error={errors.password?.message}
             {...register("password", {
               required: "비밀번호를 입력해주세요",
@@ -306,7 +317,7 @@ const Signup = () => {
         <Label>비밀번호 재확인</Label>
         <InputContainer>
           <WideInput
-            type="password"
+            type='password'
             error={errors.password2?.message}
             {...register("password2", {
               required: "비밀번호를 입력해주세요",
@@ -321,7 +332,7 @@ const Signup = () => {
           <Img src={lockcheck} />
         </InputContainer>
         <Errorbox>{errors.password2?.message}</Errorbox>
-        <SignupButton type="submit">가입하기</SignupButton>
+        <SignupButton type='submit'>가입하기</SignupButton>
       </SignupForm>
     </Container>
   );
