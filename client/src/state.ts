@@ -14,3 +14,8 @@ export const adminState = atom({
   key: "admin",
   default: false,
 });
+
+export const headerState = atom({
+  key: "header",
+  default: false,
+});
