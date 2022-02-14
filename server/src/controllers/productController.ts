@@ -30,7 +30,7 @@ export const postProduct = async (req: express.Request, res: express.Response) =
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
 
-    if (title && req.files[0] && content && quality) {
+    if (title && req.files[0].location && content && quality) {
       const productInfo = await client.product.create({
         data: {
           title,

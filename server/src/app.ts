@@ -58,6 +58,7 @@ io.on("connection", (socket) => {
     // console.log("방입장하기:", socket.rooms);
     // io.emit("receive message", { name: item.name, message: item.message });
   });
+
   socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
     console.log("방번호:", room);
 
