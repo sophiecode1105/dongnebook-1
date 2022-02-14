@@ -7,8 +7,10 @@ import productRouter from "./router/productRouter";
 import locationRouter from "./router/locationRouter";
 import chatroomRouter from "./router/chatroomRouter";
 import http from "http";
-import { Server } from "socket.io";
+
 import { instrument } from "@socket.io/admin-ui";
+import { SocketOptions } from "dgram";
+const socketIo = require("socket.io");
 const app = express();
 const logger = morgan("dev");
 app.use(cookieParser());
@@ -20,6 +22,7 @@ app.use(express.json());
 //   secure: boolean;
 //   sameSite: string;
 // }
+
 app.use(
   cors({
     origin: true,
@@ -30,60 +33,42 @@ app.use(
 
 app.use(logger);
 
-const httpServer = http.createServer(app);
-const wsServer = new Server(httpServer, {
+const server = http.createServer(app);
+const io = socketIo(server, {
   cors: {
-    origin: ["https://admin.socket.io"],
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
     credentials: true,
   },
 });
 
-instrument(wsServer, {
+instrument(io, {
   auth: false,
 });
 
-function publicRooms() {
-  const {
-    sockets: {
-      adapter: { sids, rooms },
-    },
-  } = wsServer;
-
-  const publicRooms = [];
-  rooms.forEach((_, key) => {
-    if (sids.get(key) === undefined) {
-      publicRooms.push(key);
-    }
-  });
-  return publicRooms;
-}
-function countRoom(roomName) {
-  return wsServer.sockets.adapter.rooms.get(roomName)?.size;
-}
-
-wsServer.on("connection", (socket) => {
-  socket["nickname"] = "Guest";
-  socket.onAny((event) => {
-    console.log(wsServer.sockets.adapter);
+io.on("connection", (socket) => {
+  socket.onAny((event: SocketOptions) => {
     console.log(`Socket Event : ${event}`);
   });
-  socket.on("enter_room", (roomName, done) => {
+  socket.on("enter_room", (roomName: number) => {
+    // console.log("방입장하기:", socket.id);
+    // console.log("방입장하기:", socket.rooms);
     socket.join(roomName);
-    done();
-    socket.to(roomName).emit("welcome", socket["nickname"], countRoom(roomName));
-    wsServer.sockets.emit("room_change", publicRooms());
+    socket.to(roomName).emit("welcome");
+    // console.log("방입장하기:", socket.rooms);
+    // io.emit("receive message", { name: item.name, message: item.message });
   });
-  socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("Bye", socket["nickname"], countRoom(room) - 1));
-  });
-  socket.on("disconnect", () => {
-    wsServer.sockets.emit("room_change", publicRooms());
-  });
-  socket.on("new_message", (msg, roomName, done) => {
-    socket.to(roomName).emit("new_message", `${socket["nickname"]}: ${msg}`);
+  socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
+    console.log("방번호:", room);
+
+    socket.to(room).emit("receive_message", name, value, date);
+    console.log("이름", name, "내용", value);
     done();
   });
-  socket.on("nickname", (nickanme) => (socket["nickname"] = nickanme));
+
+  socket.on("disconnect", function () {
+    console.log("user disconnected: ", socket.id);
+  });
 });
 
 app.use("/location", locationRouter);
@@ -91,6 +76,4 @@ app.use("/user", userRouter);
 app.use("/product", productRouter);
 
 app.use("/chatroom", chatroomRouter);
-// db.sequelize.sync();
-
-export default app;
+export default server;
