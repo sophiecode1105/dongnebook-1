@@ -172,10 +172,11 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.body;
+    const { token } = req.headers;
+
     let tokenInfo: string | jwt.JwtPayload;
     try {
-      tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
+      tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
       return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
     }
