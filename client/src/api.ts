@@ -18,7 +18,9 @@ type EmailCheckRequest = { email: string };
 type EmailCheckResponse = {
   number: string | undefined;
 };
-export const postEmailcheck = async (body: EmailCheckRequest): Promise<string | undefined> => {
+export const postEmailcheck = async (
+  body: EmailCheckRequest
+): Promise<string | undefined> => {
   try {
     const {
       data: { number },
@@ -40,12 +42,7 @@ interface Userinfo {
 
 export const postSignup = async (body: Userinfo) => {
   try {
-    const {
-      data: {
-        createUser: { id },
-      },
-    } = await axios.post(`${URL}/user/join`, body);
-    return id;
+    await axios.post(`${URL}/user/join`, body);
   } catch (e) {
     console.error(e);
     throw e;
@@ -56,15 +53,39 @@ interface LoginInfo extends Userinfo {
   keep: boolean;
 }
 
-type A = { id: number | undefined; admin: boolean | undefined };
-export const postSignin = async (body: LoginInfo): Promise<A> => {
+type User = {
+  token: string;
+  userInfo: {
+    id: number;
+    nickname: string;
+    email: string;
+    img: string;
+    admin: boolean;
+  };
+};
+
+export const postSignin = async (body: LoginInfo): Promise<User> => {
   try {
     const {
-      data: {
-        userInfo: { id, admin },
-      },
+      data: { userInfo, token },
     } = await axios.post(`${URL}/user/login`, body);
-    return { id, admin };
+    delete userInfo.password;
+    return { userInfo, token };
+  } catch (e) {
+    throw e;
+  }
+};
+export const getUserInfo = async (token: string | null) => {
+  try {
+    if (token) {
+      const {
+        data: { userInfo },
+      } = await axios.get(`${URL}/user/mypage`, {
+        headers: { token },
+      });
+      return userInfo;
+    }
+    return {};
   } catch (e) {
     throw e;
   }
