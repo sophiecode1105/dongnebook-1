@@ -6,5 +6,5 @@ import { instrument } from "@socket.io/admin-ui";
 // import WebSocket from "ws";
 
 export const getchatroom = async (req: express.Request, res: express.Response) => {
-  const app = express();
+  "채팅방";
 };
