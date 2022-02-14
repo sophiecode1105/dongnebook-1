@@ -45,7 +45,6 @@ export const postCertify = async (req: express.Request, res: express.Response) =
         padding: 20px;
         box-shadow: 1px 1px 3px 0px #999;
         '>
-        
         인증번호는 ${number} 입니다.
         <br/><br/><br/><br/></div>`,
       });

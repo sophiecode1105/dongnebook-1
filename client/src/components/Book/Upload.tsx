@@ -1,8 +1,24 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useForm, ValidationRule } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { NavLink } from "react-router-dom";
-import { useEffect } from "react";
+import {
+  contentStorage,
+  currentLocationStorage,
+  imageStorage,
+  mapResultsStorage,
+  searchLocation,
+  titleStorage,
+} from "../../state";
+import Swal from "sweetalert2";
+import Map from "./Map";
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 const DisplayRow = styled.div`
   display: flex;
@@ -24,13 +40,18 @@ const Wrap = styled.div`
 `;
 
 const Container = styled(DisplayColumn)`
+  justify-content: center;
   height: 100vh;
   width: 100%;
-  padding-top: 120px;
+  padding-top: 100px;
   max-width: 1200px;
 `;
 
-const Form = styled(DisplayColumn)`
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
   width: 80%;
   height: 100%;
   padding: 20px;
@@ -93,6 +114,7 @@ const Label = styled.label`
   flex-direction: column;
   align-items: center;
   position: relative;
+  z-index: 1;
 
   width: 150px;
   height: 150px;
@@ -121,11 +143,11 @@ interface ErrorProps {
 
 const Input = styled.input<ErrorProps>`
   text-decoration: none;
-  border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   width: 100%;
   padding: 8px;
   &:focus {
-    outline: none;
+    outline-color: ${(props) => (props.error ? "red" : "green")};
   }
 `;
 
@@ -145,9 +167,9 @@ const TitleLength = styled(DisplayRow)`
 const Textarea = styled.textarea<ErrorProps>`
   height: 200px;
   width: 95%;
-  border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   &:focus {
-    outline: none;
+    outline-color: ${(props) => (props.error ? "red" : "green")};
   }
 `;
 
@@ -205,36 +227,115 @@ const CheckBox = styled.input`
 `;
 
 const Checklabel = styled.label`
-  /* border: 1px solid red; */
   margin-right: 10px;
   color: grey;
 `;
+const LocationWrap = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
 
+const SearchBar = styled.input`
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  /* border-radius: 10px; */
+  width: 60%;
+  padding: 8px;
+  &:focus {
+    outline-color: green;
+    /* border-bottom: 2px solid rgba(0, 0, 0, 0.2); */
+  }
+`;
+
+const SearchButton = styled.button`
+  /* height: 40px; */
+  cursor: pointer;
+  background-color: #2f6218;
+  border: 0;
+  outline: 0;
+  color: rgb(242, 242, 242, 0.9);
+  font-weight: 500;
+  &:hover {
+    background-color: rgba(47, 98, 24, 0.8);
+  }
+  font-size: 15px;
+  transition: 0.3s;
+  padding: 0 15px;
+  i {
+    color: white;
+    font-size: 18px;
+  }
+`;
+
+const CheckBoxWrap = styled.div``;
+const SearchBox = styled.div`
+  display: flex;
+  position: relative;
+`;
+const IconBox = styled.div`
+  position: absolute;
+
+  i {
+    color: rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    padding: 10px;
+  }
+`;
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
   img: FileList;
   title: string;
   content: string;
-  quality: string;
+  quality: string | null;
+  location: string;
 };
 
 const Upload = () => {
   const [imgList, setImgList] = useState<string[]>([]);
+  const setTitle = useSetRecoilState(titleStorage);
+  const setContent = useSetRecoilState(contentStorage);
+  const setImg = useSetRecoilState(imageStorage);
+  const setLocation = useSetRecoilState(searchLocation);
+  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
+  const mapSearchResults = useRecoilValue(mapResultsStorage);
 
   const {
     register,
     getValues,
     watch,
+    handleSubmit,
     formState: { errors },
   } = useForm<FormData>({ mode: "onChange" });
+
   const { title } = watch();
   const { content } = watch();
 
-  console.log(content);
+  const onSubmit = () => {
+    const { title, content, img, quality, location } = getValues();
+    if (quality === null) {
+      return Swal.fire({
+        text: "상품 상태를 선택해주세요",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#2f6218",
+        icon: "warning",
+      });
+    }
+
+    console.log(quality);
+    setTitle(title);
+    setContent(content);
+    setImg(img);
+  };
+
+  const searchPlace = async () => {
+    const { location } = getValues();
+    setLocation(location);
+  };
 
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <TitleBox>
           <Title>도서 등록</Title>
         </TitleBox>
@@ -249,7 +350,7 @@ const Upload = () => {
                 placeholder="도서명을 입력해주세요."
                 error={errors.title?.message}
                 {...register("title", {
-                  minLength: { value: 2, message: "최소 2자 이상 입력해주세요" },
+                  required: "제목을 입력해주세요",
                   maxLength: { value: 20, message: "최대 20자 이하로 입력해주세요" },
                 })}
               />
@@ -263,12 +364,17 @@ const Upload = () => {
             <InformTitle>상태</InformTitle>
           </InformBox>
           <Uploads>
-            <CheckBox type="radio" name="check" id="new"></CheckBox>
-            <Checklabel htmlFor="new">새상품같음</Checklabel>
-            <CheckBox type="radio" name="check" id="notnew"></CheckBox>
-            <Checklabel htmlFor="notnew">약간헌책</Checklabel>
-            <CheckBox type="radio" name="check" id="dirty"></CheckBox>
-            <Checklabel htmlFor="dirty">많이헌책</Checklabel>
+            <InputBox>
+              <CheckBoxWrap>
+                <CheckBox type="radio" id="new" value="새상품같음" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="new">새상품같음</Checklabel>
+                <CheckBox type="radio" id="notnew" value="약간헌책" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="notnew">약간헌책</Checklabel>
+                <CheckBox type="radio" id="dirty" value="많이헌책" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="dirty">많이헌책</Checklabel>
+              </CheckBoxWrap>
+              <Errorbox>{errors.quality?.message}</Errorbox>
+            </InputBox>
           </Uploads>
         </UploadInform>
         <UploadInform>
@@ -293,13 +399,17 @@ const Upload = () => {
                   id="input_file"
                   type="file"
                   accept="image/*"
-                  placeholder="도서명을 입력해주세요."
                   multiple
                   {...register("img", {
                     onChange: (event) => {
                       let files = event.target.files;
                       if (imgList.length >= 3) {
-                        return alert("사진 첨부는 최대 3장까지 가능합니다.");
+                        return Swal.fire({
+                          text: "사진첨부는 최대 3장까지 가능합니다",
+                          confirmButtonText: "확인",
+                          confirmButtonColor: "#2f6218",
+                          icon: "warning",
+                        });
                       }
                       if (files && files.length) {
                         for (let i = 0; i < files.length; i++) {
@@ -319,7 +429,7 @@ const Upload = () => {
                   <div
                     style={{
                       display: "flex",
-                      border: "1px solid black",
+                      border: "1px solid #dcdbe3",
                       width: "150px",
                       height: "150px",
                       padding: "10px",
@@ -346,6 +456,7 @@ const Upload = () => {
                 placeholder="상품 설명을 입력해주세요.(10글자이상)"
                 error={errors.content?.message}
                 {...register("content", {
+                  required: "상품 설명을 입력해주세요.",
                   minLength: { value: 10, message: "상품 설명을 10자 이상 입력해주세요" },
                   maxLength: { value: 500, message: "상품 설명을 500자 이하 입력해주세요" },
                 })}
@@ -357,9 +468,54 @@ const Upload = () => {
             </InputBox>
           </Uploads>
         </UploadInform>
+        <UploadInform>
+          <InformBox>
+            <InformTitle>위치</InformTitle>
+          </InformBox>
+          <Uploads>
+            <LocationWrap>
+              <SearchBox>
+                <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                <SearchButton type="button" onClick={searchPlace}>
+                  <i className="fas fa-search"></i>
+                </SearchButton>
+              </SearchBox>
+              <div style={{ position: "relative" }}>
+                {mapSearchResults.map((searchResult: { address_name: string }) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        alert(`${searchResult.address_name} 으로 이동`);
+                        setCurrentLocation(searchResult);
+                        // recoil에 searchResult 저장
+                        /** searchResult 예
+                         * address_name: "서울 강남구 신사동 668-33"
+                         * category_group_code: "AT4"
+                         * category_group_name: "관광명소"
+                         * category_name: "여행 > 관광,명소 > 테마거리"
+                         * distance: ""
+                         * id: "7990409"
+                         * phone: "02-3445-6402"
+                         * place_name: "압구정로데오거리"
+                         * place_url: "http://place.map.kakao.com/7990409"
+                         * road_address_name: ""
+                         * x: "127.039152029523"
+                         * y: "37.5267558230172"
+                         **/
+                      }}
+                    >
+                      {searchResult?.address_name}
+                    </div>
+                  );
+                })}
+              </div>
+              <Map />
+            </LocationWrap>
+          </Uploads>
+        </UploadInform>
         <ButtonBox>
           <CancelButton>취소</CancelButton>
-          <RegisterButton>다음</RegisterButton>
+          <RegisterButton type="submit">등록</RegisterButton>
         </ButtonBox>
       </Form>
     </Container>

@@ -1,5 +1,12 @@
 import Routers from "./Routers";
 import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 const App = () => {
   useEffect(() => {
@@ -9,6 +16,7 @@ const App = () => {
     });
     return () => window.removeEventListener("beforeunload", () => alert("h"));
   }, []);
+
   return <Routers />;
 };
 
