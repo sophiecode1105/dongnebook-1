@@ -21,11 +21,26 @@ export const titleStorage = atom({
 });
 
 export const contentStorage = atom({
-  key: "title",
+  key: "content",
   default: "",
 });
 
 export const imageStorage = atom({
-  key: "title",
+  key: "image",
+  default: {},
+});
+
+export const searchLocation = atom({
+  key: "location",
+  default: "",
+});
+
+export const mapResultsStorage = atom({
+  key: "mapSearchResults",
+  default: [],
+});
+
+export const currentLocationStorage = atom({
+  key: "currentLocation",
   default: {},
 });

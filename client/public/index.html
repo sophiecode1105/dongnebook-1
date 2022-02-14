@@ -5,15 +5,44 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
+    <meta name="description" content="Web site created using create-react-app" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+      default-src 'self' 'unsafe-inline' https://dapi.kakao.com http://*.daumcdn.net http://dapi.kakao.com; 
+      script-src 'self' 'unsafe-eval' 'unsafe-inline' https://dapi.kakao.com http://dapi.kakao.com http://*.daumcdn.net https://use.fontawesome.com https://kit.fontawesome.com; 
+      img-src 'self' 'unsafe-inline' data: https://dapi.kakao.com http://dapi.kakao.com http://*.daumcdn.net; 
+      style-src 'self' 'unsafe-inline' https://*.fontawesome.com;
+      font-src 'self' 'unsafe-inline' data: https://*.fontawesome.com; 
+      connect-src 'self' 'unsafe-inline' https://dapi.kakao.com http://dapi.kakao.com https://*.fontawesome.com;"
+    />
+
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self' 'unsafe-inline' https://dapi.kakao.com http://dapi.kakao.com http://*.daumcdn.net; 
+      script-src 'self' 'unsafe-inline' https://dapi.kakao.com http://dapi.kakao.com http://*.daumcdn.net; 
+      img-src 'self' 'unsafe-inline' data: https://dapi.kakao.com http://dapi.kakao.com http://*.daumcdn.net;"
+    />
+
+    <script src="https://kit.fontawesome.com/234cd2d31a.js" crossorigin="anonymous"></script>
+    <!-- <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=%REACT_APP_KAKAO_API%"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=%REACT_APP_KAKAO_API%&libraries=LIBRARY"
+    ></script> -->
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=%REACT_APP_KAKAO_API%&libraries=services"
+    ></script>
+    <!-- <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=%REACT_APP_KAKAO_API%&libraries=services,clusterer,drawing"
+    ></script> -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -25,13 +54,9 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
-    <script
-      src="https://kit.fontawesome.com/234cd2d31a.js"
-      crossorigin="anonymous"
-    ></script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- <noscript>You need to enable JavaScript to run this app.</noscript> -->
     <div id="root"></div>
     <!--
       This HTML file is a template.

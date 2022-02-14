@@ -2,15 +2,32 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { loginState } from "../../state";
+import logo from "../../img/logo.png";
+import styled from "styled-components";
+
+const Wrap = styled.div`
+  width: 140px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const MainLogo = styled.img`
+  width: 100%;
+  height: 80%;
+`;
 
 const Header = () => {
   const [click, setClick] = useState(false);
   const [login, setLogin] = useRecoilState(loginState);
 
   return (
-    <div className="fixed top-0 left-0 bg-white header--shadow w-full">
+    <div className="fixed top-0 left-0 bg-white header--shadow w-full z-50">
       <header className="flex justify-between max-w-screen-xl m-auto w-full p-2">
-        <div>로고</div>
+        <Wrap>
+          <MainLogo src={logo} />
+        </Wrap>
         <nav className="md:flex hidden justify-center items-center">
           <Link to="/search" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
             <span className="text-sm font-bold text-center">검색</span>
@@ -66,7 +83,7 @@ const Header = () => {
           className="md:hidden fas fa-bars text-2xl hover:text-green-600 cursor-pointer transition duration-200"
         ></i>
         <nav
-          className={`md: justify-center items-centerhidden absolute right-0 top-8 bg-white w-full header--shadow -z-50 p-3 ${
+          className={`md: justify-center items-centerhidden absolute right-0 top-8 bg-white w-full header--shadow z-999 p-3 ${
             click ? "sidebar--slide" : "hidden"
           }`}
         >
