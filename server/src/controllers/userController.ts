@@ -117,7 +117,7 @@ export const login = async (req: express.Request, res: express.Response) => {
           },
           process.env.ACCESS_SECRET,
           {
-            expiresIn: "5h",
+            expiresIn: "24h",
           }
         );
         delete userInfo.password;
@@ -177,6 +177,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     } catch {
       return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
     }
+
     const userInfo = await client.user.findUnique({
       where: {
         email: tokenInfo["email"],
@@ -185,7 +186,9 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         products: true,
       },
     });
+
     delete userInfo.password;
+
     return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });

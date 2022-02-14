@@ -9,49 +9,70 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+
 model User {
   id        Int      @id @default(autoincrement())
   nickname  String   @unique
   admin     Boolean 
   email     String   @unique
-  password  String  
+  password  String? 
   products  Product[]
+  chatrooms Chatroom_User[]
   location  Location?
-
+  img       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
   id        Int      @id @default(autoincrement())
+  chatroom  Chatroom?
   title     String  
   img       String
   content   String
   quality   String
   exchanged  Boolean
-  user      User  @relation(fields: [userNickname], references: [nickname])
+  users     User  @relation(fields: [userNickname], references: [nickname])
   userNickname    String
   location  Location?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model Chatroom_User{
+  id        Int      @id @default(autoincrement())
+  chatrooms   Chatroom    @relation(fields: [chatroomId], references: [id])
+  chatroomId Int
+  users     User @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Chat {
   id        Int      @id @default(autoincrement())
-  chatroomId   Int   
-  userId    Int 
-  content   String
-  productId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-model Chatroom {
-  id        Int      @id @default(autoincrement())
-  title   String   
+  users  User @relation(fields: [userId], references: [id])
   userId  Int
+  content   String
+  read     Boolean @default (false)
+  productId Int
+  chatrooms Chatroom @relation(fields: [chatroomId], references: [id])
+  chatroomId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Chatroom {
+  id        Int      @id @default(autoincrement()) 
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  users     Chatroom_User[]  
+  chats     Chat[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Location {
   id        Int      @id @default(autoincrement())
   lat   Float   
@@ -63,6 +84,7 @@ model Location {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Notice {
   id        Int      @id @default(autoincrement())
   title   String   

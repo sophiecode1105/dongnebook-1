@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "@prisma/client": "^2.16.1",
+    "@socket.io/admin-ui": "^0.2.0",
+    "@types/aws-sdk": "^2.7.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
@@ -29,7 +31,11 @@
     "@types/fuzzy-search": "^2.1.2",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/morgan": "^1.9.3",
+    "@types/multer": "^1.4.7",
+    "@types/multer-s3": "^2.7.11",
     "@types/nodemailer": "^6.4.4",
+    "@types/socket.io": "^3.0.2",
+    "aws-sdk": "^2.1072.0",
     "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
@@ -42,9 +48,12 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.2",
     "prisma": "^2.16.1",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "socket.io": "^4.4.1",
+    "ws": "^8.5.0"
   }
 }
