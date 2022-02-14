@@ -2,7 +2,7 @@ import express from "express";
 import client from "../client";
 import FuzzySearch from "fuzzy-search";
 import { userFinder, verify } from "../token/verify";
-import jwt from "jsonwebtoken";
+
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { page } = req.body;
@@ -26,14 +26,15 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { title, img, content, quality, token } = req.body;
+    const { title, content, quality, token } = req.body;
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
-    if (title && img && content && quality) {
+
+    if (title && req.files[0] && content && quality) {
       const productInfo = await client.product.create({
         data: {
           title,
-          img,
+          img: req.files[0].location,
           content,
           quality,
           exchanged: true,
@@ -44,7 +45,8 @@ export const postProduct = async (req: express.Request, res: express.Response) =
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요." });
     }
-  } catch {
+  } catch (e) {
+    console.log(e);
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
 };
