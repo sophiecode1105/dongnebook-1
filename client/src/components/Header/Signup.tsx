@@ -10,17 +10,19 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
   width: 100%;
-  margin: 0 auto;
-  padding-top: 120px;
   max-width: 360px;
+  margin: auto;
+  padding-top: 20px;
 `;
 
 const SignupBox = styled.div`
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
   width: 100%;
+  margin-bottom: 10px;
 `;
 
 const SignupTitle = styled.div`
@@ -33,7 +35,6 @@ const SignupForm = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px 0px;
   width: 100%;
   background-color: white;
 `;
@@ -44,13 +45,12 @@ interface ErrorProps {
 
 const Input = styled.input<ErrorProps>`
   text-decoration: none;
-  margin-bottom: 20px;
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   &:focus {
-    outline: none;
+    outline-color: ${(props) => (props.error ? "red" : "green")};
   }
 `;
 
@@ -74,11 +74,11 @@ const Wrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const Button = styled.button`
   height: 60px;
-
   cursor: pointer;
   background-color: #2f6218;
   border: 0;
@@ -91,14 +91,15 @@ const Button = styled.button`
 `;
 
 const NarrowButton = styled(Button)`
-  width: 18%;
   font-size: 15px;
-  padding: 3px;
+  transition: 0.3s;
+  padding: 0 5px;
 `;
 
 const SignupButton = styled(Button)`
   width: 100%;
   font-size: 20px;
+  transition: 0.3s;
 `;
 
 interface Nickprops {
@@ -119,8 +120,8 @@ const InputContainer = styled.div`
 
 const Img = styled.img`
   position: absolute;
-  top: 14px;
-  left: 315px;
+  top: 15px;
+  right: 3px;
   width: 38px;
   height: 38px;
 `;
@@ -230,7 +231,7 @@ const Signup = () => {
   };
 
   return (
-    <Container>
+    <Container className="px-2">
       <SignupBox>
         <SignupTitle>회원가입</SignupTitle>
       </SignupBox>
@@ -281,8 +282,6 @@ const Signup = () => {
               required: "인증번호를 입력해주세요",
               validate: {
                 matchPassword: (value: string | undefined) => {
-                  console.log("인증", certificationNum);
-                  console.log("value", value);
                   return certificationNum === value || "인증번호가 일치하지 않습니다.";
                 },
               },

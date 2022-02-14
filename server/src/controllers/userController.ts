@@ -6,8 +6,8 @@ import bcrypt from "bcrypt";
 
 export const postCertify = async (req: express.Request, res: express.Response) => {
   try {
-    const { email, nickname, password } = req.body;
-    if (!email || !nickname || !password) {
+    const { email } = req.body;
+    if (!email) {
       return res.status(400).json({ message: "이메일을 입력해주세요.", state: false });
     }
     const existUser = await client.user.findUnique({
@@ -45,7 +45,6 @@ export const postCertify = async (req: express.Request, res: express.Response) =
         padding: 20px;
         box-shadow: 1px 1px 3px 0px #999;
         '>
-        <h2>${nickname}님, 안녕하세요.</h2> <br/> <h2>제목: 졸리죠</h2> <br/>자러가요 인증번호를 올바르게 입력해주세요.<br/>
         인증번호는 ${number} 입니다.
         <br/><br/><br/><br/></div>`,
       });
@@ -178,6 +177,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     } catch {
       return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
     }
+
     const userInfo = await client.user.findUnique({
       where: {
         email: tokenInfo["email"],
@@ -186,7 +186,9 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         products: true,
       },
     });
+
     delete userInfo.password;
+
     return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });

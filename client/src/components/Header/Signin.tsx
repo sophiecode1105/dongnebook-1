@@ -10,16 +10,17 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 180px;
+  padding-top: 20px;
 `;
 
 const LoginBox = styled.div`
   width: 100%;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
 `;
 
@@ -50,10 +51,10 @@ const LoginInput = styled.input<ErrorProps>`
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: 1px solid ${(props) => (props.error ? "red" : "rgba(0, 0, 0, 0.2)")};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   /* margin: 10px; */
   &:focus {
-    outline: none;
+    outline-color: ${(props) => (props.error ? "red" : "green")};
   }
 `;
 
@@ -105,7 +106,7 @@ const Signup = styled(Link)`
 `;
 
 const ButtonContainer = styled.div`
-  max-width: 280px;
+  /* max-width: 280px; */
   width: 100%;
   height: 200px;
   display: flex;
@@ -189,7 +190,6 @@ const Signin = () => {
       if (id) {
         localStorage.setItem("isLogin", String(true));
         setLoginStatus(true);
-
         navigate("/");
       }
     } catch (e) {

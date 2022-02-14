@@ -23,13 +23,13 @@ app.use(express.json());
 //   sameSite: string;
 // }
 
-// app.use(
-//   cors({
-//     origin: true,
-//     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: true,
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 app.use(logger);
 
@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
   socket.onAny((event: SocketOptions) => {
     console.log(`Socket Event : ${event}`);
   });
-  socket.on("enter_room", (roomName: string) => {
+  socket.on("enter_room", (roomName: number) => {
     // console.log("방입장하기:", socket.id);
     // console.log("방입장하기:", socket.rooms);
     socket.join(roomName);
@@ -57,13 +57,14 @@ io.on("connection", (socket) => {
     // console.log("방입장하기:", socket.rooms);
     // io.emit("receive message", { name: item.name, message: item.message });
   });
-  socket.on("new_message", (room: string, name: string, value: string, done: any) => {
+  socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
     console.log("방번호:", room);
 
-    socket.to(room).emit("receive_message", name, value);
+    socket.to(room).emit("receive_message", name, value, date);
     console.log("이름", name, "내용", value);
     done();
   });
+
   socket.on("disconnect", function () {
     console.log("user disconnected: ", socket.id);
   });
