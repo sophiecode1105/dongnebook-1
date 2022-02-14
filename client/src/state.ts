@@ -44,3 +44,8 @@ export const currentLocationStorage = atom({
   key: "currentLocation",
   default: {},
 });
+
+export const headerState = atom({
+  key: "header",
+  default: false,
+});

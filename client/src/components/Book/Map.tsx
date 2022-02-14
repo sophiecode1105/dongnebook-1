@@ -98,7 +98,7 @@ const Map = () => {
               : "";
             detailAddr += "<div>지번 주소 : " + result[0].address.address_name + "</div>";
 
-            var content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+            let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
             marker.setPosition(mouseEvent.latLng);
             marker.setMap(kakaoMap);
             console.log("위도경도는");
@@ -114,11 +114,11 @@ const Map = () => {
         // 좌표로 법정동 상세 주소 정보를 요청합니다
         geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
       }
-      console.log("setting map as", kakaoMap);
+      console.log("맵세팅해주는거", kakaoMap);
       setMap(kakaoMap);
     });
 
-    console.log("A is", a); // "a"
+    console.log("A는?", a); // "a"
 
     // 지도 중심좌표를 접속위치로 변경합니다
   }, []);

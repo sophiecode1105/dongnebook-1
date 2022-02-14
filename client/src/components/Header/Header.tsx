@@ -5,29 +5,14 @@ import { loginState } from "../../state";
 import logo from "../../img/logo.png";
 import styled from "styled-components";
 
-const Wrap = styled.div`
-  width: 140px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MainLogo = styled.img`
-  width: 100%;
-  height: 80%;
-`;
-
 const Header = () => {
   const [click, setClick] = useState(false);
   const [login, setLogin] = useRecoilState(loginState);
 
   return (
-    <div className="fixed top-0 left-0 bg-white header--shadow w-full z-50">
+    <div className="fixed top-0 left-0 bg-white header--shadow w-full z-10">
       <header className="flex justify-between max-w-screen-xl m-auto w-full p-2">
-        <Wrap>
-          <MainLogo src={logo} />
-        </Wrap>
+        <div>로고</div>
         <nav className="md:flex hidden justify-center items-center">
           <Link to="/search" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
             <span className="text-sm font-bold text-center">검색</span>

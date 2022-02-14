@@ -79,7 +79,6 @@ const Wrap = styled.div`
 
 const Button = styled.button`
   height: 60px;
-
   cursor: pointer;
   background-color: #2f6218;
   border: 0;

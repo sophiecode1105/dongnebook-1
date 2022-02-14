@@ -114,6 +114,7 @@ const Label = styled.label`
   flex-direction: column;
   align-items: center;
   position: relative;
+  z-index: 1;
 
   width: 150px;
   height: 150px;
