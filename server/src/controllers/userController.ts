@@ -3,6 +3,7 @@ import client from "../client";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { userFinder } from "../token/verify";
 
 export const postCertify = async (req: express.Request, res: express.Response) => {
   try {
@@ -79,19 +80,28 @@ export const nickCheck = async (req: express.Request, res: express.Response) => 
 
 export const postJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { email, nickname, password } = req.body;
+    const { email, nickname, password, lat, lon } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 3);
 
-    const createUser = await client.user.create({
+    await client.location.create({
       data: {
-        nickname,
-        admin: false,
-        password: hashPassword,
-        email,
+        lat,
+        lon,
+        users: {
+          create: {
+            nickname,
+            admin: false,
+            password: hashPassword,
+            email,
+          },
+        },
       },
     });
-    return res.status(201).json({ message: "회원가입 완료", createUser, state: true });
+
+    const User = await userFinder(email);
+
+    return res.status(201).json({ message: "회원가입 완료", User, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
@@ -170,10 +180,10 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.body;
+    const { token } = req.headers;
     let tokenInfo: string | jwt.JwtPayload;
     try {
-      tokenInfo = jwt.verify(token, process.env.ACCESS_SECRET);
+      tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
       return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
     }

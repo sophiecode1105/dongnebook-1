@@ -20,7 +20,8 @@ model User {
   products  Product[]
   chatrooms Chatroom_User[]
   chats     Chat[]
-  location  Location?
+  locations  Location  @relation(fields: [locationId], references: [id])
+  locationId Int
   img       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -28,15 +29,16 @@ model User {
 
 model Product {
   id        Int      @id @default(autoincrement())
-  chatroom  Chatroom?
+  chatrooms  Chatroom[]
   title     String  
   img       String?
   content   String
   quality   String
   exchanged  Boolean
-  users     User  @relation(fields: [userNickname], references: [nickname])
+  users     User      @relation(fields: [userNickname], references: [nickname])
   userNickname    String
-  location  Location?
+  locations  Location  @relation(fields: [locationId], references: [id])
+  locationId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -77,10 +79,8 @@ model Location {
   id        Int      @id @default(autoincrement())
   lat   Float   
   lon   Float
-  user      User  @relation(fields: [userId], references: [id])
-  userId    Int
-  product      Product  @relation(fields: [productId], references: [id])
-  productId    Int
+  users     User?
+  products  Product? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -5,13 +5,13 @@ import { userFinder, verify } from "../token/verify";
 
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { page } = req.body;
+    const { page } = req.query;
     const productLength = await client.product.findMany();
     const length = productLength.length;
     const allProductList = await client.product.findMany({
       take: 4,
       cursor: {
-        id: length - (page - 1) * 4,
+        id: length - (Number(page) - 1) * 4,
       },
       orderBy: {
         id: "desc",
@@ -31,17 +31,24 @@ export const postProduct = async (req: express.Request, res: express.Response) =
     const userInfo = await userFinder(data["email"]);
 
     if (title && req.files[0] && content && quality) {
-      const productInfo = await client.product.create({
-        data: {
-          title,
-          img: req.files[0].location,
-          content,
-          quality,
-          exchanged: true,
-          userNickname: userInfo.nickname,
-        },
-      });
-      return res.status(201).json({ message: "도서 업로드 성공", productInfo });
+      // const productInfo = await client.product.create({
+      // data: {
+      //   // location: {
+      //   //   create: {
+      //   //     lat: 2.1,
+      //   //     lon: 3.2,
+      //   //     userId: null,
+      //   //   },
+      //   // },
+      //   title,
+      //   img: req.files[0].location,
+      //   content,
+      //   quality,
+      //   exchanged: true,
+      //   userNickname: userInfo.nickname,
+      // },
+      // });
+      // return res.status(201).json({ message: "도서 업로드 성공", productInfo });
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요." });
     }

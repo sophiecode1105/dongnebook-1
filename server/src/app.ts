@@ -73,6 +73,5 @@ io.on("connection", (socket) => {
 app.use("/location", locationRouter);
 app.use("/user", userRouter);
 app.use("/product", productRouter);
-
 app.use("/chatroom", chatroomRouter);
 export default server;
