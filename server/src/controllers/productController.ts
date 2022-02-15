@@ -84,15 +84,11 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
     const findId = Number(id);
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
-    console.log("유저인포성공");
-    console.log(userInfo);
     const productInfo = await client.product.findMany({
       where: {
         userNickname: userInfo.nickname,
       },
     });
-    console.log("프로덕트인포");
-    console.log(productInfo);
     await client.location.update({
       where: {
         id: productInfo[0].locationId,
@@ -102,7 +98,6 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         lon: Number(lon),
       },
     });
-    console.log("프로덕트인포ㅎ후후후후");
 
     const updateProductInfo = await client.product.update({
       where: {
@@ -118,8 +113,6 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
       },
     });
 
-    console.log("업데이트프로덕인ㅍ");
-    console.log(updateProductInfo);
     return res.status(201).json({ message: "도서 정보 수정 성공", updateProductInfo });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
