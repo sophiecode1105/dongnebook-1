@@ -25,3 +25,11 @@ export async function userNickFinder(nickname: string) {
   });
   return userInfo;
 }
+export async function productFinder(locationId: number) {
+  const productInfo = await client.product.findMany({
+    where: {
+      locationId,
+    },
+  });
+  return productInfo;
+}

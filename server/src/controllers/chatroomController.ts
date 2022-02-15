@@ -15,19 +15,20 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
 
     const isFind = await client.chatroom.findMany({
       where: {
+        productId: Number(id),
         users: {
           some: {
             userId: userInfo.id,
           },
         },
-        productId: Number(id),
       },
     });
-
+    console.log("isFind");
+    console.log(isFind);
     if (isFind.length !== 0) {
       return res.status(201).json({ message: "채팅방이 이미 존재합니다", isFind, state: true });
     }
-
+    console.log("create@");
     await client.chatroom.create({
       data: {
         users: {
@@ -87,9 +88,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       },
     });
 
-    return res
-      .status(200)
-      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });

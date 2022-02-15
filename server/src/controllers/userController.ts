@@ -80,19 +80,28 @@ export const nickCheck = async (req: express.Request, res: express.Response) => 
 
 export const postJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { email, nickname, password } = req.body;
+    const { email, nickname, password, lat, lon } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 3);
 
-    const createUser = await client.user.create({
+    await client.location.create({
       data: {
-        nickname,
-        admin: false,
-        password: hashPassword,
-        email,
+        lat: Number(lat),
+        lon: Number(lon),
+        users: {
+          create: {
+            nickname,
+            admin: false,
+            password: hashPassword,
+            email,
+          },
+        },
       },
     });
-    return res.status(201).json({ message: "회원가입 완료", createUser, state: true });
+
+    const User = await userFinder(email);
+
+    return res.status(201).json({ message: "회원가입 완료", User, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
@@ -174,6 +183,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const { token } = req.headers;
 
     let tokenInfo: string | jwt.JwtPayload;
+    console.log(token);
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
@@ -199,21 +209,29 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { nickname, token } = req.body;
+    const { nickname, token, lat, lon } = req.body;
     const veriToken = verify(token);
 
-    await client.user.update({
+    const User = await client.user.update({
       where: {
         email: veriToken["email"],
       },
 
       data: {
         nickname,
-
         img: req.files[0] && req.files[0].location,
       },
     });
 
+    await client.location.update({
+      where: {
+        id: User.locationId,
+      },
+      data: {
+        lat: Number(lat),
+        lon: Number(lon),
+      },
+    });
     return res.status(200).json({ message: "마이페이지 수정 완료", state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
