@@ -86,8 +86,8 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
 
     await client.location.create({
       data: {
-        lat,
-        lon,
+        lat: Number(lat),
+        lon: Number(lon),
         users: {
           create: {
             nickname,
@@ -183,6 +183,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const { token } = req.headers;
 
     let tokenInfo: string | jwt.JwtPayload;
+    console.log(token);
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
@@ -208,21 +209,29 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { nickname, token } = req.body;
+    const { nickname, token, lat, lon } = req.body;
     const veriToken = verify(token);
 
-    await client.user.update({
+    const User = await client.user.update({
       where: {
         email: veriToken["email"],
       },
 
       data: {
         nickname,
-
         img: req.files[0] && req.files[0].location,
       },
     });
 
+    await client.location.update({
+      where: {
+        id: User.locationId,
+      },
+      data: {
+        lat: Number(lat),
+        lon: Number(lon),
+      },
+    });
     return res.status(200).json({ message: "마이페이지 수정 완료", state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
