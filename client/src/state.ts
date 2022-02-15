@@ -40,6 +40,16 @@ export const currentLocationStorage = atom({
   default: {},
 });
 
+export const currentLatitude = atom({
+  key: "currentLatitude",
+  default: 0,
+});
+
+export const currentLongtitude = atom({
+  key: "currentLongtitude",
+  default: 0,
+});
+
 export const headerState = atom({
   key: "header",
   default: false,
