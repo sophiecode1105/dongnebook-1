@@ -13,8 +13,6 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
     const userInfo = await userFinder(data["email"]);
     const otherInfo = await userNickFinder(writer);
 
-    console.log("isFind@@");
-
     const isFind = await client.chatroom.findMany({
       where: {
         productId: Number(id),

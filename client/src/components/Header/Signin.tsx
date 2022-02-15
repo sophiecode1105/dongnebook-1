@@ -3,19 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import { postSignin } from "../../api";
-import { useSetRecoilState } from "recoil";
-import { adminState, loginState, userId } from "../../state";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { loginState, userState } from "../../state";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 20px;
+  padding-top: 66px;
 `;
 
 const LoginBox = styled.div`
@@ -25,7 +24,6 @@ const LoginBox = styled.div`
 `;
 
 const LoginTitle = styled.div`
-  /* border: 1px solid blue; */
   color: black;
   font-weight: bold;
   font-size: 23px;
@@ -47,12 +45,11 @@ interface ErrorProps {
 const LoginInput = styled.input<ErrorProps>`
   width: 100%;
   text-decoration: none;
-  /* margin-bottom: 1px; */
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
-  /* margin: 10px; */
+  border: ${(props) =>
+    props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)"};
   &:focus {
     outline-color: ${(props) => (props.error ? "red" : "green")};
   }
@@ -88,7 +85,6 @@ const LoginState = styled.div<CheckProps>`
   width: 100%;
   padding-bottom: 10px;
   margin-bottom: 30px;
-  /* border-bottom: 1px solid rgba(0, 0, 0, 0.2); */
   color: grey;
   i {
     color: ${(props) => (props.check ? "green" : null)};
@@ -106,7 +102,6 @@ const Signup = styled(Link)`
 `;
 
 const ButtonContainer = styled.div`
-  /* max-width: 280px; */
   width: 100%;
   height: 200px;
   display: flex;
@@ -150,12 +145,11 @@ type FormData = {
 const Signin = () => {
   const navigate = useNavigate();
 
-  const [keep, setKeep] = useState(true);
-  const [invalid, setInvalid] = useState(true);
+  const [keep, setKeep] = useState<boolean>(true);
+  const [invalid, setInvalid] = useState<boolean>(true);
   const [infoCheck, setInfoCheck] = useState("");
-  const setUserId = useSetRecoilState(userId);
-  const setLoginStatus = useSetRecoilState(loginState);
-  const setAdminStatus = useSetRecoilState(adminState);
+  const setUser = useSetRecoilState(userState);
+  const setLogin = useSetRecoilState(loginState);
 
   const handleCheckChange = () => {
     setKeep(!keep);
@@ -171,27 +165,19 @@ const Signin = () => {
   const getUser = async () => {
     const { email, password } = getValues();
     try {
-      const { id, admin } = await postSignin({ email, password, keep });
-      localStorage.setItem("userId", String(id));
-      setUserId(String(id));
-      if (admin) {
-        localStorage.setItem("admin", String(admin));
-        setAdminStatus(true);
-      }
-      return id;
+      const { userInfo, token } = await postSignin({ email, password, keep });
+      setUser(userInfo);
+      setLogin(token);
+      localStorage.setItem("token", token);
+      navigate("/");
     } catch (e) {
       throw e;
     }
   };
+
   const handlelogin = async (e: any) => {
-    // e.preventDefault();
     try {
-      const id = await getUser();
-      if (id) {
-        localStorage.setItem("isLogin", String(true));
-        setLoginStatus(true);
-        navigate("/");
-      }
+      getUser();
     } catch (e) {
       setInfoCheck("이메일 혹은 비밀번호가 일치하지 않습니다");
       setInvalid(false);
@@ -235,7 +221,11 @@ const Signin = () => {
             },
           })}
         />
-        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
+        {invalid ? (
+          <Errorbox>{errors.password?.message}</Errorbox>
+        ) : (
+          <Errorbox>{infoCheck}</Errorbox>
+        )}
         <LoginState check={keep}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지

@@ -3,7 +3,7 @@ import client from "../client";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { userFinder } from "../token/verify";
+import { userFinder, verify } from "../token/verify";
 
 export const postCertify = async (req: express.Request, res: express.Response) => {
   try {
@@ -181,6 +181,7 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
     const { token } = req.headers;
+
     let tokenInfo: string | jwt.JwtPayload;
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
@@ -200,6 +201,29 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     delete userInfo.password;
 
     return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
+  } catch {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  }
+};
+
+export const putMypage = async (req: express.Request, res: express.Response) => {
+  try {
+    const { nickname, token } = req.body;
+    const veriToken = verify(token);
+
+    await client.user.update({
+      where: {
+        email: veriToken["email"],
+      },
+
+      data: {
+        nickname,
+
+        img: req.files[0] && req.files[0].location,
+      },
+    });
+
+    return res.status(200).json({ message: "마이페이지 수정 완료", state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }

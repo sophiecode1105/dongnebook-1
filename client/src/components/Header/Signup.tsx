@@ -5,17 +5,18 @@ import lock from "../../img/lock.png";
 import lockcheck from "../../img/lockcheck.png";
 import { postEmailcheck, postNickcheck, postSignup } from "../../api";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
   width: 100%;
   max-width: 360px;
   margin: auto;
-  padding-top: 20px;
+  padding-top: 66px;
+  padding-bottom: 10px;
 `;
 
 const SignupBox = styled.div`
@@ -48,7 +49,8 @@ const Input = styled.input<ErrorProps>`
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
+  border: ${(props) =>
+    props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)"};
   &:focus {
     outline-color: ${(props) => (props.error ? "red" : "green")};
   }
@@ -137,8 +139,10 @@ type FormData = {
 const Signup = () => {
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
-  const [certificationNum, setCertificationNum] = useState<string | undefined>("");
-
+  const [certificationNum, setCertificationNum] = useState<string | undefined>(
+    ""
+  );
+  const navigate = useNavigate();
   const {
     register,
     getValues,
@@ -165,10 +169,8 @@ const Signup = () => {
       return;
     } else {
       const { email, password, nickname } = getValues();
-      const id = await postSignup({ email, password, nickname });
-
-      localStorage.setItem("isLogin", String(true));
-      localStorage.setItem("userId", id);
+      await postSignup({ email, password, nickname });
+      navigate("/signin");
     }
   };
 
@@ -231,7 +233,7 @@ const Signup = () => {
   };
 
   return (
-    <Container className="px-2">
+    <Container>
       <SignupBox>
         <SignupTitle>회원가입</SignupTitle>
       </SignupBox>
@@ -257,7 +259,9 @@ const Signup = () => {
             중복확인
           </NarrowButton>
         </Wrap>
-        <Errorbox nickValid={nickValid}>{errors.nickname?.message ? errors.nickname.message : nickCheck}</Errorbox>
+        <Errorbox nickValid={nickValid}>
+          {errors.nickname?.message ? errors.nickname.message : nickCheck}
+        </Errorbox>
         <Label>이메일</Label>
         <Wrap>
           <NarrowInput
@@ -282,7 +286,10 @@ const Signup = () => {
               required: "인증번호를 입력해주세요",
               validate: {
                 matchPassword: (value: string | undefined) => {
-                  return certificationNum === value || "인증번호가 일치하지 않습니다.";
+                  return (
+                    certificationNum === value ||
+                    "인증번호가 일치하지 않습니다."
+                  );
                 },
               },
             })}

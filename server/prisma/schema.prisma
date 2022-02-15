@@ -14,7 +14,7 @@ generator client {
 model User {
   id        Int      @id @default(autoincrement())
   nickname  String   @unique
-  admin     Boolean 
+  admin     Boolean  @default(false)
   email     String   @unique
   password  String? 
   products  Product[]
@@ -34,8 +34,8 @@ model Product {
   img       String?
   content   String
   quality   String
-  exchanged  Boolean
-  users     User      @relation(fields: [userNickname], references: [nickname])
+  exchanged  Boolean @default(false)
+  users     User  @relation(fields: [userNickname], references: [nickname])
   userNickname    String
   locations  Location  @relation(fields: [locationId], references: [id])
   locationId Int
