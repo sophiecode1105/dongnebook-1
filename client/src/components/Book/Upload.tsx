@@ -1,11 +1,13 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue } from "recoil";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   contentStorage,
+  currentLatitude,
   currentLocationStorage,
+  currentLongtitude,
   imageStorage,
   mapResultsStorage,
   searchLocation,
@@ -13,6 +15,7 @@ import {
 } from "../../state";
 import Swal from "sweetalert2";
 import Map from "./Map";
+import { useEffect } from "react";
 
 declare global {
   interface Window {
@@ -41,9 +44,8 @@ const Wrap = styled.div`
 
 const Container = styled(DisplayColumn)`
   justify-content: center;
-  height: 100vh;
   width: 100%;
-  padding-top: 100px;
+  padding-top: 66px;
   max-width: 1200px;
 `;
 
@@ -54,7 +56,6 @@ const Form = styled.form`
   margin: 0 auto;
   width: 80%;
   height: 100%;
-  padding: 20px;
 `;
 
 const TitleBox = styled.div`
@@ -211,7 +212,21 @@ const RegisterButton = styled(Button)`
     background-color: rgba(47, 98, 24, 0.8);
   }
 `;
-const CancelButton = styled(Button)`
+const CancelButton = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 100px;
+  width: 20%;
+  height: 50px;
+  cursor: pointer;
+  font-size: 20px;
+  border: 0;
+  outline: 0;
+  color: rgb(242, 242, 242, 0.9);
+  font-weight: 500;
+  margin: 30px 30px;
   background-color: #b2b0b0;
   &:hover {
     background-color: rgba(178, 176, 176, 0.8);
@@ -234,6 +249,7 @@ const LocationWrap = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: reltative;
 `;
 
 const SearchBar = styled.input`
@@ -268,19 +284,30 @@ const SearchButton = styled.button`
   }
 `;
 
-const CheckBoxWrap = styled.div``;
-const SearchBox = styled.div`
-  display: flex;
+const SearchContainer = styled.div`
+  width: 100%;
   position: relative;
 `;
-const IconBox = styled.div`
-  position: absolute;
 
-  i {
-    color: rgba(0, 0, 0, 0.2);
-    font-size: 20px;
-    padding: 10px;
-  }
+const CheckBoxWrap = styled.div``;
+
+const SearchBox = styled.div`
+  display: flex;
+  width: 100%;
+`;
+const SearchResultBox = styled.div`
+  position: absolute;
+  width: 60%;
+  z-index: 20;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+`;
+
+const SearchResult = styled.div`
+  background-color: white;
+  padding: 2px;
+  cursor: pointer;
+
+  /* position: absolute; */
 `;
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
@@ -289,9 +316,12 @@ type FormData = {
   content: string;
   quality: string | null;
   location: string;
+  latitude: number;
+  longtitude: number;
 };
 
 const Upload = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [imgList, setImgList] = useState<string[]>([]);
   const setTitle = useSetRecoilState(titleStorage);
   const setContent = useSetRecoilState(contentStorage);
@@ -299,7 +329,10 @@ const Upload = () => {
   const setLocation = useSetRecoilState(searchLocation);
   const setCurrentLocation = useSetRecoilState(currentLocationStorage);
   const mapSearchResults = useRecoilValue(mapResultsStorage);
+  const latitude = useRecoilValue(currentLatitude);
+  const longtitude = useRecoilValue(currentLongtitude);
 
+  const side = useRef<HTMLDivElement>(null);
   const {
     register,
     getValues,
@@ -311,8 +344,16 @@ const Upload = () => {
   const { title } = watch();
   const { content } = watch();
 
-  const onSubmit = () => {
-    const { title, content, img, quality, location } = getValues();
+  // const postData = async () => {
+  //   const { title, content, img, quality } = getValues();
+  //   const formData = new FormData();
+  //   formData.append("title", title);
+  //   formData.append("cotent", content);
+  //   formData.append("file", img);
+  // };
+
+  const onSubmit = async () => {
+    const { quality } = getValues();
     if (quality === null) {
       return Swal.fire({
         text: "상품 상태를 선택해주세요",
@@ -321,17 +362,38 @@ const Upload = () => {
         icon: "warning",
       });
     }
+    try {
+      console.log("hi");
+      // await postData();
+    } catch (e) {
+      throw e;
+    }
 
     console.log(quality);
     setTitle(title);
     setContent(content);
-    setImg(img);
   };
 
   const searchPlace = async () => {
+    setIsOpen(!isOpen);
     const { location } = getValues();
     setLocation(location);
   };
+
+  const handleClickOutside = (event: CustomEvent<MouseEvent>) => {
+    console.log("작동되냐");
+    if (isOpen && !side?.current?.contains(event.target as Node)) {
+      console.log("외않되");
+      setIsOpen(!isOpen);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("click", handleClickOutside as EventListener);
+    return () => {
+      window.removeEventListener("click", handleClickOutside as EventListener);
+    };
+  }, [isOpen]);
 
   return (
     <Container>
@@ -382,68 +444,70 @@ const Upload = () => {
             <InformTitle>사진</InformTitle>
           </InformBox>
           <Uploads>
-            <div
-              style={{
-                // border: "1px solid blue",
-                display: "flex",
-                // border: "1px solid blue",
-                alignItems: "stretch",
-                justifyContent: "flex-start",
-                width: "100%",
-              }}
-            >
-              <Label htmlFor="input_file">
-                <i className="fas fa-camera"></i>
-                <ImgTitle>이미지 업로드</ImgTitle>
-                <ImgFile
-                  id="input_file"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  {...register("img", {
-                    onChange: (event) => {
-                      let files = event.target.files;
-                      if (imgList.length >= 3) {
-                        return Swal.fire({
-                          text: "사진첨부는 최대 3장까지 가능합니다",
-                          confirmButtonText: "확인",
-                          confirmButtonColor: "#2f6218",
-                          icon: "warning",
-                        });
-                      }
-                      if (files && files.length) {
-                        for (let i = 0; i < files.length; i++) {
-                          let reader = new FileReader();
-                          reader.onload = function () {
-                            setImgList((prev) => [...prev, String(reader.result)]);
-                          };
-                          reader.readAsDataURL(files[i]); // loadre\\ //////// <><><><><><><<>
+            <InputBox>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+              >
+                <Label htmlFor="input_file">
+                  <i className="fas fa-camera"></i>
+                  <ImgTitle>이미지 업로드</ImgTitle>
+                  <ImgFile
+                    id="input_file"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    {...register("img", {
+                      required: "이미지를 업로드해주세요",
+                      onChange: (event) => {
+                        let files = event.target.files;
+                        if (imgList.length >= 3) {
+                          return Swal.fire({
+                            text: "사진첨부는 최대 3장까지 가능합니다",
+                            confirmButtonText: "확인",
+                            confirmButtonColor: "#2f6218",
+                            icon: "warning",
+                          });
                         }
-                      }
-                    },
-                  })}
-                />
-              </Label>
-              {imgList.map((url) => {
-                return (
-                  <div
-                    style={{
-                      display: "flex",
-                      border: "1px solid #dcdbe3",
-                      width: "150px",
-                      height: "150px",
-                      padding: "10px",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginLeft: "20px",
-                      // margin: "10px",
-                    }}
-                  >
-                    <BookImg src={url}></BookImg>
-                  </div>
-                );
-              })}
-            </div>
+                        if (files && files.length) {
+                          for (let i = 0; i < files.length; i++) {
+                            let reader = new FileReader();
+                            reader.onload = function () {
+                              setImgList((prev) => [...prev, String(reader.result)]);
+                            };
+                            reader.readAsDataURL(files[i]); // loadre\\ //////// <><><><><><><<>
+                          }
+                        }
+                      },
+                    })}
+                  />
+                </Label>
+                {imgList.map((url) => {
+                  return (
+                    <div
+                      style={{
+                        display: "flex",
+                        border: "1px solid #dcdbe3",
+                        width: "150px",
+                        height: "150px",
+                        padding: "10px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: "20px",
+                        // margin: "10px",
+                      }}
+                    >
+                      <BookImg src={url}></BookImg>
+                    </div>
+                  );
+                })}
+              </div>
+              <Errorbox>{errors.img?.message}</Errorbox>
+            </InputBox>
           </Uploads>
         </UploadInform>
         <UploadInform>
@@ -474,47 +538,52 @@ const Upload = () => {
           </InformBox>
           <Uploads>
             <LocationWrap>
-              <SearchBox>
-                <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
-                <SearchButton type="button" onClick={searchPlace}>
-                  <i className="fas fa-search"></i>
-                </SearchButton>
-              </SearchBox>
-              <div style={{ position: "relative" }}>
-                {mapSearchResults.map((searchResult: { address_name: string }) => {
-                  return (
-                    <div
-                      onClick={() => {
-                        alert(`${searchResult.address_name} 으로 이동`);
-                        setCurrentLocation(searchResult);
-                        // recoil에 searchResult 저장
-                        /** searchResult 예
-                         * address_name: "서울 강남구 신사동 668-33"
-                         * category_group_code: "AT4"
-                         * category_group_name: "관광명소"
-                         * category_name: "여행 > 관광,명소 > 테마거리"
-                         * distance: ""
-                         * id: "7990409"
-                         * phone: "02-3445-6402"
-                         * place_name: "압구정로데오거리"
-                         * place_url: "http://place.map.kakao.com/7990409"
-                         * road_address_name: ""
-                         * x: "127.039152029523"
-                         * y: "37.5267558230172"
-                         **/
-                      }}
-                    >
-                      {searchResult?.address_name}
-                    </div>
-                  );
-                })}
-              </div>
+              <SearchContainer>
+                <SearchBox>
+                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchButton type="button" onClick={searchPlace}>
+                    <i className="fas fa-search"></i>
+                  </SearchButton>
+                </SearchBox>
+                {isOpen ? (
+                  <SearchResultBox ref={side}>
+                    {mapSearchResults.map((searchResult: { address_name: string }) => {
+                      return (
+                        <SearchResult
+                          onClick={() => {
+                            setIsOpen(!isOpen);
+                            // alert(`${searchResult.address_name} 으로 이동`);
+                            setCurrentLocation(searchResult);
+                            // recoil에 searchResult 저장
+                            /** searchResult 예
+                             * address_name: "서울 강남구 신사동 668-33"
+                             * category_group_code: "AT4"
+                             * category_group_name: "관광명소"
+                             * category_name: "여행 > 관광,명소 > 테마거리"
+                             * distance: ""
+                             * id: "7990409"
+                             * phone: "02-3445-6402"
+                             * place_name: "압구정로데오거리"
+                             * place_url: "http://place.map.kakao.com/7990409"
+                             * road_address_name: ""
+                             * x: "127.039152029523"
+                             * y: "37.5267558230172"
+                             **/
+                          }}
+                        >
+                          {searchResult?.address_name}
+                        </SearchResult>
+                      );
+                    })}
+                  </SearchResultBox>
+                ) : null}
+              </SearchContainer>
               <Map />
             </LocationWrap>
           </Uploads>
         </UploadInform>
         <ButtonBox>
-          <CancelButton>취소</CancelButton>
+          <CancelButton to="/search">취소</CancelButton>
           <RegisterButton type="submit">등록</RegisterButton>
         </ButtonBox>
       </Form>
