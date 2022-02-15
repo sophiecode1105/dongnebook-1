@@ -90,6 +90,14 @@ export const getUserInfo = async (token: string | null) => {
   }
 };
 
+export const postContent = async (body: any) => {
+  try {
+    await axios.post(`${URL}/product/post`, body);
+  } catch (e) {
+    throw e;
+  }
+};
+
 export const getBookList = async () => {
   try {
     const {

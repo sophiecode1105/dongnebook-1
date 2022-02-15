@@ -9,6 +9,7 @@ import {
   currentLocationStorage,
   currentLongtitude,
   imageStorage,
+  loginState,
   mapResultsStorage,
   searchLocation,
   titleStorage,
@@ -16,6 +17,7 @@ import {
 import Swal from "sweetalert2";
 import Map from "./Map";
 import { useEffect } from "react";
+import { postContent } from "../../api";
 
 declare global {
   interface Window {
@@ -314,7 +316,7 @@ type FormData = {
   img: FileList;
   title: string;
   content: string;
-  quality: string | null;
+  quality: string;
   location: string;
   latitude: number;
   longtitude: number;
@@ -329,6 +331,7 @@ const Upload = () => {
   const setLocation = useSetRecoilState(searchLocation);
   const setCurrentLocation = useSetRecoilState(currentLocationStorage);
   const mapSearchResults = useRecoilValue(mapResultsStorage);
+  const token = useRecoilValue(loginState);
   const latitude = useRecoilValue(currentLatitude);
   const longtitude = useRecoilValue(currentLongtitude);
 
@@ -344,13 +347,19 @@ const Upload = () => {
   const { title } = watch();
   const { content } = watch();
 
-  // const postData = async () => {
-  //   const { title, content, img, quality } = getValues();
-  //   const formData = new FormData();
-  //   formData.append("title", title);
-  //   formData.append("cotent", content);
-  //   formData.append("file", img);
-  // };
+  const postData = async () => {
+    const { title, content, img, quality } = getValues();
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("cotent", content);
+    formData.append("file", img[0]);
+    formData.append("quality", quality);
+    formData.append("lat", String(latitude));
+    formData.append("lon", String(longtitude));
+    formData.append("token", String(token));
+
+    postContent(formData);
+  };
 
   const onSubmit = async () => {
     const { quality } = getValues();
@@ -364,7 +373,7 @@ const Upload = () => {
     }
     try {
       console.log("hi");
-      // await postData();
+      await postData();
     } catch (e) {
       throw e;
     }
