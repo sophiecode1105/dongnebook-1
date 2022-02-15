@@ -80,20 +80,23 @@ export const nickCheck = async (req: express.Request, res: express.Response) => 
 
 export const postJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { email, nickname, password, lat, lon } = req.body;
+    const { email, nickname, password } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 3);
 
     await client.location.create({
       data: {
-        lat: Number(lat),
-        lon: Number(lon),
+        lat: 37.4965544495086,
+        lon: 127.02475418053183,
+        address: "서울시 서초구 서초동",
+
         users: {
           create: {
             nickname,
             admin: false,
             password: hashPassword,
             email,
+            img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/31644921016560.png",
           },
         },
       },
@@ -196,6 +199,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         products: true,
+        locations: true,
       },
     });
 
@@ -209,7 +213,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { nickname, token, lat, lon } = req.body;
+    const { nickname, token, lat, lon, address } = req.body;
     const veriToken = verify(token);
 
     const User = await client.user.update({
@@ -230,6 +234,7 @@ export const putMypage = async (req: express.Request, res: express.Response) => 
       data: {
         lat: Number(lat),
         lon: Number(lon),
+        address,
       },
     });
     return res.status(200).json({ message: "마이페이지 수정 완료", state: true });

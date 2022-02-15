@@ -9,12 +9,18 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     const productLength = await client.product.findMany();
     const length = productLength.length;
     const allProductList = await client.product.findMany({
+      where: {
+        exchanged: false,
+      },
       take: 4,
       cursor: {
         id: length - (Number(page) - 1) * 4,
       },
       orderBy: {
         id: "desc",
+      },
+      include: {
+        locations: true,
       },
     });
 
@@ -26,7 +32,7 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { title, content, quality, token, lat, lon } = req.body;
+    const { title, content, quality, token, lat, lon, address } = req.body;
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
     if (title && req.files[0] && content && quality) {
@@ -34,13 +40,13 @@ export const postProduct = async (req: express.Request, res: express.Response) =
         data: {
           lat: Number(lat),
           lon: Number(lon),
+          address,
           products: {
             create: {
               title,
               img: req.files[0].location,
               content,
               quality,
-              exchanged: true,
               userNickname: userInfo.nickname,
             },
           },
@@ -66,6 +72,9 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       where: {
         id: findId,
       },
+      include: {
+        locations: true,
+      },
     });
     if (productInfo) {
       return res.status(201).json({ message: "도서 상세보기 성공", productInfo });
@@ -79,7 +88,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
     let { id } = req.params;
-    const { title, img, content, quality, token, lat, lon } = req.body;
+    const { title, img, content, quality, token, lat, lon, address } = req.body;
 
     const findId = Number(id);
     const data = verify(token);
@@ -96,6 +105,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
       data: {
         lat: Number(lat),
         lon: Number(lon),
+        address,
       },
     });
 
@@ -116,6 +126,22 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
     return res.status(201).json({ message: "도서 정보 수정 성공", updateProductInfo });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  }
+};
+export const exchangedProduct = async (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    await client.product.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        exchanged: true,
+      },
+    });
+    return res.status(200).json({ message: "거래가 완료되었습니다.", state: true });
+  } catch {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", state: false });
   }
 };
 
