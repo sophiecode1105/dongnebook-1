@@ -18,9 +18,7 @@ type EmailCheckRequest = { email: string };
 type EmailCheckResponse = {
   number: string | undefined;
 };
-export const postEmailcheck = async (
-  body: EmailCheckRequest
-): Promise<string | undefined> => {
+export const postEmailcheck = async (body: EmailCheckRequest): Promise<string | undefined> => {
   try {
     const {
       data: { number },
@@ -75,6 +73,7 @@ export const postSignin = async (body: LoginInfo): Promise<User> => {
     throw e;
   }
 };
+
 export const getUserInfo = async (token: string | null) => {
   try {
     if (token) {
@@ -86,6 +85,17 @@ export const getUserInfo = async (token: string | null) => {
       return userInfo;
     }
     return {};
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getBookList = async () => {
+  try {
+    const {
+      data: { allProductList },
+    } = await axios.get(`${URL}/product/list`, { withCredentials: true });
+    return allProductList;
   } catch (e) {
     throw e;
   }
