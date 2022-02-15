@@ -2,7 +2,7 @@
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nickname` VARCHAR(191) NOT NULL,
-    `admin` BOOLEAN NOT NULL,
+    `admin` BOOLEAN NOT NULL DEFAULT false,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191),
     `locationId` INTEGER NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `Product` (
     `img` VARCHAR(191),
     `content` VARCHAR(191) NOT NULL,
     `quality` VARCHAR(191) NOT NULL,
-    `exchanged` BOOLEAN NOT NULL,
+    `exchanged` BOOLEAN NOT NULL DEFAULT false,
     `userNickname` VARCHAR(191) NOT NULL,
     `locationId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -72,6 +72,7 @@ CREATE TABLE `Location` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `lat` DOUBLE NOT NULL,
     `lon` DOUBLE NOT NULL,
+    `address` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -103,14 +104,7 @@ ALTER TABLE `Product` ADD FOREIGN KEY (`locationId`) REFERENCES `Location`(`id`)
 ALTER TABLE `Chatroom_User` ADD FOREIGN KEY (`chatroomId`) REFERENCES `Chatroom`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-<<<<<<< HEAD:server/prisma/migrations/20220215045103_0215/migration.sql
 ALTER TABLE `Chatroom_User` ADD FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-=======
-ALTER TABLE `Chat` ADD FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Chat` ADD FOREIGN KEY (`chatroomId`) REFERENCES `Chatroom`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
->>>>>>> 9845ce3fb7f857a3d53a0d62db9687cff186bc99:server/prisma/migrations/20220214073952_0214/migration.sql
 
 -- AddForeignKey
 ALTER TABLE `Chat` ADD FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
