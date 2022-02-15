@@ -351,7 +351,7 @@ const Upload = () => {
     const { title, content, img, quality } = getValues();
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("cotent", content);
+    formData.append("content", content);
     formData.append("file", img[0]);
     formData.append("quality", quality);
     formData.append("lat", String(latitude));

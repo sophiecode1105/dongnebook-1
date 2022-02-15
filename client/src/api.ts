@@ -102,7 +102,7 @@ export const getBookList = async () => {
   try {
     const {
       data: { allProductList },
-    } = await axios.get(`${URL}/product/list`, { withCredentials: true });
+    } = await axios.get(`${URL}/product/list?page=1`, { withCredentials: true });
     return allProductList;
   } catch (e) {
     throw e;

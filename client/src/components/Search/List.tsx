@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Booklist from "./BookList";
 
 const Container = styled.section`
   padding: 0px 15px;
@@ -21,13 +22,8 @@ const BookListContainer = styled.div`
 `;
 
 const Div = styled.div`
-  border: 1px solid red;
-  background-color: yellow;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   width: 100%;
-`;
-
-const Content = styled.div`
-  background-color: white;
 `;
 
 type BookInfo = {
@@ -47,11 +43,10 @@ const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
     <Container>
       <BookListContainer>
         <Div>
-          <Content>내용써보셈</Content>
+          {allProductList.map((list, idx) => {
+            return <Booklist key={idx} list={list} />;
+          })}
         </Div>
-        <Div></Div>
-        <Div></Div>
-        <Div></Div>
       </BookListContainer>
     </Container>
   );
