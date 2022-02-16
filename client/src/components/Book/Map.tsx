@@ -9,7 +9,9 @@ import {
   currentLocationStorage,
   currentLatitude,
   currentLongtitude,
+  currentaddress,
 } from "../../state";
+import { createNumericLiteral } from "typescript";
 
 declare global {
   interface Window {
@@ -50,6 +52,7 @@ const Map = () => {
   const [geocoder, setGeocoder] = useState<any>(new window.kakao.maps.services.Geocoder());
   const latitude = useSetRecoilState(currentLatitude);
   const longtitude = useSetRecoilState(currentLongtitude);
+  const storeaddress = useSetRecoilState(currentaddress);
   const searchContent = useRecoilValue(searchLocation);
   const currentLocation = useRecoilValue(currentLocationStorage);
   const setMapSearchResults = useSetRecoilState(mapResultsStorage);
@@ -101,12 +104,21 @@ const Map = () => {
         setMarker(marker);
 
         searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
+          storeaddress(
+            result[0].address.region_1depth_name +
+              " " +
+              result[0].address.region_2depth_name +
+              " " +
+              result[0].address.region_3depth_name
+          );
+
           let detailAddr = !!result[0].road_address
             ? "<div>도로명주소 : " + result[0].road_address.address_name + "</div>"
             : "";
           detailAddr += "<div>지번 주소 : " + result[0].address.address_name + "</div>";
 
           let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+
           marker.setPosition(locPosition);
           marker.setMap(kakaoMap);
 
@@ -118,9 +130,13 @@ const Map = () => {
           console.log("마우스이벤트정보", mouseEvent);
           // 클릭한 위도, 경도 정보를 가져옵니다
           searchDetailAddrFromCoords(mouseEvent.latLng, function (result: any, status: any) {
-            console.log("마우스이벤트");
-
-            console.log("주소변환해서 들어오는거", result);
+            storeaddress(
+              result[0].address.region_1depth_name +
+                " " +
+                result[0].address.region_2depth_name +
+                " " +
+                result[0].address.region_3depth_name
+            );
             let detailAddr = !!result[0].road_address
               ? "<div>도로명주소 : " + result[0].road_address.address_name + "</div>"
               : "";
@@ -186,7 +202,13 @@ const Map = () => {
     map?.panTo(moveLatLng);
     marker?.setPosition(moveLatLng);
     searchDetailAddrFromCoords(moveLatLng, function (result: any, status: any) {
-      console.log("주소변환해서 들어오는거", result);
+      storeaddress(
+        result[0].address.region_1depth_name +
+          " " +
+          result[0].address.region_2depth_name +
+          " " +
+          result[0].address.region_3depth_name
+      );
       if (result) {
         let detailAddr = !!result[0]?.road_address
           ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"

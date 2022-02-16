@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Booklist from "./BookList";
 
 const Container = styled.section`
   padding: 0px 15px;
@@ -12,22 +13,12 @@ const Container = styled.section`
 `;
 
 const BookListContainer = styled.div`
-  border: 1px solid blue;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-auto-rows: 300px;
-  width: 80%;
-  display: grid;
-  grid-gap: 20px;
-`;
-
-const Div = styled.div`
-  border: 1px solid red;
-  background-color: yellow;
+  grid-auto-rows: 320px;
   width: 100%;
-`;
-
-const Content = styled.div`
-  background-color: white;
+  display: grid;
+  padding-left: 30px;
+  grid-gap: 20px;
 `;
 
 type BookInfo = {
@@ -40,18 +31,18 @@ type BookInfo = {
   userId: number;
   createdAt: string;
   updatedAt: string;
+  locations: {
+    address: string;
+  };
 };
 
 const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
   return (
     <Container>
       <BookListContainer>
-        <Div>
-          <Content>내용써보셈</Content>
-        </Div>
-        <Div></Div>
-        <Div></Div>
-        <Div></Div>
+        {allProductList.map((list, idx) => {
+          return <Booklist key={idx} list={list} />;
+        })}
       </BookListContainer>
     </Container>
   );

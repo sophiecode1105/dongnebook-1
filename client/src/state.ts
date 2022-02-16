@@ -50,6 +50,11 @@ export const currentLongtitude = atom({
   default: 0,
 });
 
+export const currentaddress = atom({
+  key: "address",
+  default: "",
+});
+
 export const headerState = atom({
   key: "header",
   default: false,
