@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../img/logo.png";
-import { loginState } from "../../state";
+import { loginState } from "../../state/state";
 import { useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { getUserInfo } from "../../api";
-import { userState } from "../../state";
+import { userState } from "../../state/state";
+import { UserState } from "../../state/typeDefs";
 
 const Header = () => {
   const [click, setClick] = useState(false);
@@ -32,9 +33,7 @@ const Header = () => {
           </Link>
         </div>
         <nav className="md:flex hidden justify-center items-center">
-          <Link
-            to="/search"
-            className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
+          <Link to="/search" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
             <span className="text-sm font-bold text-center">검색</span>
           </Link>
           <Link
@@ -50,9 +49,7 @@ const Header = () => {
           <Link
             to={login ? "/myinfo" : "/signup"}
             className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200">
-            <span className="text-sm font-bold">
-              {login ? "내정보" : "회원가입"}
-            </span>
+            <span className="text-sm font-bold">{login ? "내정보" : "회원가입"}</span>
           </Link>
           <Link
             to={login ? "/" : "/signin"}
@@ -63,9 +60,7 @@ const Header = () => {
               }
             }}
             className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200">
-            <span className="text-sm font-bold">
-              {login ? "로그아웃" : "로그인"}
-            </span>
+            <span className="text-sm font-bold">{login ? "로그아웃" : "로그인"}</span>
           </Link>
         </nav>
         <i
@@ -98,24 +93,20 @@ const Header = () => {
             onClick={() => setClick((prev) => !prev)}
             to={login ? "/myinfo" : "/signup"}
             className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200 mb-3">
-            <span className="text-sm font-bold">
-              {login ? "내정보" : "회원가입"}
-            </span>
+            <span className="text-sm font-bold">{login ? "내정보" : "회원가입"}</span>
           </Link>
           <Link
             onClick={() => {
               if (login) {
                 localStorage.removeItem("token");
                 setLogin(null);
-                setUser({});
+                setUser({} as UserState);
               }
               setClick((prev) => !prev);
             }}
             to={login ? "/" : "/signin"}
             className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200">
-            <span className="text-sm font-bold">
-              {login ? "로그아웃" : "로그인"}
-            </span>
+            <span className="text-sm font-bold">{login ? "로그아웃" : "로그인"}</span>
           </Link>
         </nav>
       </header>

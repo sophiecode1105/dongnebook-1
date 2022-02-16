@@ -1,4 +1,5 @@
 import axios from "axios";
+import { UserState } from "./state/typeDefs";
 
 const URL = "http://localhost:4000";
 
@@ -51,16 +52,27 @@ interface LoginInfo extends Userinfo {
   keep: boolean;
 }
 
-type User = {
+interface User {
   token: string;
   userInfo: {
     id: number;
     nickname: string;
-    email: string;
     img: string;
     admin: boolean;
+    email: string;
+    locationId: number;
+    createdAt: string;
+    updatedAt: string;
+    locations: {
+      createdAt: string;
+      address: string;
+      id: number;
+      lat: number;
+      lon: number;
+      updatedAt: string;
+    };
   };
-};
+}
 
 export const postSignin = async (body: LoginInfo): Promise<User> => {
   try {
