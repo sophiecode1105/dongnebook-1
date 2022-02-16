@@ -58,6 +58,14 @@ io.on("connection", (socket) => {
     // io.emit("receive message", { name: item.name, message: item.message });
   });
 
+  // 1. 겟  (방번호 유저정보 내역 프로덕트)
+
+  // 2. 에밋 뉴메시지
+
+  // 3. 포스트챗()
+
+  // 4. 온   리시브메시지
+
   socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
     console.log("방번호:", room);
 
