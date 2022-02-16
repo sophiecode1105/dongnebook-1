@@ -84,15 +84,27 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
 
     const hashPassword = await bcrypt.hash(password, 3);
 
-    const createUser = await client.user.create({
+    await client.location.create({
       data: {
-        nickname,
-        admin: false,
-        password: hashPassword,
-        email,
+        lat: 37.4965544495086,
+        lon: 127.02475418053183,
+        address: "서울시 서초구 서초동",
+
+        users: {
+          create: {
+            nickname,
+            admin: false,
+            password: hashPassword,
+            email,
+            img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/31644921016560.png",
+          },
+        },
       },
     });
-    return res.status(201).json({ message: "회원가입 완료", createUser, state: true });
+
+    const User = await userFinder(email);
+
+    return res.status(201).json({ message: "회원가입 완료", User, state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
@@ -113,6 +125,7 @@ export const login = async (req: express.Request, res: express.Response) => {
       if (user) {
         const token = jwt.sign(
           {
+            id: userInfo.id,
             email: userInfo.email,
             nickname: userInfo.nickname,
           },
@@ -174,6 +187,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const { token } = req.headers;
 
     let tokenInfo: string | jwt.JwtPayload;
+    console.log(token);
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
@@ -185,13 +199,31 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         email: tokenInfo["email"],
       },
       include: {
-        products: true,
+        locations: true,
+      },
+    });
+    const exchangeTrue = await client.product.findMany({
+      where: {
+        exchanged: true,
+        userNickname: userInfo.nickname,
+      },
+    });
+    const exchangeFalse = await client.product.findMany({
+      where: {
+        exchanged: false,
+        userNickname: userInfo.nickname,
       },
     });
 
     delete userInfo.password;
 
-    return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
+    return res.status(200).json({
+      message: "마이페이지 접근 완료",
+      userInfo,
+      exchangeTrue,
+      exchangeFalse,
+      state: true,
+    });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
@@ -199,21 +231,30 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { nickname, token } = req.body;
+    const { nickname, token, lat, lon, address } = req.body;
     const veriToken = verify(token);
 
-    await client.user.update({
+    const User = await client.user.update({
       where: {
         email: veriToken["email"],
       },
 
       data: {
         nickname,
-
         img: req.files[0] && req.files[0].location,
       },
     });
 
+    await client.location.update({
+      where: {
+        id: User.locationId,
+      },
+      data: {
+        lat: Number(lat),
+        lon: Number(lon),
+        address,
+      },
+    });
     return res.status(200).json({ message: "마이페이지 수정 완료", state: true });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });

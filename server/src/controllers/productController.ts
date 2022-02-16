@@ -1,20 +1,26 @@
 import express from "express";
 import client from "../client";
 import FuzzySearch from "fuzzy-search";
-import { userFinder, verify } from "../token/verify";
+import { productFinder, userFinder, verify } from "../token/verify";
 
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { page } = req.body;
+    const { page } = req.query;
     const productLength = await client.product.findMany();
     const length = productLength.length;
     const allProductList = await client.product.findMany({
+      where: {
+        exchanged: false,
+      },
       take: 4,
       cursor: {
-        id: length - (page - 1) * 4,
+        id: length - (Number(page) - 1) * 4,
       },
       orderBy: {
         id: "desc",
+      },
+      include: {
+        locations: true,
       },
     });
 
@@ -26,22 +32,29 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { title, content, quality, token } = req.body;
+    const { title, content, quality, token, lat, lon, address } = req.body;
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
-
-    if (title && req.files[0].location && content && quality) {
-      const productInfo = await client.product.create({
+    if (title && req.files[0] && content && quality) {
+      const locationCreate = await client.location.create({
         data: {
-          title,
-          img: req.files[0].location,
-          content,
-          quality,
-          exchanged: true,
-          userNickname: userInfo.nickname,
+          lat: Number(lat),
+          lon: Number(lon),
+          address,
+          products: {
+            create: {
+              title,
+              img: req.files[0].location,
+              content,
+              quality,
+              userNickname: userInfo.nickname,
+            },
+          },
         },
       });
-      return res.status(201).json({ message: "도서 업로드 성공", productInfo });
+      const productInfo = await productFinder(locationCreate.id);
+
+      return res.status(201).json({ message: "도서 업로드 성공", productInfo: productInfo[0] });
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요." });
     }
@@ -59,6 +72,9 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       where: {
         id: findId,
       },
+      include: {
+        locations: true,
+      },
     });
     if (productInfo) {
       return res.status(201).json({ message: "도서 상세보기 성공", productInfo });
@@ -72,10 +88,27 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
     let { id } = req.params;
-    const { title, img, content, quality, token } = req.body;
+    const { title, img, content, quality, token, lat, lon, address } = req.body;
+
     const findId = Number(id);
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
+    const productInfo = await client.product.findMany({
+      where: {
+        userNickname: userInfo.nickname,
+      },
+    });
+    await client.location.update({
+      where: {
+        id: productInfo[0].locationId,
+      },
+      data: {
+        lat: Number(lat),
+        lon: Number(lon),
+        address,
+      },
+    });
+
     const updateProductInfo = await client.product.update({
       where: {
         id: findId,
@@ -89,9 +122,26 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         userNickname: userInfo.nickname,
       },
     });
+
     return res.status(201).json({ message: "도서 정보 수정 성공", updateProductInfo });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  }
+};
+export const exchangedProduct = async (req: express.Request, res: express.Response) => {
+  try {
+    const { id } = req.params;
+    await client.product.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        exchanged: true,
+      },
+    });
+    return res.status(200).json({ message: "거래가 완료되었습니다.", state: true });
+  } catch {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", state: false });
   }
 };
 

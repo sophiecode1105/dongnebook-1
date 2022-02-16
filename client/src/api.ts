@@ -18,9 +18,7 @@ type EmailCheckRequest = { email: string };
 type EmailCheckResponse = {
   number: string | undefined;
 };
-export const postEmailcheck = async (
-  body: EmailCheckRequest
-): Promise<string | undefined> => {
+export const postEmailcheck = async (body: EmailCheckRequest): Promise<string | undefined> => {
   try {
     const {
       data: { number },
@@ -75,6 +73,7 @@ export const postSignin = async (body: LoginInfo): Promise<User> => {
     throw e;
   }
 };
+
 export const getUserInfo = async (token: string | null) => {
   try {
     if (token) {
@@ -89,4 +88,57 @@ export const getUserInfo = async (token: string | null) => {
   } catch (e) {
     throw e;
   }
+};
+
+export const postContent = async (body: any) => {
+  try {
+    await axios.post(`${URL}/product/post`, body);
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getBookList = async () => {
+  try {
+    const {
+      data: { allProductList },
+    } = await axios.get(`${URL}/product/list?page=1`, { withCredentials: true });
+    return allProductList;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getSingleBookInfo = async (id: number | undefined) => {
+  try {
+    const {
+      data: { productInfo },
+    } = await axios.get(`${URL}/product/${id}`, { withCredentials: true });
+    return productInfo;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const timeForToday = (value: string) => {
+  const today = new Date();
+  const timeValue = new Date(value);
+
+  const betweenTime = Math.floor((today.getTime() - timeValue.getTime()) / 1000 / 60);
+  if (betweenTime < 1) return "방금전";
+  if (betweenTime < 60) {
+    return `${betweenTime}분전`;
+  }
+
+  const betweenTimeHour = Math.floor(betweenTime / 60);
+  if (betweenTimeHour < 24) {
+    return `${betweenTimeHour}시간전`;
+  }
+
+  const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
+  if (betweenTimeDay < 365) {
+    return `${betweenTimeDay}일전`;
+  }
+
+  return `${Math.floor(betweenTimeDay / 365)}년전`;
 };

@@ -39,3 +39,18 @@ export const currentLocationStorage = atom({
   key: "currentLocation",
   default: {},
 });
+
+export const currentLatitude = atom({
+  key: "currentLatitude",
+  default: 0,
+});
+
+export const currentLongtitude = atom({
+  key: "currentLongtitude",
+  default: 0,
+});
+
+export const currentaddress = atom({
+  key: "address",
+  default: "",
+});

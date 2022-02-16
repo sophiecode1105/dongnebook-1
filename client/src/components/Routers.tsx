@@ -4,6 +4,7 @@ import Chat from "../pages/Chat";
 import Main from "../pages/Main";
 import Search from "../pages/Search";
 import ChatRoom from "./Chat/ChatRoom";
+import Detail from "./Search/Detail";
 import Header from "./Header/Header";
 import Mypage from "./Header/Mypage";
 import Signin from "./Header/Signin";
@@ -22,6 +23,7 @@ const Routers = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/chat/:id" element={<ChatRoom />} />
         <Route path="/myinfo" element={<Mypage />} />
+        <Route path="/search/:id" element={<Detail />} />
       </Routes>
     </BrowserRouter>
   );
