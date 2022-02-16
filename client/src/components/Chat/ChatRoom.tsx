@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { headerState } from "../../state";
 
 type chatsType = {
   id: number;
@@ -9,25 +7,15 @@ type chatsType = {
 };
 
 const ChatRoom = () => {
-  const setHeader = useSetRecoilState(headerState);
   const params = useParams<string>();
   const [chats, setChats] = useState<chatsType[]>([]);
   const [content, setContent] = useState("");
-
-  useEffect(() => {
-    if (params.id) {
-      setHeader(true);
-    }
-  });
 
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="relative max-w-md w-full m-auto bg-green-50 h-full md:h-[600px] overflow-hidden">
         <nav className="flex justify-between text-xl p-3">
-          <Link
-            to="/chat"
-            onClick={() => setHeader((prev: boolean) => !prev)}
-            className="cursor-pointer">
+          <Link to="/chat" className="cursor-pointer">
             <i className="fas fa-arrow-left "></i>
           </Link>
           <h1 className="font-bold mb-4">사용자 닉네임</h1>

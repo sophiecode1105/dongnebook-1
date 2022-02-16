@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { headerState } from "../../state";
 
 interface ChatListObj {
   id: number;
@@ -29,14 +27,11 @@ const chats: ChatListObj = {
 };
 
 const ChatList = () => {
-  const setHeader = useSetRecoilState(headerState);
   return (
     <div className="pt-14 max-w-md w-full m-auto text-center font-bold">
       <h1 className="text-2xl">채팅목록</h1>
       <ul>
-        <Link
-          to={`${chats.id}`}
-          onClick={() => setHeader((prev: boolean) => !prev)}>
+        <Link to={`${chats.id}`}>
           <li className="flex cursor-pointer hover:bg-green-200 transition duration-300 p-5">
             <img
               src={`${chats.img}`}
