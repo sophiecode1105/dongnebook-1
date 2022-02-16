@@ -5,6 +5,7 @@ import { useSetRecoilState, useRecoilValue } from "recoil";
 import { Link } from "react-router-dom";
 import {
   contentStorage,
+  currentaddress,
   currentLatitude,
   currentLocationStorage,
   currentLongtitude,
@@ -48,7 +49,7 @@ const Container = styled(DisplayColumn)`
   justify-content: center;
   width: 100%;
   padding-top: 66px;
-  max-width: 1200px;
+  max-width: 1400px;
 `;
 
 const Form = styled.form`
@@ -86,16 +87,10 @@ const InformBox = styled.div`
 `;
 
 const InformTitle = styled.div`
-  /* border: 1px solid blue; */
   min-width: 100px;
   font-size: 18px;
   color: #363636f0;
-`;
-
-const ImageCount = styled.div`
-  color: #949393;
-  border: 1px solid pink;
-  margin-left: 5px;
+  padding: 0px 0px 0px 10px;
 `;
 
 const Uploads = styled.div`
@@ -334,6 +329,7 @@ const Upload = () => {
   const token = useRecoilValue(loginState);
   const latitude = useRecoilValue(currentLatitude);
   const longtitude = useRecoilValue(currentLongtitude);
+  const address = useRecoilValue(currentaddress);
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -356,6 +352,7 @@ const Upload = () => {
     formData.append("quality", quality);
     formData.append("lat", String(latitude));
     formData.append("lon", String(longtitude));
+    formData.append("address", address);
     formData.append("token", String(token));
 
     postContent(formData);

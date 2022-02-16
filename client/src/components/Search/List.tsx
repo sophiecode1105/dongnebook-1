@@ -13,17 +13,12 @@ const Container = styled.section`
 `;
 
 const BookListContainer = styled.div`
-  border: 1px solid blue;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-auto-rows: 300px;
-  width: 80%;
-  display: grid;
-  grid-gap: 20px;
-`;
-
-const Div = styled.div`
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  grid-auto-rows: 320px;
   width: 100%;
+  display: grid;
+  padding-left: 30px;
+  grid-gap: 20px;
 `;
 
 type BookInfo = {
@@ -36,17 +31,18 @@ type BookInfo = {
   userId: number;
   createdAt: string;
   updatedAt: string;
+  locations: {
+    address: string;
+  };
 };
 
 const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
   return (
     <Container>
       <BookListContainer>
-        <Div>
-          {allProductList.map((list, idx) => {
-            return <Booklist key={idx} list={list} />;
-          })}
-        </Div>
+        {allProductList.map((list, idx) => {
+          return <Booklist key={idx} list={list} />;
+        })}
       </BookListContainer>
     </Container>
   );
