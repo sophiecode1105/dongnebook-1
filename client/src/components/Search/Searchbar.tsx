@@ -9,7 +9,7 @@ const Container = styled.div`
   justify-content: center;
   width: 100%;
   padding: 66px 0px 20px 0px;
-  max-width: 1200px;
+  max-width: 1400px;
   position: relative;
 `;
 

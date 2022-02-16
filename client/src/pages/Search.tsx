@@ -16,6 +16,9 @@ const Search = () => {
     userId: number;
     createdAt: string;
     updatedAt: string;
+    locations: {
+      address: string;
+    };
   };
 
   const [allProducList, setAllProductList] = useState<BookInfo[]>([]);
