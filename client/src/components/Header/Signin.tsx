@@ -3,9 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import { postSignin } from "../../api";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { loginState, userState } from "../../state/state";
-import { UserState } from "../../state/typeDefs";
+import { ErrorProps, UserState } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +39,7 @@ const LoginForm = styled.form`
   background-color: white;
 `;
 
-const LoginInput = styled.input<{ error: string | undefined }>`
+const LoginInput = styled.input<ErrorProps>`
   width: 100%;
   text-decoration: none;
   border: none;
@@ -158,7 +158,7 @@ const Signin = () => {
     const { email, password } = getValues();
     try {
       const { userInfo, token } = await postSignin({ email, password, keep });
-      setUser(userInfo as UserState);
+      setUser(userInfo);
       setLogin(token);
       localStorage.setItem("token", token);
       navigate("/");

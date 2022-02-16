@@ -1,9 +1,10 @@
-export interface UserState {
+export type UserState = {
   id: number;
   nickname: string;
   img: string;
   admin: boolean;
   email: string;
+  password?: string;
   locationId: number;
   createdAt: string;
   updatedAt: string;
@@ -15,7 +16,7 @@ export interface UserState {
     lon: number;
     updatedAt: string;
   };
-}
+};
 
 export type BookInfo = {
   id: number;
@@ -55,4 +56,8 @@ export type ListProps = {
   locations: {
     address: string;
   };
+};
+
+export type ErrorProps = {
+  error: string | undefined;
 };
