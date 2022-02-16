@@ -22,6 +22,7 @@ model User {
   chats     Chat[]
   locations  Location  @relation(fields: [locationId], references: [id])
   locationId Int
+  likes     Like[]
   img       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,6 +40,8 @@ model Product {
   userNickname    String
   locations  Location  @relation(fields: [locationId], references: [id])
   locationId Int
+  likes     Like[]
+  visit     Int  @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -60,7 +63,7 @@ model Chat {
   content   String
   read     Boolean @default (false)
   chatrooms Chatroom @relation(fields: [chatroomId], references: [id])
-  chatroomId Int
+  chatroomId Int 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -85,6 +88,20 @@ model Location {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  users   User @relation(fields: [userId], references: [id])
+  userId  Int
+  products   Product @relation(fields: [productId], references: [id])
+  productId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
 
 model Notice {
   id        Int      @id @default(autoincrement())
