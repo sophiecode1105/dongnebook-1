@@ -10,13 +10,8 @@ import {
   currentLatitude,
   currentLongtitude,
   currentaddress,
-<<<<<<< HEAD
-} from "../../state";
-=======
 } from "../../state/state";
-import { createNumericLiteral } from "typescript";
 import { KakaoMap } from "../../state/typeDefs";
->>>>>>> 2891afb7a3651de61dc8226f5a1ff82ba014e7da
 
 declare global {
   interface Window {

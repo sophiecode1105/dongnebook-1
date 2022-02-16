@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getSingleBookInfo, timeForToday } from "../../api";
-<<<<<<< HEAD
-import avatar from "../../img/avatar.png";
-=======
 import { BookInfo } from "../../state/typeDefs";
->>>>>>> 2891afb7a3651de61dc8226f5a1ff82ba014e7da
+import avatar from "../../img/avatar.png";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -229,7 +226,7 @@ const Details = () => {
           <BorderBottom />
           <UserInfoBox>
             <UserAvatar src={avatar} />
-            <UserNickname>{userNickname}</UserNickname>
+            <UserNickname>이채야채</UserNickname>
           </UserInfoBox>
           <IconBox>
             <Heart>
