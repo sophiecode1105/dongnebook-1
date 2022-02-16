@@ -22,7 +22,7 @@ model User {
   chats     Chat[]
   locations  Location  @relation(fields: [locationId], references: [id])
   locationId Int
-  likes     Like[]
+  likes     Liked[]
   img       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,7 +40,7 @@ model Product {
   userNickname    String
   locations  Location  @relation(fields: [locationId], references: [id])
   locationId Int
-  likes     Like[]
+  likes     Liked[]
   visit     Int  @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,7 +90,7 @@ model Location {
 }
 
 
-model Like {
+model Liked {
   id        Int      @id @default(autoincrement())
   users   User @relation(fields: [userId], references: [id])
   userId  Int

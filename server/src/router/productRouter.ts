@@ -4,6 +4,7 @@ import {
   exchangedProduct,
   getAllProduct,
   getOneProduct,
+  postLike,
   postProduct,
   putProduct,
   searchProduct,
@@ -16,7 +17,12 @@ productRouter.route("/list").get(getAllProduct);
 
 productRouter.route("/post").post(upload.array("file"), postProduct);
 
-productRouter.route("/:id(\\d+)").get(getOneProduct).put(upload.array("file"), putProduct).delete(deleteProduct);
+productRouter
+  .route("/:id(\\d+)")
+  .post(postLike)
+  .get(getOneProduct)
+  .put(upload.array("file"), putProduct)
+  .delete(deleteProduct);
 
 productRouter.route("/search").get(searchProduct);
 

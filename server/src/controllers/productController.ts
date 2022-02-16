@@ -160,6 +160,40 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
   }
 };
 
+export const postLike = async (req: express.Request, res: express.Response) => {
+  try {
+    console.log("접근완료");
+    const { token } = req.body;
+    const { id } = req.params;
+    const userInfo = verify(token);
+
+    // await client.product.findMany({
+    //   where: {
+    //     likes: {
+    //       some,
+    //     },
+    //   },
+    // });
+
+    const result = await client.product.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        likes: {
+          create: {
+            userId: userInfo["id"],
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: "찜하기 성공", result });
+  } catch {
+    res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  }
+};
+
 export const searchProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { type, value } = req.query;
