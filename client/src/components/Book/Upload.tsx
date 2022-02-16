@@ -14,7 +14,7 @@ import {
   mapResultsStorage,
   searchLocation,
   titleStorage,
-} from "../../state";
+} from "../../state/state";
 import Swal from "sweetalert2";
 import Map from "./Map";
 import { useEffect } from "react";
@@ -457,8 +457,7 @@ const Upload = () => {
                   alignItems: "stretch",
                   justifyContent: "flex-start",
                   width: "100%",
-                }}
-              >
+                }}>
                 <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
@@ -505,8 +504,7 @@ const Upload = () => {
                         alignItems: "center",
                         marginLeft: "20px",
                         // margin: "10px",
-                      }}
-                    >
+                      }}>
                       <BookImg src={url}></BookImg>
                     </div>
                   );
@@ -575,8 +573,7 @@ const Upload = () => {
                              * x: "127.039152029523"
                              * y: "37.5267558230172"
                              **/
-                          }}
-                        >
+                          }}>
                           {searchResult?.address_name}
                         </SearchResult>
                       );

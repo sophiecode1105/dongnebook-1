@@ -1,27 +1,9 @@
 import { atom } from "recoil";
-
-type UserState = {
-  id?: number;
-  nickname?: string;
-  img?: string;
-  admin?: boolean;
-  email?: string;
-  locationId?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  locations?: {
-    createdAt: string;
-    address: string;
-    id: number;
-    lat: number;
-    lon: number;
-    updatedAt: string;
-  };
-};
+import { UserState } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
-  default: {},
+  default: {} as UserState,
 });
 
 export const loginState = atom<string | null>({
