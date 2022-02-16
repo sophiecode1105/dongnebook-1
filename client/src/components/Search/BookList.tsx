@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { ListProps } from "../../state/typeDefs";
 
 const Container = styled(Link)`
   display: flex;
@@ -32,21 +33,6 @@ const Location = styled.div`
   margin: 5px;
   color: rgba(0, 0, 0, 0.6);
 `;
-
-type ListProps = {
-  id: number;
-  title: string;
-  img: string;
-  content: string;
-  quality: string;
-  exchanged: Boolean;
-  userId: number;
-  createdAt: string;
-  updatedAt: string;
-  locations: {
-    address: string;
-  };
-};
 
 const Booklist = ({ list }: { list: ListProps }) => {
   const { id, title, content, img, locations } = list;

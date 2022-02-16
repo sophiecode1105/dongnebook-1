@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getSingleBookInfo, timeForToday } from "../../api";
+<<<<<<< HEAD
 import avatar from "../../img/avatar.png";
+=======
+import { BookInfo } from "../../state/typeDefs";
+>>>>>>> 2891afb7a3651de61dc8226f5a1ff82ba014e7da
 
 const Container = styled.div`
   max-width: 1400px;
@@ -190,34 +194,13 @@ const TouchButton = styled.button`
   }
 `;
 
-type BookInfo = {
-  id: number;
-  title: string;
-  img: string;
-  content: string;
-  quality: string;
-  exchanged: Boolean;
-  userNickname: string;
-  locationId: number;
-  createdAt: string;
-  updatedAt: string;
-  locations: {
-    id: number;
-    lat: number;
-    lon: number;
-    address: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
 const Details = () => {
   let { id } = useParams();
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isPressed, setIsPressed] = useState(false);
 
-  const { title, img, content, quality, exchanged, userNickname, createdAt, locations } = bookDetailInfo as BookInfo;
+  const { title, img, content, quality, exchanged, createdAt, locations } = bookDetailInfo as BookInfo;
 
   const date = timeForToday(createdAt);
 

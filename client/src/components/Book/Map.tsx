@@ -10,7 +10,13 @@ import {
   currentLatitude,
   currentLongtitude,
   currentaddress,
+<<<<<<< HEAD
 } from "../../state";
+=======
+} from "../../state/state";
+import { createNumericLiteral } from "typescript";
+import { KakaoMap } from "../../state/typeDefs";
+>>>>>>> 2891afb7a3651de61dc8226f5a1ff82ba014e7da
 
 declare global {
   interface Window {
@@ -36,11 +42,6 @@ const Conatiner = styled.div`
 const Loading = styled.img`
   margin-top: 10px;
 `;
-
-type KakaoMap = {
-  panTo(arg: any): any;
-  setCenter(arg: any): any;
-};
 
 const Map = () => {
   const place = useRef(null);

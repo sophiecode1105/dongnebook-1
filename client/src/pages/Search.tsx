@@ -4,23 +4,9 @@ import SearchBar from "../components/Search/Searchbar";
 import axios from "axios";
 import { getBookList } from "../api";
 import { useEffect } from "react";
+import { BookInfo } from "../state/typeDefs";
 
 const Search = () => {
-  type BookInfo = {
-    id: number;
-    title: string;
-    img: string;
-    content: string;
-    quality: string;
-    exchanged: Boolean;
-    userId: number;
-    createdAt: string;
-    updatedAt: string;
-    locations: {
-      address: string;
-    };
-  };
-
   const [allProducList, setAllProductList] = useState<BookInfo[]>([]);
 
   const getData = async () => {

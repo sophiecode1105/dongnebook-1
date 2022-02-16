@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import { postSignin } from "../../api";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { loginState, userState } from "../../state";
+import { useSetRecoilState } from "recoil";
+import { loginState, userState } from "../../state/state";
+import { ErrorProps, UserState } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;
@@ -37,10 +38,6 @@ const LoginForm = styled.form`
   width: 100%;
   background-color: white;
 `;
-
-interface ErrorProps {
-  error: string | undefined;
-}
 
 const LoginInput = styled.input<ErrorProps>`
   width: 100%;
@@ -76,11 +73,7 @@ const LoginButton = styled.button`
   }
 `;
 
-interface CheckProps {
-  check: boolean;
-}
-
-const LoginState = styled.div<CheckProps>`
+const LoginState = styled.div<{ check: boolean }>`
   width: 100%;
   padding-bottom: 10px;
   margin-bottom: 30px;

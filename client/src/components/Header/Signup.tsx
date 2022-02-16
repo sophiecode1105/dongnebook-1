@@ -7,6 +7,7 @@ import { postEmailcheck, postNickcheck, postSignup } from "../../api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import DaumPostCode from "react-daum-postcode";
+import { ErrorProps } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;
@@ -40,10 +41,6 @@ const SignupForm = styled.form`
   width: 100%;
   background-color: white;
 `;
-
-interface ErrorProps {
-  error: string | undefined;
-}
 
 const Input = styled.input<ErrorProps>`
   text-decoration: none;

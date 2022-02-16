@@ -125,6 +125,7 @@ export const login = async (req: express.Request, res: express.Response) => {
       if (user) {
         const token = jwt.sign(
           {
+            id: userInfo.id,
             email: userInfo.email,
             nickname: userInfo.nickname,
           },
@@ -198,14 +199,31 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         email: tokenInfo["email"],
       },
       include: {
-        products: true,
         locations: true,
+      },
+    });
+    const exchangeTrue = await client.product.findMany({
+      where: {
+        exchanged: true,
+        userNickname: userInfo.nickname,
+      },
+    });
+    const exchangeFalse = await client.product.findMany({
+      where: {
+        exchanged: false,
+        userNickname: userInfo.nickname,
       },
     });
 
     delete userInfo.password;
 
-    return res.status(200).json({ message: "마이페이지 접근 완료", userInfo, state: true });
+    return res.status(200).json({
+      message: "마이페이지 접근 완료",
+      userInfo,
+      exchangeTrue,
+      exchangeFalse,
+      state: true,
+    });
   } catch {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
   }
