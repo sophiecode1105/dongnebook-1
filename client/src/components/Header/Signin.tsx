@@ -48,8 +48,7 @@ const LoginInput = styled.input<ErrorProps>`
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: ${(props) =>
-    props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)"};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   &:focus {
     outline-color: ${(props) => (props.error ? "red" : "green")};
   }
@@ -221,11 +220,7 @@ const Signin = () => {
             },
           })}
         />
-        {invalid ? (
-          <Errorbox>{errors.password?.message}</Errorbox>
-        ) : (
-          <Errorbox>{infoCheck}</Errorbox>
-        )}
+        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
         <LoginState check={keep}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지
