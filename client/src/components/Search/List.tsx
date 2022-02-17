@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { BookInfo } from "../../state/typeDefs";
 import Booklist from "./BookList";
 
 const Container = styled.section`
@@ -20,21 +21,6 @@ const BookListContainer = styled.div`
   padding-left: 30px;
   grid-gap: 20px;
 `;
-
-type BookInfo = {
-  id: number;
-  title: string;
-  img: string;
-  content: string;
-  quality: string;
-  exchanged: Boolean;
-  userId: number;
-  createdAt: string;
-  updatedAt: string;
-  locations: {
-    address: string;
-  };
-};
 
 const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
   return (

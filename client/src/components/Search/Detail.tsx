@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getSingleBookInfo, timeForToday } from "../../api";
+import { BookInfo } from "../../state/typeDefs";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -80,33 +81,12 @@ const Date = styled.div`
   color: grey;
 `;
 
-type BookInfo = {
-  id: number;
-  title: string;
-  img: string;
-  content: string;
-  quality: string;
-  exchanged: Boolean;
-  userNickname: string;
-  locationId: number;
-  createdAt: string;
-  updatedAt: string;
-  locations: {
-    id: number;
-    lat: number;
-    lon: number;
-    address: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
 const Details = () => {
   let { id } = useParams();
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
 
-  const { title, img, content, quality, exchanged, userNickname, createdAt, locations } = bookDetailInfo as BookInfo;
+  const { title, img, content, quality, exchanged, createdAt, locations } = bookDetailInfo as BookInfo;
 
   const date = timeForToday(createdAt);
 
