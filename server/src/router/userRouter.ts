@@ -19,6 +19,6 @@ userRouter.route("/nickcheck").post(nickCheck);
 userRouter.route("/login").post(login);
 userRouter.route("/logout").get();
 userRouter.route("/delete").delete(deleteJoin);
-userRouter.route("/mypage").get(mypage).put(upload.array("file"), putMypage);
+userRouter.route("/mypage").get(mypage).patch(upload.array("file"), putMypage);
 
 export default userRouter;

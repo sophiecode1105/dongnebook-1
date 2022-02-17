@@ -20,7 +20,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@prisma/client": "^2.16.1",
+    "@prisma/client": "^3.0.1",
     "@socket.io/admin-ui": "^0.2.0",
     "@types/aws-sdk": "^2.7.0",
     "@types/bcrypt": "^5.0.0",
@@ -51,7 +51,7 @@
     "multer-s3": "^2.10.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.2",
-    "prisma": "^2.16.1",
+    "prisma": "^3.0.1",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^4.4.1",
     "ws": "^8.5.0"
