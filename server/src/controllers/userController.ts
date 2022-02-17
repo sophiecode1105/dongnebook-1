@@ -51,10 +51,10 @@ export const postCertify = async (req: express.Request, res: express.Response) =
       });
       return res.status(200).json({ message: "인증 성공", number, state: true }); // 클라이언트에게 보내기
     } else {
-      return res.status(200).json({ message: "이미 가입된 회원입니다.", state: false });
+      return res.status(403).json({ message: "이미 가입된 회원입니다.", state: false });
     }
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -71,10 +71,10 @@ export const nickCheck = async (req: express.Request, res: express.Response) => 
     if (!existUser) {
       return res.status(200).json({ message: "사용 가능한 닉네임 입니다.", state: true });
     } else {
-      return res.status(200).json({ message: "이미 사용중인 닉네임 입니다.", state: false });
+      return res.status(403).json({ message: "이미 사용중인 닉네임 입니다.", state: false });
     }
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -105,8 +105,8 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
     const User = await userFinder(email);
 
     return res.status(201).json({ message: "회원가입 완료", User, state: true });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -137,13 +137,13 @@ export const login = async (req: express.Request, res: express.Response) => {
         delete userInfo.password;
         return res.status(200).json({ message: "로그인 완료", state: true, userInfo, token });
       } else {
-        return res.status(403).json({ message: "비밀번호가 일치하지 않습니다.", state: false });
+        return res.status(400).json({ message: "비밀번호가 일치하지 않습니다.", state: false });
       }
     } else {
       return res.status(403).json({ message: "존재하지않는 회원입니다.", state: false });
     }
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -151,34 +151,17 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
   try {
     const { token } = req.body;
 
-    jwt.verify(
-      token,
-      process.env.ACCESS_SECRET,
-      async (err: jwt.JsonWebTokenError, decoded: string | jwt.JwtPayload) => {
-        try {
-          if (err) {
-            return res.status(500).json({ message: "로그인을 다시 해주세요." });
-          } else {
-            const deleteProduct = client.product.deleteMany({
-              where: {
-                userNickname: decoded["nickname"],
-              },
-            });
-            const deleteUser = client.user.delete({
-              where: {
-                email: decoded["email"],
-              },
-            });
-            await client.$transaction([deleteProduct, deleteUser]);
-            return res.status(200).json({ message: "회원탈퇴 완료", state: true });
-          }
-        } catch (err) {
-          return res.status(500).json({ message: "존재하지 않는 회원입니다.", err });
-        }
-      }
-    );
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+    const userInfo = verify(token);
+
+    await client.user.delete({
+      where: {
+        id: userInfo["id"],
+      },
+    });
+
+    return res.status(200).json({ message: "회원탈퇴 완료", state: true });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -187,11 +170,11 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const { token } = req.headers;
 
     let tokenInfo: string | jwt.JwtPayload;
-    console.log(token);
+
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
-      return res.status(403).json({ message: "로그인을 다시 해주세요.", state: false });
+      return res.status(401).json({ message: "로그인을 다시 해주세요.", state: false });
     }
 
     const userInfo = await client.user.findUnique({
@@ -200,6 +183,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         locations: true,
+        likes: true,
       },
     });
     const exchangeTrue = await client.product.findMany({
@@ -207,11 +191,17 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         exchanged: true,
         userNickname: userInfo.nickname,
       },
+      include: {
+        images: true,
+      },
     });
     const exchangeFalse = await client.product.findMany({
       where: {
         exchanged: false,
         userNickname: userInfo.nickname,
+      },
+      include: {
+        images: true,
       },
     });
 
@@ -224,8 +214,8 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       exchangeFalse,
       state: true,
     });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -256,7 +246,7 @@ export const putMypage = async (req: express.Request, res: express.Response) => 
       },
     });
     return res.status(200).json({ message: "마이페이지 수정 완료", state: true });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
