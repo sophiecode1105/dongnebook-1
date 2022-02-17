@@ -187,7 +187,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const { token } = req.headers;
 
     let tokenInfo: string | jwt.JwtPayload;
-    console.log(token);
+
     try {
       tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
     } catch {
@@ -200,6 +200,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         locations: true,
+        likes: true,
       },
     });
     const exchangeTrue = await client.product.findMany({

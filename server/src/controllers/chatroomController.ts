@@ -69,7 +69,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
     const data = verify(String(token));
     const userInfo = await userFinder(data["email"]);
 
-    const chat = await client.chatroom.findMany({
+    const notReadChat = await client.chatroom.findMany({
       where: {
         users: {
           some: {
@@ -113,7 +113,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
     });
 
     chatroom.forEach((el, idx) => {
-      el["count"] = chat[idx].chats.length;
+      el["count"] = notReadChat[idx].chats.length;
     });
 
     return res
@@ -134,8 +134,7 @@ export const postChat = async (req: express.Request, res: express.Response) => {
     const { id } = req.params; //채팅방 id
 
     const userInfo = verify(token);
-    console.log("@@@@@@@@");
-    console.log(userInfo);
+
     await client.chat.create({
       data: {
         userId: userInfo["id"],
@@ -181,7 +180,27 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
         },
       },
     });
-    return res.status(200).json({ message: "채팅방 입장 완료", state: true });
+
+    const chatroom = await client.chatroom.findMany({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        users: {
+          include: {
+            users: true,
+          },
+        },
+        chats: {
+          orderBy: {
+            id: "desc",
+          },
+        },
+        product: true,
+      },
+    });
+
+    return res.status(200).json({ message: "채팅방 입장 완료", chatroom, state: true });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
