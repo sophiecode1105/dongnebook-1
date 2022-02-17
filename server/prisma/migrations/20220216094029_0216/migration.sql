@@ -26,6 +26,7 @@ CREATE TABLE `Product` (
     `exchanged` BOOLEAN NOT NULL DEFAULT false,
     `userNickname` VARCHAR(191) NOT NULL,
     `locationId` INTEGER NOT NULL,
+    `visit` INTEGER NOT NULL DEFAULT 0,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

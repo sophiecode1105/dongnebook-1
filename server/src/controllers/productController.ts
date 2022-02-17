@@ -68,6 +68,17 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
     let { id } = req.params;
     const findId = Number(id);
 
+    await client.product.update({
+      where: {
+        id: findId,
+      },
+      data: {
+        visit: {
+          increment: 1,
+        },
+      },
+    });
+
     const productInfo = await client.product.findUnique({
       where: {
         id: findId,
