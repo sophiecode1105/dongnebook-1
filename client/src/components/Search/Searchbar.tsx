@@ -1,5 +1,9 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { bookSearch, loginState } from "../../state/state";
+import { searchBook } from "../../api";
+import { useState } from "react";
 
 const Container = styled.div`
   display: flex;
@@ -64,7 +68,7 @@ const SearchButton = styled.button`
   }
 `;
 
-const IconBox = styled(Link)`
+const IconBox = styled.div`
   width: 4%;
   display: flex;
   align-items: center;
@@ -78,18 +82,47 @@ const IconBox = styled(Link)`
   }
 `;
 
-const SearchBar = () => {
+const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
+  const isLogin = useRecoilValue(loginState);
+  const navigate = useNavigate();
+  const [textSearch, setTextSearch] = useState("");
+  const search = useSetRecoilState(bookSearch);
+  search(textSearch);
+
+  const handleCheckLogin = () => {
+    if (isLogin) {
+      navigate("/upload");
+    } else {
+      navigate("/signin");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Enter") {
+      handleSearchClick();
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextSearch(e.target.value);
+  };
+
   return (
     <Container>
       <TitleBox>
         <Title>도서 검색</Title>
       </TitleBox>
       <SearchBox>
-        <SearchInput type="text" placeholder="찾고싶은 도서를 검색해보세요"></SearchInput>
-        <SearchButton type="button">
+        <SearchInput
+          type="text"
+          placeholder="찾고싶은 도서를 검색해보세요"
+          onKeyPress={handleKeyPress}
+          onChange={handleChange}
+        ></SearchInput>
+        <SearchButton type="button" onClick={handleSearchClick}>
           <i className="fas fa-search"></i>
         </SearchButton>
-        <IconBox to="/upload">
+        <IconBox onClick={handleCheckLogin}>
           <i className="fas fa-plus-circle"></i>
         </IconBox>
       </SearchBox>

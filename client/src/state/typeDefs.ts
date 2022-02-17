@@ -18,6 +18,17 @@ export type UserState = {
   };
 };
 
+export type UserInfo = {
+  userInfo: {
+    id: number;
+    nickname: string;
+    admin: boolean;
+    email: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export type BookInfo = {
   id: number;
   title: string;
@@ -26,6 +37,7 @@ export type BookInfo = {
   quality: string;
   exchanged: Boolean;
   userId: number;
+  userNickname: string;
   createdAt: string;
   updatedAt: string;
   locations: {
@@ -60,4 +72,8 @@ export type ListProps = {
 
 export type ErrorProps = {
   error: string | undefined;
+};
+
+export type isWriterProps = {
+  isWriter: Boolean;
 };
