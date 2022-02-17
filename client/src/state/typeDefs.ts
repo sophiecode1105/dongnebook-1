@@ -8,14 +8,7 @@ export type UserState = {
   locationId: number;
   createdAt: string;
   updatedAt: string;
-  locations: {
-    createdAt: string;
-    address: string;
-    id: number;
-    lat: number;
-    lon: number;
-    updatedAt: string;
-  };
+  locations: locations;
 };
 
 export type BookInfo = {
@@ -28,14 +21,7 @@ export type BookInfo = {
   userId: number;
   createdAt: string;
   updatedAt: string;
-  locations: {
-    id: number;
-    lat: number;
-    lon: number;
-    address: string;
-    createdAt: string;
-    updatedAt: string;
-  };
+  locations: locations;
 };
 
 export type KakaoMap = {
@@ -53,11 +39,18 @@ export type ListProps = {
   userId: number;
   createdAt: string;
   updatedAt: string;
-  locations: {
-    address: string;
-  };
+  locations: locations;
 };
 
 export type ErrorProps = {
   error: string | undefined;
+};
+
+type locations = {
+  id: number;
+  lat: number;
+  lon: number;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
 };
