@@ -15,13 +15,13 @@ const productRouter = express.Router();
 
 productRouter.route("/list").get(getAllProduct);
 
-productRouter.route("/post").post(upload.array("file"), postProduct);
+productRouter.route("/post").post(upload.array("file", 4), postProduct);
 
 productRouter
   .route("/:id(\\d+)")
   .post(postLike)
   .get(getOneProduct)
-  .patch(upload.array("file"), putProduct)
+  .patch(upload.array("file", 4), putProduct)
   .delete(deleteProduct);
 
 productRouter.route("/search").get(searchProduct);

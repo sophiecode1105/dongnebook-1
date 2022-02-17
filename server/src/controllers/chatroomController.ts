@@ -27,9 +27,7 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
     });
 
     if (isFind.length !== 0) {
-      return res
-        .status(200)
-        .json({ message: "채팅방이 이미 존재합니다", chatroom: isFind, state: true });
+      return res.status(200).json({ message: "채팅방이 이미 존재합니다", chatroom: isFind, state: true });
     }
 
     const chatroom = await client.chatroom.create({
@@ -111,7 +109,11 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
             id: "desc",
           },
         },
-        product: true,
+        product: {
+          include: {
+            images: true,
+          },
+        },
       },
     });
 
@@ -119,9 +121,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res
-      .status(200)
-      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -199,7 +199,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
             id: "desc",
           },
         },
-        product: true,
+        product: { include: { images: true } },
       },
     });
 

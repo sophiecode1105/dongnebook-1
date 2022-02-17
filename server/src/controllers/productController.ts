@@ -2,6 +2,8 @@ import express from "express";
 import client from "../client";
 import FuzzySearch from "fuzzy-search";
 import { productFinder, userFinder, verify } from "../token/verify";
+import { create } from "domain";
+import { url } from "inspector";
 
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
@@ -21,6 +23,7 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
       },
       include: {
         locations: true,
+        images: true,
       },
     });
 
@@ -41,6 +44,11 @@ export const postProduct = async (req: express.Request, res: express.Response) =
     const data = verify(token);
 
     const userInfo = await userFinder(data["email"]);
+    const imgs = req.files;
+    const url = [];
+    for (let i = 0; i < imgs.length; i++) {
+      url.push({ url: imgs[i].location });
+    }
 
     if (title && req.files[0] && content && quality) {
       const locationCreate = await client.location.create({
@@ -48,10 +56,11 @@ export const postProduct = async (req: express.Request, res: express.Response) =
           lat: Number(lat),
           lon: Number(lon),
           address,
+
           products: {
             create: {
               title,
-              img: req.files[0].location,
+              images: { createMany: { data: url } },
               content,
               quality,
               userNickname: userInfo.nickname,
@@ -80,6 +89,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       },
       include: {
         locations: true,
+        images: true,
       },
     });
 
@@ -112,11 +122,18 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
     let { id } = req.params;
-    const { title, img, content, quality, token, lat, lon, address } = req.body;
+    const { title, content, quality, token, lat, lon, address } = req.body;
 
     const findId = Number(id);
     const data = verify(token);
     const userInfo = await userFinder(data["email"]);
+
+    const imgs = req.files;
+    const url = [];
+    for (let i = 0; i < imgs.length; i++) {
+      url.push({ url: imgs[i].location, productId: findId });
+    }
+    console.log(url);
     const productInfo = await client.product.findMany({
       where: {
         userNickname: userInfo.nickname,
@@ -132,14 +149,20 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         address,
       },
     });
-
+    await client.image.deleteMany({
+      where: {
+        productId: findId,
+      },
+    });
+    await client.image.createMany({
+      data: url,
+    });
     const updateProductInfo = await client.product.update({
       where: {
         id: findId,
       },
       data: {
         title,
-        img,
         content,
         quality,
         exchanged: true,

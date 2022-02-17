@@ -191,11 +191,17 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         exchanged: true,
         userNickname: userInfo.nickname,
       },
+      include: {
+        images: true,
+      },
     });
     const exchangeFalse = await client.product.findMany({
       where: {
         exchanged: false,
         userNickname: userInfo.nickname,
+      },
+      include: {
+        images: true,
       },
     });
 

@@ -35,7 +35,6 @@ model Product {
   id        Int      @id @default(autoincrement())
   chatrooms  Chatroom[]
   title     String  
-  img       String?
   content   String
   quality   String
   exchanged  Boolean @default(false)
@@ -44,6 +43,7 @@ model Product {
   locations  Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
   locationId Int
   likes     Liked[]
+  images    Image[]
   visit     Int  @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,7 +102,14 @@ model Liked {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
+model Image {
+  id        Int      @id @default(autoincrement())
+  url String
+  products   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 
 
