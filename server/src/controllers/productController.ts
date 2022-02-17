@@ -25,8 +25,8 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     });
 
     return res.status(200).json({ message: "도서 목록 조회 성공", allProductList });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -58,9 +58,8 @@ export const postProduct = async (req: express.Request, res: express.Response) =
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요." });
     }
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 export const getOneProduct = async (req: express.Request, res: express.Response) => {
@@ -98,8 +97,8 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
     } else {
       return res.status(400).json({ message: "해당도서가 없습니다." });
     }
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 export const putProduct = async (req: express.Request, res: express.Response) => {
@@ -141,8 +140,8 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
     });
 
     return res.status(201).json({ message: "도서 정보 수정 성공", updateProductInfo });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 export const exchangedProduct = async (req: express.Request, res: express.Response) => {
@@ -157,8 +156,8 @@ export const exchangedProduct = async (req: express.Request, res: express.Respon
       },
     });
     return res.status(200).json({ message: "거래가 완료되었습니다.", state: true });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", state: false });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", state: false, err });
   }
 };
 
@@ -172,8 +171,8 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
       return res.status(200).json({ message: "존재하지 않는 도서입니다." });
     }
     return res.status(200).json({ message: "도서 삭제 성공" });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -213,8 +212,8 @@ export const postLike = async (req: express.Request, res: express.Response) => {
     });
 
     return res.status(201).json({ message: "찜하기 성공", result, status: true });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
 
@@ -230,7 +229,7 @@ export const searchProduct = async (req: express.Request, res: express.Response)
     const result = searcher.search(value as string);
 
     return res.status(200).json({ message: "도서 찾기 성공", result });
-  } catch {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });
+  } catch (err) {
+    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };

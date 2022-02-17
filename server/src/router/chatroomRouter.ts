@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  enterChatroom,
-  getchatroom,
-  postChat,
-  postChatroom,
-} from "../controllers/chatroomController";
+import { enterChatroom, getchatroom, postChat, postChatroom } from "../controllers/chatroomController";
 
 const chatroomRouter = express.Router();
 
