@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
 import { postSignin } from "../../api";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { loginState, userState } from "../../state";
+import { useSetRecoilState } from "recoil";
+import { loginState, userState } from "../../state/state";
+import { ErrorProps, UserState } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;
@@ -38,18 +39,13 @@ const LoginForm = styled.form`
   background-color: white;
 `;
 
-interface ErrorProps {
-  error: string | undefined;
-}
-
 const LoginInput = styled.input<ErrorProps>`
   width: 100%;
   text-decoration: none;
   border: none;
   padding: 20px 20px;
   font-size: 15px;
-  border: ${(props) =>
-    props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)"};
+  border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   &:focus {
     outline-color: ${(props) => (props.error ? "red" : "green")};
   }
@@ -77,11 +73,7 @@ const LoginButton = styled.button`
   }
 `;
 
-interface CheckProps {
-  check: boolean;
-}
-
-const LoginState = styled.div<CheckProps>`
+const LoginState = styled.div<{ check: boolean }>`
   width: 100%;
   padding-bottom: 10px;
   margin-bottom: 30px;
@@ -221,11 +213,7 @@ const Signin = () => {
             },
           })}
         />
-        {invalid ? (
-          <Errorbox>{errors.password?.message}</Errorbox>
-        ) : (
-          <Errorbox>{infoCheck}</Errorbox>
-        )}
+        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
         <LoginState check={keep}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지

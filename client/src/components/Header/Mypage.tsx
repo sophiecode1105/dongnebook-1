@@ -1,5 +1,5 @@
 import { useRecoilValue } from "recoil";
-import { userState } from "../../state";
+import { userState } from "../../state/state";
 
 const Mypage = () => {
   const user = useRecoilValue(userState);

@@ -1,4 +1,3 @@
-import e from "express";
 import express from "express";
 import client from "../client";
 import { userFinder, userNickFinder, verify } from "../token/verify";
@@ -116,9 +115,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res
-      .status(200)
-      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다." });

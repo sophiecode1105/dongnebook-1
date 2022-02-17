@@ -1,4 +1,5 @@
 import axios from "axios";
+import { UserState } from "./state/typeDefs";
 
 const URL = "http://localhost:4000";
 
@@ -53,20 +54,14 @@ interface LoginInfo extends Userinfo {
 
 type User = {
   token: string;
-  userInfo: {
-    id: number;
-    nickname: string;
-    email: string;
-    img: string;
-    admin: boolean;
-  };
+  userInfo: UserState;
 };
 
 export const postSignin = async (body: LoginInfo): Promise<User> => {
   try {
     const {
       data: { userInfo, token },
-    } = await axios.post(`${URL}/user/login`, body);
+    } = await axios.post<User>(`${URL}/user/login`, body);
     delete userInfo.password;
     return { userInfo, token };
   } catch (e) {
@@ -74,17 +69,17 @@ export const postSignin = async (body: LoginInfo): Promise<User> => {
   }
 };
 
-export const getUserInfo = async (token: string | null) => {
+export const getUserInfo = async (token: string | null): Promise<UserState> => {
   try {
     if (token) {
       const {
         data: { userInfo },
-      } = await axios.get(`${URL}/user/mypage`, {
+      } = await axios.get<User>(`${URL}/user/mypage`, {
         headers: { token },
       });
       return userInfo;
     }
-    return {};
+    return {} as UserState;
   } catch (e) {
     throw e;
   }
