@@ -21,10 +21,10 @@ productRouter
   .route("/:id(\\d+)")
   .post(postLike)
   .get(getOneProduct)
-  .put(upload.array("file"), putProduct)
+  .patch(upload.array("file"), putProduct)
   .delete(deleteProduct);
 
 productRouter.route("/search").get(searchProduct);
 
-productRouter.route("/exchange/:id(\\d+)").put(exchangedProduct);
+productRouter.route("/:id(\\d+)/exchange").patch(exchangedProduct);
 export default productRouter;
