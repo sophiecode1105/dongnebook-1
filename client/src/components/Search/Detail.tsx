@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteContent, getSingleBookInfo, timeForToday } from "../../api";
-import { BookInfo, isWriterProps } from "../../state/typeDefs";
+import { deleteContent, getSingleBookInfo, postHeart, timeForToday } from "../../api";
+import { BookInfo, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
-import { userState } from "../../state/state";
+import { loginState, userState } from "../../state/state";
 import { useRecoilValue } from "recoil";
+import axios from "axios";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -37,7 +38,7 @@ const KeyInfoBox = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 1100px;
-  height: 500px;
+  height: 550px;
   margin: 30px;
 `;
 
@@ -102,9 +103,10 @@ const UserNickname = styled.div`
 const UserModifyBox = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid black;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   width: 300px;
-  color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
 `;
 
 const BookStatusBox = styled.div`
@@ -115,27 +117,40 @@ const BookStatusBox = styled.div`
 `;
 
 const BookStatusTitle = styled.div`
-  width: 50%;
+  width: 100%;
   height: 50%;
-  border: 1px solid green;
+  font-size: 17px;
+  font-weight: bold;
+  padding: 5px;
 `;
 const BookStatusChangeBox = styled.div`
-  width: 50%;
+  width: 100%;
   height: 50%;
-  border: 1px solid black;
+  /* border: 1px solid black; */
 `;
 
 const BooksStatusChange = styled.div`
-  border: 1px solid pink;
+  width: 100%;
   height: 50%;
+  padding: 5px;
+  font-size: 16px;
+  font-weight: bold;
 `;
 
 const StatusCheck = styled.div`
-  border: 1px solid blue;
   height: 50%;
+  padding: 5px;
+  font-size: 10px;
 `;
 
-const CheckList = styled.input``;
+const Checklabel = styled.label`
+  margin-right: 10px;
+  font-size: 15px;
+`;
+
+const CheckList = styled.input`
+  margin-right: 7px;
+`;
 
 const ModifyButtonBox = styled.div`
   display: flex;
@@ -176,6 +191,7 @@ const Line = styled.div`
 const BorderBottom = styled.div`
   width: 95%;
   border: 0.5px solid rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
 `;
 
 const DetailInfoBox = styled.div`
@@ -188,7 +204,7 @@ const DetailInfoBox = styled.div`
 const Content = styled.div`
   display: flex;
   justify-content: cetner;
-  height: 30%;
+  height: 300px;
   color: rgba(0, 0, 0, 0.7);
   width: 100%;
   padding: 20px 20px 0px 20px;
@@ -245,17 +261,25 @@ const TouchButton = styled.button<isWriterProps>`
     background-color: rgba(47, 98, 24, 0.8);
   }
 `;
+const Div = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 const Details = () => {
   let { id } = useParams();
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
+  const [userData, setUserData] = useState<UserState>(useRecoilValue(userState));
   const UserCheck = useRecoilValue(userState);
+  const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, img, content, quality, exchanged, createdAt, locations, userNickname } = bookDetailInfo as BookInfo;
-
+  const { title, images, content, quality, exchanged, createdAt, locations, userNickname } = bookDetailInfo as BookInfo;
+  // console.log("이미지", images[0]);
   const date = timeForToday(createdAt);
   const navigate = useNavigate();
   const isWriter = UserCheck?.nickname === userNickname;
@@ -266,8 +290,13 @@ const Details = () => {
     setBookDetailInfo(data);
   };
 
-  const handleClickHeart = () => {
+  const handleClickHeart = async () => {
     setIsHeartPressed(!isHeartPressed);
+    try {
+      await postHeart(Number(id), token);
+    } catch (e) {
+      console.error(e);
+    }
   };
   const handleChangePage = () => {
     navigate("/myinfo");
@@ -278,9 +307,30 @@ const Details = () => {
     navigate("/search");
   };
 
+  //테스트용!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  const bookLiked = async () => {
+    console.log("USERCHECK -> ", UserCheck);
+    // 페이지 강제 접속시 userCheck empty object 버그
+    let { data } = await axios.post(`http://localhost:4000/user/${UserCheck?.id}/likes`, {
+      token,
+      productId: Number(id),
+    });
+    console.log("liked", data.liked);
+    setIsHeartPressed(data.liked);
+  };
+
   useEffect(() => {
+    setUserData(UserCheck);
     getSingleData();
+    //get user likes
   }, []);
+
+  useEffect(() => {
+    console.log("IS BOOK LIEKD?????");
+    let isPressed = bookLiked();
+  }, [UserCheck]);
 
   return isPc ? (
     <Container>
@@ -288,7 +338,7 @@ const Details = () => {
         <Title>상세보기</Title>
       </TitleBox>
       <KeyInfoBox>
-        <BookImg src={img} />
+        <BookImg src={images && images[0].url} />
         <KeyInfo>
           <BookTitle>{title}</BookTitle>
           <BorderBottom />
@@ -297,22 +347,28 @@ const Details = () => {
               <UserAvatar src={avatar} />
               <UserNickname>{userNickname}</UserNickname>
             </UserBox>
-            <UserModifyBox>
-              <BookStatusBox>
+            {isWriter ? (
+              <UserModifyBox>
                 <BookStatusTitle>도서 상태 관리</BookStatusTitle>
-                <BookStatusChangeBox>
-                  <BooksStatusChange>상태 변경</BooksStatusChange>
-                  <StatusCheck>
-                    <CheckList type="radio" id="can"></CheckList>
-                    <CheckList type="radio" id="cannot"></CheckList>
-                  </StatusCheck>
-                </BookStatusChangeBox>
-              </BookStatusBox>
-              <ModifyButtonBox>
-                <ModifyButton>수정</ModifyButton>
-                <ModifyButton onClick={handleClickDelete}>삭제</ModifyButton>
-              </ModifyButtonBox>
-            </UserModifyBox>
+                <Div>
+                  <BookStatusBox>
+                    <BookStatusChangeBox>
+                      <BooksStatusChange>상태 변경</BooksStatusChange>
+                      <StatusCheck>
+                        <CheckList type="radio" id="can" name="status"></CheckList>
+                        <Checklabel htmlFor="can">교환완료</Checklabel>
+                        <CheckList type="radio" id="cannot" name="status"></CheckList>
+                        <Checklabel htmlFor="cannot">교환가능</Checklabel>
+                      </StatusCheck>
+                    </BookStatusChangeBox>
+                  </BookStatusBox>
+                  <ModifyButtonBox>
+                    <ModifyButton>수정</ModifyButton>
+                    <ModifyButton onClick={handleClickDelete}>삭제</ModifyButton>
+                  </ModifyButtonBox>
+                </Div>
+              </UserModifyBox>
+            ) : null}
           </UserInfoBox>
           <IconBox>
             <Heart>
@@ -339,6 +395,7 @@ const Details = () => {
               <DetailContent>{locations?.address}</DetailContent>
             </StatusBox>
           </DetailInfoBox>
+
           <Content>{content}</Content>
           <ButtonBox>
             {isWriter ? (

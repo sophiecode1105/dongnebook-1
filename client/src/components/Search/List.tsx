@@ -15,7 +15,7 @@ const Container = styled.section`
 
 const BookListContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-auto-rows: 320px;
+  grid-auto-rows: 330px;
   width: 100%;
   display: grid;
   padding-left: 30px;
