@@ -493,9 +493,10 @@ const Upload = () => {
                     })}
                   />
                 </Label>
-                {imgList.map((url) => {
+                {imgList.map((url, key) => {
                   return (
                     <div
+                      key={key}
                       style={{
                         display: "flex",
                         border: "1px solid #dcdbe3",

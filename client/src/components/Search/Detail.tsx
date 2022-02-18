@@ -274,7 +274,7 @@ const Details = () => {
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
-  const [isSold, setIsSold] = useState(false);
+  // const [isSold, setIsSold] = useState(false);
   const [userData, setUserData] = useState<UserState>(useRecoilValue(userState));
   const UserCheck = useRecoilValue(userState);
   const token = useRecoilValue(loginState);
@@ -311,7 +311,7 @@ const Details = () => {
 
   const handleClickExchange = async (e: any) => {
     await patchExchange(Number(id));
-    setIsSold(true);
+    // setIsSold(true);
     Swal.fire({
       text: "교환완료로 변경되었습니다.",
       confirmButtonText: "확인",
@@ -323,27 +323,12 @@ const Details = () => {
   //테스트용!!!!!!!!!!!!!!!!!!!!!!!!!!!
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  const bookLiked = async () => {
-    console.log("USERCHECK -> ", UserCheck);
-    // 페이지 강제 접속시 userCheck empty object 버그
-    let { data } = await axios.post(`http://localhost:4000/user/${UserCheck?.id}/likes`, {
-      token,
-      productId: Number(id),
-    });
-    console.log("liked", data.liked);
-    setIsHeartPressed(data.liked);
-  };
 
   useEffect(() => {
     setUserData(UserCheck);
     getSingleData();
     //get user likes
   }, []);
-
-  useEffect(() => {
-    console.log("IS BOOK LIEKD?????");
-    let isPressed = bookLiked();
-  }, [UserCheck]);
 
   return isPc ? (
     <Container>
@@ -368,15 +353,9 @@ const Details = () => {
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
                       <StatusCheck>
-                        <CheckList
-                          type="radio"
-                          id="can"
-                          name="status"
-                          checked={isSold}
-                          onClick={handleClickExchange}
-                        ></CheckList>
+                        <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status" checked={!isSold}></CheckList>
+                        <CheckList type="radio" id="cannot" name="status"></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
