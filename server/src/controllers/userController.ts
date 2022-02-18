@@ -149,9 +149,9 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 export const deleteJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.body;
+    const { token } = req.headers;
 
-    const userInfo = verify(token);
+    const userInfo = verify(String(token));
 
     await client.user.delete({
       where: {

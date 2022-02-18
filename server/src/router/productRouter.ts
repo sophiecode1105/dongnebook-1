@@ -17,6 +17,8 @@ productRouter.route("/list").get(getAllProduct);
 
 productRouter.route("/post").post(upload.array("file", 4), postProduct);
 
+productRouter.route("/:id(\\d+)/exchange").patch(exchangedProduct);
+
 productRouter
   .route("/:id(\\d+)")
   .post(postLike)
@@ -26,5 +28,4 @@ productRouter
 
 productRouter.route("/search").get(searchProduct);
 
-productRouter.route("/:id(\\d+)/exchange").patch(exchangedProduct);
 export default productRouter;
