@@ -56,6 +56,11 @@ export const currentaddress = atom<string>({
   default: "",
 });
 
+export const chatlist = atom({
+  key: "chatlist",
+  default: {},
+});
+
 export const bookSearch = atom<string>({
   key: "bookSearch",
   default: "",

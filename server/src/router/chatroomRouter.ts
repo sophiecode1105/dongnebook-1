@@ -3,7 +3,8 @@ import { deleteChatroom, enterChatroom, getchatroom, postChat, postChatroom } fr
 
 const chatroomRouter = express.Router();
 
-chatroomRouter.route("/").get(getchatroom);
+chatroomRouter.route("/").get(getchatroom).post(postChatroom);
 chatroomRouter.route("/:id/chat").post(postChat);
-chatroomRouter.route("/:id").post(postChatroom).get(enterChatroom).delete(deleteChatroom);
+
+chatroomRouter.route("/:id").get(enterChatroom).delete(deleteChatroom);
 export default chatroomRouter;

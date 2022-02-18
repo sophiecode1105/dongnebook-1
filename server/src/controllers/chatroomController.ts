@@ -4,16 +4,15 @@ import { userFinder, userNickFinder, verify } from "../token/verify";
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token, writer } = req.body;
-    const { id } = req.params; // 게시글 id
+    const { id } = req.body;
+    const { token } = req.headers;
     let data;
     try {
-      data = verify(token);
+      data = verify(String(token));
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
     const userInfo = await userFinder(data["email"]);
-    const otherInfo = await userNickFinder(writer);
 
     const isFind = await client.chatroom.findMany({
       where: {
@@ -25,7 +24,15 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
         },
       },
     });
-
+    const otherInfo = await client.user.findMany({
+      where: {
+        products: {
+          some: {
+            id: Number(id),
+          },
+        },
+      },
+    });
     if (isFind.length !== 0) {
       return res.status(200).json({ message: "채팅방이 이미 존재합니다", chatroom: isFind, state: true });
     }
@@ -44,7 +51,7 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
             {
               users: {
                 connect: {
-                  id: otherInfo.id,
+                  id: otherInfo[0].id,
                 },
               },
             },
@@ -109,11 +116,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
             id: "desc",
           },
         },
-        product: {
-          include: {
-            images: true,
-          },
-        },
+        product: true,
       },
     });
 
@@ -129,13 +132,14 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
 
 export const postChat = async (req: express.Request, res: express.Response) => {
   try {
-    const { content, token } = req.body;
+    const { content } = req.body;
+    const { token } = req.headers;
     if (!token) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
     const { id } = req.params; //채팅방 id
 
-    const userInfo = verify(token);
+    const userInfo = verify(String(token));
 
     await client.chat.create({
       data: {
@@ -199,7 +203,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
             id: "desc",
           },
         },
-        product: { include: { images: true } },
+        product: true,
       },
     });
 

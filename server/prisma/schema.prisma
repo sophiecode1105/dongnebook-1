@@ -38,8 +38,8 @@ model Product {
   content   String
   quality   String
   exchanged  Boolean @default(false)
-  users     User  @relation(fields: [userNickname], references: [nickname], onDelete: Cascade)
-  userNickname    String
+  users     User  @relation(fields: [nickname], references: [nickname], onDelete: Cascade)
+  nickname    String
   locations  Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
   locationId Int
   likes     Liked[]
