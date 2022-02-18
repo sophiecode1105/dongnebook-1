@@ -7,10 +7,9 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
     const { id } = req.body;
     const authorization = req.headers.authorization;
 
-    const token = verify(authorization.split(" ")[1]);
     let data;
     try {
-      data = verify(String(token));
+      data = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
@@ -72,10 +71,9 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
   try {
     const authorization = req.headers.authorization;
 
-    const token = verify(authorization.split(" ")[1]);
     let data;
     try {
-      data = verify(String(token));
+      data = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
@@ -139,13 +137,12 @@ export const postChat = async (req: express.Request, res: express.Response) => {
     const { content } = req.body;
     const authorization = req.headers.authorization;
 
-    const token = verify(authorization.split(" ")[1]);
-    if (!token) {
+    if (!authorization) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
     const { id } = req.params; //채팅방 id
 
-    const userInfo = verify(String(token));
+    const userInfo = verify(authorization.split(" ")[1]);
 
     await client.chat.create({
       data: {
@@ -165,13 +162,11 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
   try {
     const authorization = req.headers.authorization;
 
-    const token = verify(authorization.split(" ")[1]);
-
     const { id } = req.params; //채팅방 id
     let userInfo;
 
     try {
-      userInfo = verify(String(token));
+      userInfo = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
