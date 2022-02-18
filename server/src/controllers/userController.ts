@@ -153,9 +153,9 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 export const deleteJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
-    const userInfo = verify(String(token));
+    const userInfo = verify(authorization.split(" ")[1]);
 
     await client.user.delete({
       where: {
@@ -171,12 +171,12 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
     let tokenInfo: string | jwt.JwtPayload;
 
     try {
-      tokenInfo = jwt.verify(String(token), process.env.ACCESS_SECRET);
+      tokenInfo = verify(authorization.split(" ")[1]);
     } catch {
       return res.status(401).json({ message: "로그인을 다시 해주세요.", state: false });
     }
@@ -226,9 +226,9 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
     const { nickname, lat, lon, address } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
-    const veriToken = verify(String(token));
+    const veriToken = verify(authorization.split(" ")[1]);
 
     const user = await client.user.update({
       where: {

@@ -5,10 +5,11 @@ import { userFinder, userNickFinder, verify } from "../token/verify";
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
     let data;
     try {
-      data = verify(String(token));
+      data = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
@@ -68,10 +69,11 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
 
 export const getchatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
     let data;
     try {
-      data = verify(String(token));
+      data = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
@@ -133,13 +135,14 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
 export const postChat = async (req: express.Request, res: express.Response) => {
   try {
     const { content } = req.body;
-    const { token } = req.headers;
-    if (!token) {
+    const authorization = req.headers.authorization;
+
+    if (!authorization) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
     const { id } = req.params; //채팅방 id
 
-    const userInfo = verify(String(token));
+    const userInfo = verify(authorization.split(" ")[1]);
 
     await client.chat.create({
       data: {
@@ -157,13 +160,13 @@ export const postChat = async (req: express.Request, res: express.Response) => {
 
 export const enterChatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
     const { id } = req.params; //채팅방 id
     let userInfo;
 
     try {
-      userInfo = verify(String(token));
+      userInfo = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }

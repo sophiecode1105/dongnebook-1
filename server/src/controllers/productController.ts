@@ -48,9 +48,9 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { title, content, quality, lat, lon, address } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
-    const data = verify(String(token));
+    const data = verify(authorization.split(" ")[1]);
 
     const userInfo = await userFinder(data["email"]);
     const imgs = req.files;
@@ -89,9 +89,27 @@ export const postProduct = async (req: express.Request, res: express.Response) =
 };
 export const getOneProduct = async (req: express.Request, res: express.Response) => {
   try {
+    const authorization = req.headers.authorization;
+
     let { id } = req.params;
+
     const findId = Number(id);
 
+    let checkLike: any;
+    if (authorization) {
+      const token = verify(authorization.split(" ")[1]);
+      checkLike = await client.product.findMany({
+        where: {
+          id: findId,
+          likes: {
+            some: {
+              userId: token["id"],
+            },
+          },
+        },
+      });
+    }
+    const isLike = checkLike.length === 0 ? false : true;
     const productInfo = await client.product.findUnique({
       where: {
         id: findId,
@@ -120,7 +138,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
         },
       });
 
-      return res.status(201).json({ message: "도서 상세보기 성공", productInfo, likeCount });
+      return res.status(201).json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
     } else {
       return res.status(400).json({ message: "해당도서가 없습니다." });
     }
@@ -132,7 +150,9 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
   try {
     let { id } = req.params;
     const { title, content, quality, lat, lon, address, url } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const data = verify(authorization.split(" ")[1]);
     let urls = [];
     if (url) {
       Array.isArray(url)
@@ -142,7 +162,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         : urls.push(JSON.parse(url));
     }
     const findId = Number(id);
-    const data = verify(String(token));
+
     const userInfo = await userFinder(data["email"]);
 
     const imgs = req.files;
@@ -230,12 +250,12 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
 
 export const postLike = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
 
     const { id } = req.params;
     let userInfo;
     try {
-      userInfo = verify(String(token));
+      userInfo = verify(authorization.split(" ")[1]);
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요합니다", status: false, err });
     }
@@ -254,7 +274,7 @@ export const postLike = async (req: express.Request, res: express.Response) => {
           productId: Number(id),
         },
       });
-      return res.status(200).json({ message: "찜하기 취소", status: true });
+      return res.status(200).json({ message: "찜하기 취소", isLike: false, status: true });
     }
     const result = await client.product.update({
       where: {
@@ -269,7 +289,7 @@ export const postLike = async (req: express.Request, res: express.Response) => {
       },
     });
 
-    return res.status(201).json({ message: "찜하기 성공", result, status: true });
+    return res.status(201).json({ message: "찜하기 성공", result, isLike: true, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -286,6 +306,9 @@ export const searchProduct = async (req: express.Request, res: express.Response)
       include: {
         locations: true,
         images: true,
+      },
+      orderBy: {
+        id: "desc",
       },
     });
 
