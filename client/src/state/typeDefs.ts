@@ -37,7 +37,7 @@ export type BookInfo = {
   quality: string;
   exchanged: Boolean;
   userId: number;
-  userNickname: string;
+  nickname: string;
   createdAt: string;
   updatedAt: string;
   locations: locations;

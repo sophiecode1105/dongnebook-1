@@ -278,11 +278,11 @@ const Details = () => {
   const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, exchanged, createdAt, locations, userNickname } = bookDetailInfo as BookInfo;
+  const { title, images, content, quality, exchanged, createdAt, locations, nickname } = bookDetailInfo as BookInfo;
   // console.log("이미지", images[0]);
   const date = timeForToday(createdAt);
   const navigate = useNavigate();
-  const isWriter = UserCheck?.nickname === userNickname;
+  const isWriter = UserCheck?.nickname === nickname;
   console.log(isWriter);
 
   const getSingleData = async () => {
@@ -345,7 +345,7 @@ const Details = () => {
           <UserInfoBox>
             <UserBox>
               <UserAvatar src={avatar} />
-              <UserNickname>{userNickname}</UserNickname>
+              <UserNickname>{nickname}</UserNickname>
             </UserBox>
             {isWriter ? (
               <UserModifyBox>
