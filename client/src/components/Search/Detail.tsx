@@ -286,7 +286,7 @@ const Details = () => {
   console.log(isWriter);
 
   const getSingleData = async () => {
-    const data = await getSingleBookInfo(Number(id));
+    const data = await getSingleBookInfo(Number(id), token);
     setBookDetailInfo(data);
   };
 
