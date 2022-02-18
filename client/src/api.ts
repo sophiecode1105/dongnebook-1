@@ -11,7 +11,7 @@ export const postNickcheck = async (body: Nick) => {
     } = await axios.post(`${URL}/user/nickcheck`, body);
     return state;
   } catch (e) {
-    console.error(e);
+    throw e;
   }
 };
 
@@ -93,6 +93,14 @@ export const postContent = async (body: any) => {
   }
 };
 
+export const deleteContent = async (id: number | undefined) => {
+  try {
+    await axios.delete(`${URL}/product/${id}`);
+  } catch (e) {
+    throw e;
+  }
+};
+
 export const getBookList = async () => {
   try {
     const {
@@ -110,6 +118,17 @@ export const getSingleBookInfo = async (id: number | undefined) => {
       data: { productInfo },
     } = await axios.get(`${URL}/product/${id}`, { withCredentials: true });
     return productInfo;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const searchBook = async (type: string, value: string) => {
+  try {
+    const {
+      data: { result },
+    } = await axios.post(`${URL}/product/search?type=${type}&value=${value}`);
+    return result;
   } catch (e) {
     throw e;
   }
