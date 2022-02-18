@@ -85,9 +85,9 @@ export const getUserInfo = async (token: string | null): Promise<UserState> => {
   }
 };
 
-export const postContent = async (body: any) => {
+export const postContent = async (body: any, token: string) => {
   try {
-    await axios.post(`${URL}/product/post`, body);
+    await axios.post(`${URL}/product/post`, body, { headers: { authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
