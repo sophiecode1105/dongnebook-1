@@ -274,7 +274,7 @@ export const postLike = async (req: express.Request, res: express.Response) => {
           productId: Number(id),
         },
       });
-      return res.status(200).json({ message: "찜하기 취소", status: true });
+      return res.status(200).json({ message: "찜하기 취소", isLike: false, status: true });
     }
     const result = await client.product.update({
       where: {
@@ -289,7 +289,7 @@ export const postLike = async (req: express.Request, res: express.Response) => {
       },
     });
 
-    return res.status(201).json({ message: "찜하기 성공", result, status: true });
+    return res.status(201).json({ message: "찜하기 성공", result, isLike: true, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
