@@ -74,20 +74,18 @@ export const getUserInfo = async (token: string | null): Promise<UserState> => {
     if (token) {
       const {
         data: { userInfo },
-      } = await axios.get<User>(`${URL}/user/mypage`, {
-        headers: { token },
-      });
+      } = await axios.get<User>(`${URL}/user/mypage`, { headers: { Authorization: `jwt ${token}` } });
       return userInfo;
     }
     return {} as UserState;
-  } catch (e) {
+  } catch (e: any) {
     throw e;
   }
 };
 
 export const postContent = async (body: any, token: string) => {
   try {
-    await axios.post(`${URL}/product/post`, body, { headers: { authorization: `jwt ${token}` } });
+    await axios.post(`${URL}/product/post`, body, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
@@ -136,7 +134,7 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(`${URL}/product/${id?.toString()}`, { token });
+    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
@@ -168,6 +166,6 @@ export const timeForToday = (value: string) => {
 export const getChatRoomList = async (token: string | null) => {
   const {
     data: { chatroom },
-  } = await axios.get(`${URL}/chatroom`, { headers: { token: token || "token" } });
+  } = await axios.get(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } });
   return chatroom;
 };
