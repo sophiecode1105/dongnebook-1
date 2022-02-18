@@ -25,8 +25,15 @@ export type UserInfo = {
 export type BookInfo = {
   id: number;
   title: string;
-  img: string;
+  images: {
+    id: number;
+    url: string;
+    productId: number;
+    createdAt: string;
+    updatedAt: string;
+  }[];
   content: string;
+  visit: number;
   quality: string;
   exchanged: Boolean;
   userId: number;
@@ -44,7 +51,6 @@ export type KakaoMap = {
 export type ListProps = {
   id: number;
   title: string;
-  img: string;
   content: string;
   quality: string;
   exchanged: Boolean;
@@ -52,6 +58,13 @@ export type ListProps = {
   createdAt: string;
   updatedAt: string;
   locations: locations;
+  images: {
+    id: number;
+    url: string;
+    productId: number;
+    createdAt: string;
+    updatedAt: string;
+  }[];
 };
 
 export type ErrorProps = {

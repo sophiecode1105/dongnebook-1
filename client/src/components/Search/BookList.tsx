@@ -20,6 +20,7 @@ const BookImgBox = styled.div`
 const BookImg = styled.img`
   width: 100%;
   height: 100%;
+  object-fit: fill;
 `;
 
 const Title = styled.div`
@@ -35,15 +36,16 @@ const Location = styled.div`
 `;
 
 const Booklist = ({ list }: { list: ListProps }) => {
-  const { id, title, content, img, locations } = list;
-  const { address } = locations;
+  const { id, title, content, locations, images } = list;
+  // console.log(images);
+  // const { address } = locations;
   return (
     <Container to={`${id}`}>
       <BookImgBox>
-        <BookImg src={img} />
+        <BookImg src={images && images[0].url} />
       </BookImgBox>
       <Title>{title}</Title>
-      <Location>{address}</Location>
+      <Location>{locations?.address}</Location>
     </Container>
   );
 };
