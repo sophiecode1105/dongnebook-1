@@ -36,7 +36,7 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     });
 
     if (allProductList.length === 0) {
-      return res.status(400).json({ message: "빈 페이지 입니다.", allProductList, state: false });
+      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList, state: false });
     }
 
     return res.status(200).json({ message: "도서 목록 조회 성공", allProductList, state: true });
@@ -94,9 +94,10 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
     let { id } = req.params;
 
     const findId = Number(id);
-
     let checkLike: any;
-    if (authorization) {
+    let isLike;
+    if (authorization.split(" ")[1] !== "null") {
+      console.log(typeof authorization.split(" ")[1]);
       const token = verify(authorization.split(" ")[1]);
       checkLike = await client.product.findMany({
         where: {
@@ -108,8 +109,8 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
           },
         },
       });
+      isLike = checkLike.length === 0 ? false : true;
     }
-    const isLike = checkLike.length === 0 ? false : true;
     const productInfo = await client.product.findUnique({
       where: {
         id: findId,
