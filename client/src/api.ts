@@ -118,11 +118,11 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (id: number | undefined) => {
+export const getSingleBookInfo = async (id: number | undefined, token: string | null) => {
   try {
     const {
       data: { productInfo },
-    } = await axios.get(`${URL}/product/${id}`, { withCredentials: true });
+    } = await axios.get(`${URL}/product/${id}`, { headers: { Authorization: `jwt ${token}`, withCredentials: true } });
     return productInfo;
   } catch (e) {
     throw e;
