@@ -16,7 +16,7 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     });
 
     if (target.length === 0) {
-      return res.status(400).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
+      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
     }
     const allProductList = await client.product.findMany({
       where: {
