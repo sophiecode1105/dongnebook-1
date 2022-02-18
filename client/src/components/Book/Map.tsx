@@ -99,6 +99,7 @@ const Map = () => {
         setMarker(marker);
 
         searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
+          console.log("결과", result);
           storeaddress(
             result[0].address.region_1depth_name +
               " " +
@@ -196,15 +197,17 @@ const Map = () => {
     longtitude(coords.x);
     map?.panTo(moveLatLng);
     marker?.setPosition(moveLatLng);
+
     searchDetailAddrFromCoords(moveLatLng, function (result: any, status: any) {
-      storeaddress(
-        result[0].address?.region_1depth_name +
-          " " +
-          result[0].address?.region_2depth_name +
-          " " +
-          result[0].address?.region_3depth_name
-      );
-      if (result) {
+      if (result[0]) {
+        storeaddress(
+          result[0].address?.region_1depth_name +
+            " " +
+            result[0].address?.region_2depth_name +
+            " " +
+            result[0].address?.region_3depth_name
+        );
+
         let detailAddr = !!result[0]?.road_address
           ? "<div>도로명주소 : " + result[0]?.road_address?.address_name + "</div>"
           : "";
