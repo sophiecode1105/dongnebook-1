@@ -263,6 +263,10 @@ export const searchProduct = async (req: express.Request, res: express.Response)
       where: {
         exchanged: false,
       },
+      include: {
+        locations: true,
+        images: true,
+      },
     });
 
     const searcher = new FuzzySearch(product, [type as string], {

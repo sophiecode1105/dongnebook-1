@@ -6,7 +6,6 @@ import lockcheck from "../../img/lockcheck.png";
 import { postEmailcheck, postNickcheck, postSignup } from "../../api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import DaumPostCode from "react-daum-postcode";
 import { ErrorProps } from "../../state/typeDefs";
 
 const Container = styled.div`

@@ -11,6 +11,17 @@ export type UserState = {
   locations: locations;
 };
 
+export type UserInfo = {
+  userInfo: {
+    id: number;
+    nickname: string;
+    admin: boolean;
+    email: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export type BookInfo = {
   id: number;
   title: string;
@@ -19,6 +30,7 @@ export type BookInfo = {
   quality: string;
   exchanged: Boolean;
   userId: number;
+  userNickname: string;
   createdAt: string;
   updatedAt: string;
   locations: locations;
@@ -53,4 +65,8 @@ type locations = {
   address: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type isWriterProps = {
+  isWriter: Boolean;
 };

@@ -4,8 +4,7 @@ import { userFinder, userNickFinder, verify } from "../token/verify";
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token, writer } = req.body;
-    const { id } = req.params; // 게시글 id
+    const { token, id } = req.body;
     let data;
     try {
       data = verify(token);
@@ -13,7 +12,6 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
     const userInfo = await userFinder(data["email"]);
-    const otherInfo = await userNickFinder(writer);
 
     const isFind = await client.chatroom.findMany({
       where: {
@@ -25,7 +23,15 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
         },
       },
     });
-
+    const otherInfo = await client.user.findMany({
+      where: {
+        products: {
+          some: {
+            id: Number(id),
+          },
+        },
+      },
+    });
     if (isFind.length !== 0) {
       return res.status(200).json({ message: "채팅방이 이미 존재합니다", chatroom: isFind, state: true });
     }
@@ -44,7 +50,7 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
             {
               users: {
                 connect: {
-                  id: otherInfo.id,
+                  id: otherInfo[0].id,
                 },
               },
             },
@@ -109,11 +115,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
             id: "desc",
           },
         },
-        product: {
-          include: {
-            images: true,
-          },
-        },
+        product: true,
       },
     });
 
@@ -199,7 +201,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
             id: "desc",
           },
         },
-        product: { include: { images: true } },
+        product: true,
       },
     });
 
