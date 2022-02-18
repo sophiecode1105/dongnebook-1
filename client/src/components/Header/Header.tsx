@@ -15,8 +15,11 @@ const Header = () => {
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (token) {
+    try {
       setUser(await getUserInfo(token));
+    } catch {
+      localStorage.removeItem("token");
+      setLogin(null);
     }
   };
 

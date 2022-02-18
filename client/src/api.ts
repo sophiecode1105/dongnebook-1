@@ -156,3 +156,10 @@ export const timeForToday = (value: string) => {
 
   return `${Math.floor(betweenTimeDay / 365)}년전`;
 };
+
+export const getChatRoomList = async (token: string | null) => {
+  const {
+    data: { chatroom },
+  } = await axios.get(`${URL}/chatroom`, { headers: { token: token || "token" } });
+  return chatroom;
+};
