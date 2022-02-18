@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue } from "recoil";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   contentStorage,
   currentaddress,
@@ -330,6 +330,7 @@ const Upload = () => {
   const latitude = useRecoilValue(currentLatitude);
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
+  const navigate = useNavigate();
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -370,6 +371,7 @@ const Upload = () => {
     try {
       console.log("hi");
       await postData();
+      navigate("/search");
     } catch (e) {
       throw e;
     }

@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteContent, getSingleBookInfo, postHeart, timeForToday } from "../../api";
+import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday } from "../../api";
 import { BookInfo, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
 import { loginState, userState } from "../../state/state";
 import { useRecoilValue } from "recoil";
+import Swal from "sweetalert2";
 import axios from "axios";
 
 const Container = styled.div`
@@ -273,6 +274,7 @@ const Details = () => {
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
+  const [isSold, setIsSold] = useState(false);
   const [userData, setUserData] = useState<UserState>(useRecoilValue(userState));
   const UserCheck = useRecoilValue(userState);
   const token = useRecoilValue(loginState);
@@ -305,6 +307,17 @@ const Details = () => {
   const handleClickDelete = async () => {
     await deleteContent(Number(id));
     navigate("/search");
+  };
+
+  const handleClickExchange = async (e: any) => {
+    await patchExchange(Number(id));
+    setIsSold(true);
+    Swal.fire({
+      text: "교환완료로 변경되었습니다.",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#2f6218",
+      icon: "success",
+    });
   };
 
   //테스트용!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -355,9 +368,15 @@ const Details = () => {
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
                       <StatusCheck>
-                        <CheckList type="radio" id="can" name="status"></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="can"
+                          name="status"
+                          checked={isSold}
+                          onClick={handleClickExchange}
+                        ></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status"></CheckList>
+                        <CheckList type="radio" id="cannot" name="status" checked={!isSold}></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
