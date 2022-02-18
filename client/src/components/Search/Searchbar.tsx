@@ -87,7 +87,6 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
   const navigate = useNavigate();
   const [textSearch, setTextSearch] = useState("");
   const search = useSetRecoilState(bookSearch);
-  search(textSearch);
 
   const handleCheckLogin = () => {
     if (isLogin) {
@@ -105,6 +104,7 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTextSearch(e.target.value);
+    search(textSearch);
   };
 
   return (

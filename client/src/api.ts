@@ -91,6 +91,14 @@ export const postContent = async (body: any, token: string) => {
   }
 };
 
+export const patchExchange = async (id: number) => {
+  try {
+    await axios.patch(`${URL}/product/${id}/exchange`);
+  } catch (e) {
+    throw e;
+  }
+};
+
 export const deleteContent = async (id: number | undefined) => {
   try {
     await axios.delete(`${URL}/product/${id}`);

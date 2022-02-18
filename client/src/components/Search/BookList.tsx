@@ -20,7 +20,8 @@ const BookImgBox = styled.div`
 const BookImg = styled.img`
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  margin: auto;
+  object-fit: cover;
 `;
 
 const Title = styled.div`
