@@ -85,9 +85,9 @@ export const getUserInfo = async (token: string | null): Promise<UserState> => {
   }
 };
 
-export const postContent = async (body: any) => {
+export const postContent = async (body: any, token: string) => {
   try {
-    await axios.post(`${URL}/product/post`, body);
+    await axios.post(`${URL}/product/post`, body, { headers: { authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
@@ -127,8 +127,16 @@ export const searchBook = async (type: string, value: string) => {
   try {
     const {
       data: { result },
-    } = await axios.post(`${URL}/product/search?type=${type}&value=${value}`);
+    } = await axios.get(`${URL}/product/search?type=${type}&value=${value}`);
     return result;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const postHeart = async (id: number | undefined, token: string | null) => {
+  try {
+    await axios.post(`${URL}/product/${id?.toString()}`, { token });
   } catch (e) {
     throw e;
   }
