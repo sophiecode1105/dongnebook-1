@@ -8,8 +8,16 @@ import { url } from "inspector";
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { page } = req.query;
-    const target = await client.product.findMany({ orderBy: { id: "desc" } });
+    const target = await client.product.findMany({
+      where: {
+        exchanged: false,
+      },
+      orderBy: { id: "desc" },
+    });
 
+    if (target.length === 0) {
+      return res.status(400).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
+    }
     const allProductList = await client.product.findMany({
       where: {
         exchanged: false,
@@ -39,9 +47,10 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { title, content, quality, token, lat, lon, address } = req.body;
+    const { title, content, quality, lat, lon, address } = req.body;
+    const { token } = req.headers;
 
-    const data = verify(token);
+    const data = verify(String(token));
 
     const userInfo = await userFinder(data["email"]);
     const imgs = req.files;
@@ -63,7 +72,7 @@ export const postProduct = async (req: express.Request, res: express.Response) =
               images: { createMany: { data: url } },
               content,
               quality,
-              userNickname: userInfo.nickname,
+              nickname: userInfo.nickname,
             },
           },
         },
@@ -122,21 +131,37 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
     let { id } = req.params;
-    const { title, content, quality, token, lat, lon, address } = req.body;
-
+    const { title, content, quality, lat, lon, address, url } = req.body;
+    const { token } = req.headers;
+    let urls = [];
+    if (url) {
+      Array.isArray(url)
+        ? url.forEach((el) => {
+            urls.push(JSON.parse(el));
+          })
+        : urls.push(JSON.parse(url));
+    }
     const findId = Number(id);
-    const data = verify(token);
+    const data = verify(String(token));
     const userInfo = await userFinder(data["email"]);
 
     const imgs = req.files;
-    const url = [];
+
     for (let i = 0; i < imgs.length; i++) {
-      url.push({ url: imgs[i].location, productId: findId });
+      urls.push({ url: imgs[i].location, productId: findId });
     }
-    console.log(url);
+    await client.image.deleteMany({
+      where: {
+        productId: findId,
+      },
+    });
+    await client.image.createMany({
+      data: urls,
+    });
+
     const productInfo = await client.product.findMany({
       where: {
-        userNickname: userInfo.nickname,
+        nickname: userInfo.nickname,
       },
     });
     await client.location.update({
@@ -149,14 +174,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         address,
       },
     });
-    await client.image.deleteMany({
-      where: {
-        productId: findId,
-      },
-    });
-    await client.image.createMany({
-      data: url,
-    });
+
     const updateProductInfo = await client.product.update({
       where: {
         id: findId,
@@ -165,8 +183,11 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
         title,
         content,
         quality,
-        exchanged: true,
-        userNickname: userInfo.nickname,
+        nickname: userInfo.nickname,
+      },
+      include: {
+        images: true,
+        locations: true,
       },
     });
 
@@ -178,7 +199,6 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
 export const exchangedProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.params;
-
     await client.product.update({
       where: {
         id: Number(id),
@@ -210,12 +230,12 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
 
 export const postLike = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.body;
+    const { token } = req.headers;
 
     const { id } = req.params;
     let userInfo;
     try {
-      userInfo = verify(token);
+      userInfo = verify(String(token));
     } catch (err) {
       return res.status(401).json({ message: "로그인이 필요합니다", status: false, err });
     }

@@ -102,9 +102,9 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
       },
     });
 
-    const User = await userFinder(email);
+    const user = await userFinder(email);
 
-    return res.status(201).json({ message: "회원가입 완료", User, state: true });
+    return res.status(201).json({ message: "회원가입 완료", user, state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -117,6 +117,10 @@ export const login = async (req: express.Request, res: express.Response) => {
     const userInfo = await client.user.findUnique({
       where: {
         email,
+      },
+      include: {
+        likes: true,
+        locations: true,
       },
     });
 
@@ -189,7 +193,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const exchangeTrue = await client.product.findMany({
       where: {
         exchanged: true,
-        userNickname: userInfo.nickname,
+        nickname: userInfo.nickname,
       },
       include: {
         images: true,
@@ -198,7 +202,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
     const exchangeFalse = await client.product.findMany({
       where: {
         exchanged: false,
-        userNickname: userInfo.nickname,
+        nickname: userInfo.nickname,
       },
       include: {
         images: true,
@@ -221,10 +225,12 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { nickname, token, lat, lon, address } = req.body;
-    const veriToken = verify(token);
+    const { nickname, lat, lon, address } = req.body;
+    const { token } = req.headers;
 
-    const User = await client.user.update({
+    const veriToken = verify(String(token));
+
+    const user = await client.user.update({
       where: {
         email: veriToken["email"],
       },
@@ -237,7 +243,7 @@ export const putMypage = async (req: express.Request, res: express.Response) => 
 
     await client.location.update({
       where: {
-        id: User.locationId,
+        id: user.locationId,
       },
       data: {
         lat: Number(lat),
