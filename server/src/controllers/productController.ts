@@ -48,7 +48,9 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
 export const postProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { title, content, quality, lat, lon, address } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     const data = verify(String(token));
 
@@ -132,7 +134,9 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
   try {
     let { id } = req.params;
     const { title, content, quality, lat, lon, address, url } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
     let urls = [];
     if (url) {
       Array.isArray(url)
@@ -230,7 +234,9 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
 
 export const postLike = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     const { id } = req.params;
     let userInfo;

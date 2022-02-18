@@ -153,7 +153,9 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 export const deleteJoin = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     const userInfo = verify(String(token));
 
@@ -171,7 +173,9 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
 
 export const mypage = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     let tokenInfo: string | jwt.JwtPayload;
 
@@ -226,7 +230,9 @@ export const mypage = async (req: express.Request, res: express.Response) => {
 export const putMypage = async (req: express.Request, res: express.Response) => {
   try {
     const { nickname, lat, lon, address } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     const veriToken = verify(String(token));
 

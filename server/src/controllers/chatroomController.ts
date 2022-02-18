@@ -5,7 +5,9 @@ import { userFinder, userNickFinder, verify } from "../token/verify";
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
     let data;
     try {
       data = verify(String(token));
@@ -68,7 +70,9 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
 
 export const getchatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
     let data;
     try {
       data = verify(String(token));
@@ -133,7 +137,9 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
 export const postChat = async (req: express.Request, res: express.Response) => {
   try {
     const { content } = req.body;
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
     if (!token) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
@@ -157,7 +163,9 @@ export const postChat = async (req: express.Request, res: express.Response) => {
 
 export const enterChatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { token } = req.headers;
+    const authorization = req.headers.authorization;
+
+    const token = verify(authorization.split(" ")[1]);
 
     const { id } = req.params; //채팅방 id
     let userInfo;
