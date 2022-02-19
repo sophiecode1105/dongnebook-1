@@ -1,6 +1,4 @@
 import express from "express";
-import client from "../client";
-
 export const postLocation = async (req: express.Request, res: express.Response) => {
   try {
     const { urls } = req.body;

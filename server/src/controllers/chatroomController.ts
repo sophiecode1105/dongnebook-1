@@ -1,13 +1,14 @@
 import express from "express";
+import { JwtPayload } from "jsonwebtoken";
 import client from "../client";
-import { userFinder, userNickFinder, verify } from "../token/verify";
+import { userFinder, verify } from "../token/verify";
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
     const { id } = req.body;
     const authorization = req.headers.authorization;
 
-    let data;
+    let data: string | JwtPayload;
     try {
       data = verify(authorization.split(" ")[1]);
     } catch (err) {
@@ -140,7 +141,7 @@ export const postChat = async (req: express.Request, res: express.Response) => {
     if (!authorization) {
       return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
     }
-    const { id } = req.params; //채팅방 id
+    const { chatroomId } = req.params; //채팅방 id
 
     const userInfo = verify(authorization.split(" ")[1]);
 
@@ -148,7 +149,7 @@ export const postChat = async (req: express.Request, res: express.Response) => {
       data: {
         userId: userInfo["id"],
         content,
-        chatroomId: Number(id),
+        chatroomId: Number(chatroomId),
       },
     });
 
@@ -162,7 +163,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
   try {
     const authorization = req.headers.authorization;
 
-    const { id } = req.params; //채팅방 id
+    const { chatroomId } = req.params; //채팅방 id
     let userInfo;
 
     try {
@@ -173,7 +174,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
 
     await client.chatroom.update({
       where: {
-        id: Number(id),
+        id: Number(chatroomId),
       },
       data: {
         chats: {
@@ -193,7 +194,7 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
 
     const chatroom = await client.chatroom.findMany({
       where: {
-        id: Number(id),
+        id: Number(chatroomId),
       },
       include: {
         users: {
@@ -218,11 +219,11 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
 
 export const deleteChatroom = async (req: express.Request, res: express.Response) => {
   try {
-    const { id } = req.params; //채팅방 id
+    const { chatroomId } = req.params; //채팅방 id
 
     await client.chatroom.deleteMany({
       where: {
-        id: Number(id),
+        id: Number(chatroomId),
       },
     });
 

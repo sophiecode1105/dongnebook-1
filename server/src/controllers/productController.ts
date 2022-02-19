@@ -2,8 +2,8 @@ import express from "express";
 import client from "../client";
 import FuzzySearch from "fuzzy-search";
 import { productFinder, userFinder, verify } from "../token/verify";
-import { create } from "domain";
-import { url } from "inspector";
+import { JwtPayload } from "jsonwebtoken";
+import { off } from "process";
 
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
@@ -91,13 +91,11 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
   try {
     const authorization = req.headers.authorization;
 
-    let { id } = req.params;
-
-    const findId = Number(id);
+    let { productId } = req.params;
+    const findId = Number(productId);
     let checkLike: any;
-    let isLike;
-    if (authorization.split(" ")[1] !== "null") {
-      console.log(typeof authorization.split(" ")[1]);
+    let isLike: any;
+    if (authorization) {
       const token = verify(authorization.split(" ")[1]);
       checkLike = await client.product.findMany({
         where: {
@@ -111,6 +109,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       });
       isLike = checkLike.length === 0 ? false : true;
     }
+
     const productInfo = await client.product.findUnique({
       where: {
         id: findId,
@@ -118,6 +117,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       include: {
         locations: true,
         images: true,
+        users: true,
       },
     });
 
@@ -149,12 +149,17 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 };
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
-    let { id } = req.params;
+    const { productId } = req.params;
     const { title, content, quality, lat, lon, address, url } = req.body;
     const authorization = req.headers.authorization;
+    if (!authorization) {
+      return res.status(400).json({ message: "로그인이 필요한 서비스 입니다.", status: false });
+    }
 
     const data = verify(authorization.split(" ")[1]);
+
     let urls = [];
+
     if (url) {
       Array.isArray(url)
         ? url.forEach((el) => {
@@ -162,9 +167,21 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
           })
         : urls.push(JSON.parse(url));
     }
-    const findId = Number(id);
+    const findId = Number(productId);
 
     const userInfo = await userFinder(data["email"]);
+
+    const isMine = await client.product.findMany({
+      where: {
+        id: Number(productId),
+        users: {
+          id: userInfo.id,
+        },
+      },
+    });
+    if (isMine.length === 0) {
+      return res.status(400).json({ message: "글쓴이만 수정이 가능합니다.", status: false });
+    }
 
     const imgs = req.files;
 
@@ -219,10 +236,10 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
 };
 export const exchangedProduct = async (req: express.Request, res: express.Response) => {
   try {
-    const { id } = req.params;
+    const { productId } = req.params;
     await client.product.update({
       where: {
-        id: Number(id),
+        id: Number(productId),
       },
       data: {
         exchanged: true,
@@ -236,8 +253,8 @@ export const exchangedProduct = async (req: express.Request, res: express.Respon
 
 export const deleteProduct = async (req: express.Request, res: express.Response) => {
   try {
-    let { id } = req.params;
-    const findId = Number(id);
+    let { productId } = req.params;
+    const findId = Number(productId);
     try {
       await client.product.delete({ where: { id: findId } });
     } catch (err) {
@@ -253,8 +270,8 @@ export const postLike = async (req: express.Request, res: express.Response) => {
   try {
     const authorization = req.headers.authorization;
 
-    const { id } = req.params;
-    let userInfo;
+    const { productId } = req.params;
+    let userInfo: string | JwtPayload;
     try {
       userInfo = verify(authorization.split(" ")[1]);
     } catch (err) {
@@ -264,7 +281,7 @@ export const postLike = async (req: express.Request, res: express.Response) => {
     const likeCheck = await client.liked.findMany({
       where: {
         userId: userInfo["id"],
-        productId: Number(id),
+        productId: Number(productId),
       },
     });
 
@@ -272,14 +289,14 @@ export const postLike = async (req: express.Request, res: express.Response) => {
       await client.liked.deleteMany({
         where: {
           userId: userInfo["id"],
-          productId: Number(id),
+          productId: Number(productId),
         },
       });
       return res.status(200).json({ message: "찜하기 취소", isLike: false, status: true });
     }
     const result = await client.product.update({
       where: {
-        id: Number(id),
+        id: Number(productId),
       },
       data: {
         likes: {
