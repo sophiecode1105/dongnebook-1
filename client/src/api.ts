@@ -122,7 +122,9 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
   try {
     const {
       data: { productInfo },
-    } = await axios.get(`${URL}/product/${id}`, { headers: { Authorization: `jwt ${token}`, withCredentials: true } });
+    } = await axios.get(`${URL}/product/${id}`, {
+      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
+    });
     return productInfo;
   } catch (e) {
     throw e;
