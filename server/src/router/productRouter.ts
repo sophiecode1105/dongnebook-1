@@ -17,10 +17,10 @@ productRouter.route("/list").get(getAllProduct);
 
 productRouter.route("/post").post(upload.array("file", 4), postProduct);
 
-productRouter.route("/:id(\\d+)/exchange").patch(exchangedProduct);
+productRouter.route("/:productId(\\d+)/exchange").patch(exchangedProduct);
 
 productRouter
-  .route("/:id(\\d+)")
+  .route("/:productId(\\d+)")
   .post(postLike)
   .get(getOneProduct)
   .patch(upload.array("file", 4), putProduct)

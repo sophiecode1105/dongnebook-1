@@ -228,11 +228,11 @@ export const putMypage = async (req: express.Request, res: express.Response) => 
     const { nickname, lat, lon, address } = req.body;
     const authorization = req.headers.authorization;
 
-    const veriToken = verify(authorization.split(" ")[1]);
+    const userInfo = verify(authorization.split(" ")[1]);
 
     const user = await client.user.update({
       where: {
-        email: veriToken["email"],
+        email: userInfo["email"],
       },
 
       data: {
