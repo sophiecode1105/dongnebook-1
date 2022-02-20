@@ -150,7 +150,7 @@ export const postHeart = async (id: number | undefined, token: string | null) =>
   }
 };
 
-export const timeForToday = (value: string) => {
+export const timeForToday = (value: Date) => {
   const today = new Date();
   const timeValue = new Date(value);
 
@@ -166,11 +166,7 @@ export const timeForToday = (value: string) => {
   }
 
   const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
-  if (betweenTimeDay < 365) {
-    return `${betweenTimeDay}일전`;
-  }
-
-  return `${Math.floor(betweenTimeDay / 365)}년전`;
+  return `${betweenTimeDay}일전`;
 };
 
 export const getChatRoomList = async (token: string | null) => {

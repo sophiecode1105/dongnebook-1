@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { UserInfo, UserState } from "./typeDefs";
+import { chatRoomListType, UserInfo, UserState } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
@@ -56,9 +56,9 @@ export const currentaddress = atom<string>({
   default: "",
 });
 
-export const chatlist = atom({
-  key: "chatlist",
-  default: {},
+export const chatRoomList = atom<chatRoomListType[]>({
+  key: "chatRoomList",
+  default: [],
 });
 
 export const bookSearch = atom<string>({
