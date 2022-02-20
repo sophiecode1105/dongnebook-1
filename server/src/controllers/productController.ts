@@ -16,9 +16,7 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     });
 
     if (target.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
+      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
     }
     const allProductList = await client.product.findMany({
       where: {
@@ -81,9 +79,7 @@ export const postProduct = async (req: express.Request, res: express.Response) =
       });
       const productInfo = await productFinder(locationCreate.id);
 
-      return res
-        .status(201)
-        .json({ message: "도서 업로드 성공", productInfo: productInfo[0], status: true });
+      return res.status(201).json({ message: "도서 업로드 성공", productInfo: productInfo[0], status: true });
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요.", status: false });
     }
@@ -143,9 +139,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
         },
       });
 
-      return res
-        .status(201)
-        .json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
+      return res.status(201).json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
     } else {
       return res.status(400).json({ message: "해당도서가 없습니다." });
     }
@@ -235,9 +229,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
       },
     });
 
-    return res
-      .status(200)
-      .json({ message: "도서 정보 수정 성공", updateProductInfo, status: true });
+    return res.status(200).json({ message: "도서 정보 수정 성공", updateProductInfo, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -264,8 +256,15 @@ export const deleteProduct = async (req: express.Request, res: express.Response)
   try {
     let { productId } = req.params;
     const findId = Number(productId);
+
+    const productInfo = await client.product.findUnique({
+      where: {
+        id: findId,
+      },
+    });
+
     try {
-      await client.product.delete({ where: { id: findId } });
+      await client.location.delete({ where: { id: productInfo.locationId } });
     } catch (err) {
       return res.status(400).json({ message: "존재하지 않는 도서입니다.", status: false, err });
     }
