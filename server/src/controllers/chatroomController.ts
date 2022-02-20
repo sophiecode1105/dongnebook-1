@@ -1,12 +1,28 @@
 import express from "express";
 import { JwtPayload } from "jsonwebtoken";
-import { io } from "../app";
+import server from "../app";
 import client from "../client";
 import { userFinder, verify } from "../token/verify";
+import { instrument } from "@socket.io/admin-ui";
+const socketIo = require("socket.io");
 
-export const live = () => {
+let count = 0;
+
+export const live = (req, res, next) => {
+  const io = socketIo(server, {
+    cors: {
+      origin: true,
+      methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+      credentials: true,
+    },
+  });
+
+  instrument(io, {
+    auth: false,
+  });
+
   io.on("connection", (socket) => {
-    socket.onAny((event: WorkletOptions) => {
+    socket.onAny((event: any) => {
       console.log(`Socket Event : ${event}`);
     });
     socket.on("enter_room", (roomName: number) => {
@@ -20,6 +36,7 @@ export const live = () => {
 
         socket.to(room).emit("receive_message", name, value, date);
         console.log("이름", name, "내용", value);
+        count = socket.adapter.rooms.get(room);
         done();
       }
     );
@@ -28,6 +45,8 @@ export const live = () => {
       console.log("user disconnected: ", socket.id);
     });
   });
+
+  next();
 };
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
@@ -90,7 +109,7 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
       });
     }
     //상대도 있으면
-
+    console.log(count);
     await client.chat.create({
       data: {
         userId: userInfo["id"],
@@ -99,6 +118,7 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
         // read: 상대가있으면? true:false
       },
     });
+
     return res.status(201).json({ message: "채팅 완료", chatroom: chatroom[0], state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
@@ -147,7 +167,14 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       },
       include: {
         users: {
-          include: {
+          where: {
+            users: {
+              id: {
+                not: userInfo.id,
+              },
+            },
+          },
+          select: {
             users: true,
           },
         },
