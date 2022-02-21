@@ -90,6 +90,7 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
 
   const handleCheckLogin = () => {
     if (isLogin) {
+      localStorage.setItem("whichmap", "등록");
       navigate("/upload");
     } else {
       navigate("/signin");

@@ -12,6 +12,8 @@ import {
   imageStorage,
   loginState,
   mapResultsStorage,
+  modifyLatitude,
+  modifyLongtitude,
   searchLocation,
   storeContentId,
   titleStorage,
@@ -19,7 +21,7 @@ import {
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
-import { createNumericLiteral, setConstantValue } from "typescript";
+import { setConstantValue } from "typescript";
 import { BookInfo } from "../../state/typeDefs";
 
 declare global {
@@ -336,6 +338,9 @@ const Modify = () => {
   const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
   const setCurrentLocation = useSetRecoilState(currentLocationStorage);
+  const modifyLat = useSetRecoilState(modifyLatitude);
+  const modifyLon = useSetRecoilState(modifyLongtitude);
+
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const latitude = useRecoilValue(currentLatitude);
@@ -384,7 +389,7 @@ const Modify = () => {
 
   const getSingleData = async (id: number) => {
     const data = await getSingleBookInfo(id, token);
-    console.log("modify컨텐츠 내놔새꺄->", data);
+    console.log("싱글데이터", data);
     setValue("title", data.title);
     setValue("content", data.content);
     const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
@@ -402,6 +407,8 @@ const Modify = () => {
     setImageUrls((prev) => {
       return [...prev, ...imgData];
     });
+    modifyLat(data.locations.lat);
+    modifyLon(data.locations.lon);
   };
 
   const patchData = async () => {
