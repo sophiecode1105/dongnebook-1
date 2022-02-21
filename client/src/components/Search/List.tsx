@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import { BookInfo } from "../../state/typeDefs";
 import Booklist from "./BookList";
@@ -23,6 +24,7 @@ const BookListContainer = styled.div`
 `;
 
 const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
+  useEffect(() => {}, [allProductList]);
   return (
     <Container>
       <BookListContainer>

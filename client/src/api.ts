@@ -85,7 +85,8 @@ export const getUserInfo = async (token: string | null): Promise<UserState> => {
 
 export const postContent = async (body: any, token: string) => {
   try {
-    await axios.post(`${URL}/product/post`, body, { headers: { Authorization: `jwt ${token}` } });
+    let resp = await axios.post(`${URL}/product/post`, body, { headers: { Authorization: `jwt ${token}` } });
+    return resp.status;
   } catch (e) {
     throw e;
   }
@@ -93,7 +94,8 @@ export const postContent = async (body: any, token: string) => {
 
 export const patchExchange = async (id: number) => {
   try {
-    await axios.patch(`${URL}/product/${id}/exchange`);
+    let resp = await axios.patch(`${URL}/product/${id}/exchange`);
+    return resp.status;
   } catch (e) {
     throw e;
   }
@@ -143,6 +145,15 @@ export const searchBook = async (type: string, value: string) => {
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
     await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const patchContent = async (id: number, body: any, token: string | null) => {
+  try {
+    let resp = await axios.patch(`${URL}/product/${id}`, body, { headers: { Authorization: `jwt ${token}` } });
+    return resp.status;
   } catch (e) {
     throw e;
   }
