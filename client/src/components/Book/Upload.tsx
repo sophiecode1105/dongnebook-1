@@ -435,6 +435,10 @@ const Upload = () => {
   };
 
   useEffect(() => {
+    setCurrentLocation({});
+  }, []);
+
+  useEffect(() => {
     window.addEventListener("click", handleClickOutside as EventListener);
     return () => {
       window.removeEventListener("click", handleClickOutside as EventListener);

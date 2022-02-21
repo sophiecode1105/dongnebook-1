@@ -430,6 +430,7 @@ const Details = () => {
   const handleClickModify = () => {
     storeId(Number(id));
     localStorage.setItem("modify_id", String(id));
+    localStorage.setItem("whichmap", "수정");
     navigate("/modify");
   };
   const handleClickDelete = async () => {
