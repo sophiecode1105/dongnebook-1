@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,13 +13,14 @@ import {
   loginState,
   mapResultsStorage,
   searchLocation,
+  storeContentId,
   titleStorage,
 } from "../../state/state";
 import Swal from "sweetalert2";
-import Map from "./Map";
-import { useEffect } from "react";
-import { postContent } from "../../api";
-import { resolve } from "node:path/win32";
+import Map from "../Book/Map";
+import { getSingleBookInfo, patchContent } from "../../api";
+import { createNumericLiteral, setConstantValue } from "typescript";
+import { BookInfo } from "../../state/typeDefs";
 
 declare global {
   interface Window {
@@ -134,6 +135,17 @@ const ImgFile = styled.input`
   position: absolute;
   font-size: 0;
   opacity: 0;
+`;
+
+const ImgMapList = styled.div`
+  display: flex;
+  border: 1px solid #dcdbe3;
+  width: 150px;
+  height: 150px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
 `;
 
 interface ErrorProps {
@@ -281,17 +293,6 @@ const SearchButton = styled.button`
   }
 `;
 
-const ImgMapList = styled.div`
-  display: flex;
-  border: 1px solid #dcdbe3;
-  width: 150px;
-  height: 150px;
-  padding: 10px;
-  justify-content: center;
-  align-items: center;
-  margin-left: 20px;
-`;
-
 const SearchContainer = styled.div`
   width: 100%;
   position: relative;
@@ -328,10 +329,11 @@ type FormData = {
   longtitude: number;
 };
 
-const Upload = () => {
+const Modify = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [imageStore, setImageStore] = useState<any[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
   const setCurrentLocation = useSetRecoilState(currentLocationStorage);
   const mapSearchResults = useRecoilValue(mapResultsStorage);
@@ -340,6 +342,9 @@ const Upload = () => {
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
+  const id = useRecoilValue(storeContentId);
+  const [modifyquality, setModifyQuality] = useState<string>("");
+  const pageChange = Number(localStorage.getItem("modify_id"));
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -347,15 +352,62 @@ const Upload = () => {
     getValues,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({ mode: "onChange" });
 
   const { title } = watch();
   const { content } = watch();
 
-  const postData = async () => {
+  const convertFileToURL = (file: File) => {
+    return new Promise<string>((res, rej) => {
+      const fileReader = new FileReader();
+      fileReader.onerror = rej;
+      fileReader.onload = () => {
+        res(String(fileReader.result));
+      };
+      fileReader.readAsDataURL(file);
+    });
+  };
+
+  const convertManyFilesToURL = async (files: FileList) => {
+    let promises = [];
+    for (let i = 0; i < files?.length; i++) {
+      promises.push(convertFileToURL(files[i]));
+    }
+    try {
+      return await Promise.all<string>(promises);
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const getSingleData = async (id: number) => {
+    const data = await getSingleBookInfo(id, token);
+    console.log("modify컨텐츠 내놔새꺄->", data);
+    setValue("title", data.title);
+    setValue("content", data.content);
+    const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
+    radiobuttonValue.checked = true;
+    setModifyQuality(data.quality);
+    let modifyImg = data.images;
+    let imgData: any[] = [];
+    for (let i = 0; i < modifyImg.length; i++) {
+      imgData.push(modifyImg[i].url);
+    }
+
+    setPatchImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+  };
+
+  const patchData = async () => {
     return new Promise(async (res, rej) => {
-      const { title, content, img, quality } = getValues();
+      const { title, content, quality } = getValues();
+
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
@@ -364,11 +416,21 @@ const Upload = () => {
           formData.append("file", imageStore[i]);
         }
       }
-      formData.append("quality", quality);
+
+      for (let i = 0; i < patchImageUrls.length; i++) {
+        formData.append("url", JSON.stringify({ url: patchImageUrls[i], productId: pageChange }));
+      }
+
+      if (quality === null) {
+        formData.append("quality", modifyquality);
+      } else {
+        formData.append("quality", quality);
+      }
       formData.append("lat", String(latitude));
       formData.append("lon", String(longtitude));
       formData.append("address", address);
-      let status = await postContent(formData, token || "token");
+
+      let status = await patchContent(Number(id), formData, token || "token");
       if (Number(status) < 300) {
         res(true);
       } else {
@@ -378,17 +440,8 @@ const Upload = () => {
   };
 
   const onSubmit = async () => {
-    const { quality } = getValues();
-    if (quality === null) {
-      return Swal.fire({
-        text: "상품 상태를 선택해주세요",
-        confirmButtonText: "확인",
-        confirmButtonColor: "#2f6218",
-        icon: "warning",
-      });
-    }
     try {
-      let successful = await postData();
+      let successful = await patchData();
       if (successful) {
         navigate("/search", { replace: true });
       }
@@ -404,33 +457,8 @@ const Upload = () => {
   };
 
   const handleClickOutside = (event: CustomEvent<MouseEvent>) => {
-    // console.log("작동되냐");
     if (isOpen && !side?.current?.contains(event.target as Node)) {
-      // console.log("외않되");
       setIsOpen(!isOpen);
-    }
-  };
-
-  const convertFileToURL = (file: File) => {
-    return new Promise<string>((res, rej) => {
-      const fileReader = new FileReader();
-      fileReader.onerror = rej;
-      fileReader.onload = () => {
-        res(String(fileReader.result));
-      };
-      fileReader.readAsDataURL(file);
-    });
-  };
-
-  const convertManyFilesToURL = async (files: FileList) => {
-    let promises = [];
-    for (let i = 0; i < files.length; i++) {
-      promises.push(convertFileToURL(files[i]));
-    }
-    try {
-      return await Promise.all<string>(promises);
-    } catch (e) {
-      throw e;
     }
   };
 
@@ -441,15 +469,22 @@ const Upload = () => {
     };
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   console.log("k");
-  // }, [imageUrls]);
+  useEffect(() => {
+    let fetchID = id;
+    if (fetchID === null) {
+      fetchID = Number(localStorage.getItem("modify_id"));
+    }
+    getSingleData(fetchID);
+    return () => {
+      localStorage.removeItem("modify_id");
+    };
+  }, []);
 
   return (
     <Container>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <TitleBox>
-          <Title>도서 등록</Title>
+          <Title>게시글 수정</Title>
         </TitleBox>
         <UploadInform>
           <InformBox>
@@ -512,7 +547,6 @@ const Upload = () => {
                     accept="image/*"
                     multiple
                     {...register("img", {
-                      required: "이미지를 업로드해주세요",
                       onChange: async (event) => {
                         let files = event.target.files;
                         if (files && files.length) {
@@ -604,12 +638,12 @@ const Upload = () => {
           </Uploads>
         </UploadInform>
         <ButtonBox>
-          <CancelButton to="/search">취소</CancelButton>
-          <RegisterButton type="submit">등록</RegisterButton>
+          <CancelButton to={`/search/${pageChange}`}>취소</CancelButton>
+          <RegisterButton type="submit">수정</RegisterButton>
         </ButtonBox>
       </Form>
     </Container>
   );
 };
 
-export default Upload;
+export default Modify;

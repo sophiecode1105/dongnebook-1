@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { UserInfo, UserState } from "./typeDefs";
+import { BookInfo, UserInfo, UserState } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
@@ -54,6 +54,11 @@ export const currentLongtitude = atom<number>({
 export const currentaddress = atom<string>({
   key: "address",
   default: "",
+});
+
+export const storeContentId = atom<number | null>({
+  key: "id",
+  default: null,
 });
 
 export const chatlist = atom({

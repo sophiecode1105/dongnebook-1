@@ -18,7 +18,7 @@ const Container = styled.div`
 `;
 
 const TitleBox = styled.div`
-  width: 80%;
+  width: 1100px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
 `;

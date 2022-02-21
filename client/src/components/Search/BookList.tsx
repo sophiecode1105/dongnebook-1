@@ -1,6 +1,8 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ListProps } from "../../state/typeDefs";
+import { useEffect } from "react";
 
 const Container = styled(Link)`
   display: flex;
@@ -38,12 +40,11 @@ const Location = styled.div`
 
 const Booklist = ({ list }: { list: ListProps }) => {
   const { id, title, content, locations, images } = list;
-  // console.log(images);
-  // const { address } = locations;
+
   return (
     <Container to={`${id}`}>
       <BookImgBox>
-        <BookImg src={images && images[0].url} />
+        <BookImg src={images[0]?.url} />
       </BookImgBox>
       <Title>{title}</Title>
       <Location>{locations?.address}</Location>

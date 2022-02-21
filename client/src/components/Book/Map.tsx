@@ -69,11 +69,9 @@ const Map = () => {
     //인포윈도우
     // const infowindow = new window.kakao.maps.InfoWindow({ zindex: 1 });
 
-    let a;
     navigator.geolocation.getCurrentPosition(function (position) {
       let lat = position.coords.latitude;
       let lon = position.coords.longitude;
-      a = "a";
 
       let locPosition = new window.kakao.maps.LatLng(lat, lon);
       let kakaoMap = new window.kakao.maps.Map(container, {
@@ -99,7 +97,6 @@ const Map = () => {
         setMarker(marker);
 
         searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
-          console.log("결과", result);
           storeaddress(
             result[0].address.region_1depth_name +
               " " +
@@ -123,7 +120,6 @@ const Map = () => {
         });
 
         window.kakao.maps.event.addListener(kakaoMap, "click", function (mouseEvent: any) {
-          console.log("마우스이벤트정보", mouseEvent);
           // 클릭한 위도, 경도 정보를 가져옵니다
           searchDetailAddrFromCoords(mouseEvent.latLng, function (result: any, status: any) {
             storeaddress(
@@ -144,8 +140,8 @@ const Map = () => {
             marker.setPosition(mouseEvent.latLng);
             marker.setMap(kakaoMap);
 
-            console.log("위도", mouseEvent.latLng?.getLat());
-            console.log("경도", mouseEvent.latLng?.getLng());
+            // console.log("위도", mouseEvent.latLng?.getLat());
+            // console.log("경도", mouseEvent.latLng?.getLng());
 
             latitude(mouseEvent.latLng?.getLat());
             longtitude(mouseEvent.latLng?.getLng());
@@ -156,14 +152,12 @@ const Map = () => {
         });
       }
 
-      console.log("위도2", lat, "type", typeof lat);
-      console.log("경도2", lon);
+      // console.log("위도2", lat, "type", typeof lat);
+      // console.log("경도2", lon);
       setMap(kakaoMap);
       latitude(lat);
       longtitude(lon);
     });
-
-    console.log("A는?", a); // "a"
 
     // 지도 중심좌표를 접속위치로 변경합니다
   }, []);
@@ -172,7 +166,6 @@ const Map = () => {
     const places = new window.kakao.maps.services.Places();
     places.keywordSearch(searchContent, (result: any, status: any) => {
       if (status === window.kakao.maps.services.Status.OK) {
-        console.log("검색reuslt결과", result);
         setMapSearchResults(result);
         // console.log("results -> ", result);
         // const firstItem = result[0];
@@ -191,8 +184,8 @@ const Map = () => {
   useEffect(() => {
     let coords: any = currentLocation;
     const moveLatLng = new window.kakao.maps.LatLng(coords.y, coords.x);
-    console.log("위도??", coords.y);
-    console.log("경도?", coords.x);
+    // console.log("위도??", coords.y);
+    // console.log("경도?", coords.x);
     latitude(coords.y);
     longtitude(coords.x);
     map?.panTo(moveLatLng);
