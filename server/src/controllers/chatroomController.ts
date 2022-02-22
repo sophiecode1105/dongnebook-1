@@ -49,14 +49,11 @@ export const live = (req, res, next) => {
       count[roomName] = socket.adapter.rooms.get(roomName)?.size;
     });
 
-    socket.on(
-      "new_message",
-      (room: number, name: string, value: string, date: number, done: any) => {
-        socket.to(room).emit("receive_message", name, value, date);
-        console.log("방번호:", room, "이름", name, "내용", value);
-        done();
-      }
-    );
+    socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
+      socket.to(room).emit("receive_message", name, value, date);
+      console.log("방번호:", room, "이름", name, "내용", value);
+      done();
+    });
 
     socket.on("disconnecting", function () {
       const roomName = publicRooms(socket.id);
@@ -204,7 +201,11 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
             id: "desc",
           },
         },
-        product: true,
+        product: {
+          include: {
+            images: true,
+          },
+        },
       },
     });
 
@@ -212,9 +213,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res
-      .status(200)
-      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -259,16 +258,23 @@ export const enterChatroom = async (req: express.Request, res: express.Response)
       },
       include: {
         users: {
-          include: {
+          where: {
+            users: {
+              id: {
+                not: userInfo.id,
+              },
+            },
+          },
+          select: {
             users: true,
           },
         },
-        chats: {
-          orderBy: {
-            id: "desc",
+        chats: true,
+        product: {
+          include: {
+            images: true,
           },
         },
-        product: true,
       },
     });
 
