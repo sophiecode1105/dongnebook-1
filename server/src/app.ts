@@ -9,6 +9,7 @@ import http from "http";
 
 import { instrument } from "@socket.io/admin-ui";
 import { live } from "./controllers/chatroomController";
+import locationRouter from "./router/locationRouter";
 const socketIo = require("socket.io");
 
 const app = express();
@@ -30,6 +31,7 @@ const server = http.createServer(app);
 
 app.use("/user", userRouter);
 app.use("/product", productRouter);
+app.use("/location", locationRouter);
 app.use(live);
 app.use("/chatroom", chatroomRouter);
 export default server;
