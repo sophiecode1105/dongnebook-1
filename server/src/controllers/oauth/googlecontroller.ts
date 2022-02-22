@@ -1,10 +1,11 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import client from "../../client";
+import express from "express";
 
 const users = client.user;
 
-export const googleLogin = async (req, res) => {
+export const googleLogin = async (req: express.Request, res: express.Response) => {
   try {
     const { code } = req.body;
     const {
@@ -31,18 +32,25 @@ export const googleLogin = async (req, res) => {
     });
 
     if (!user) {
-      user = await users.create({
+      await client.location.create({
         data: {
-          email,
-          admin: false,
-          nickname: Math.random()
-            .toString(36)
-            .replace(/[^a-z]+/g, "")
-            .substr(0, 5),
+          lat: 37.4965544495086,
+          lon: 127.02475418053183,
+          address: "서울시 서초구 서초동",
+          users: {
+            create: {
+              nickname: Math.random()
+                .toString(36)
+                .replace(/[^a-z]+/g, "")
+                .substr(0, 5),
+              admin: false,
+              email,
+              img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/31644921016560.png",
+            },
+          },
         },
       });
     }
-
     const token = jwt.sign({ email }, process.env.ACCESS_SECRET, { expiresIn: "24h" });
     return res.status(201).json({ message: "구글 소셜 로그인 성공", id: user.id, token, state: true });
   } catch (e) {
