@@ -8,6 +8,7 @@ export type UserState = {
   locationId: number;
   createdAt: Date;
   updatedAt: Date;
+  likes: likes[];
   locations: locations;
 };
 
@@ -71,6 +72,10 @@ export type ErrorProps = {
   error: string | undefined;
 };
 
+export type CurrentImgProps = {
+  Cm: number;
+};
+
 type locations = {
   id: number;
   lat: number;
@@ -78,6 +83,14 @@ type locations = {
   address: string;
   createdAt: Date;
   updatedAt: Date;
+};
+
+type likes = {
+  createdAt: string;
+  id: number;
+  productId: number;
+  updatedAt: string;
+  userId: number;
 };
 
 export type isWriterProps = {

@@ -155,14 +155,15 @@ export const deleteJoin = async (req: express.Request, res: express.Response) =>
   try {
     const authorization = req.headers.authorization;
 
-    const userInfo = verify(authorization.split(" ")[1]);
+    const tokenInfo = verify(authorization.split(" ")[1]);
 
-    await client.user.delete({
+    const userInfo = await userFinder(tokenInfo["email"]);
+
+    await client.location.delete({
       where: {
-        id: userInfo["id"],
+        id: userInfo["locationId"],
       },
     });
-
     return res.status(200).json({ message: "회원탈퇴 완료", state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });

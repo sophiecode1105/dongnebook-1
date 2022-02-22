@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
 import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday } from "../../api";
-import { BookInfo, ChatRoomFrameType, isWriterProps, UserState } from "../../state/typeDefs";
+import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
-import { chatRoomFrame, chatRoomVisible, loginState, userState } from "../../state/state";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { chatRoomFrame, chatRoomVisible, imageStorage, loginState, storeContentId, userState } from "../../state/state";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -22,7 +22,7 @@ const Container = styled.div`
   padding: 0px 15px 0px 15px;
 `;
 const TitleBox = styled.div`
-  width: 1100px;
+  width: 1160px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
 `;
@@ -38,14 +38,77 @@ const KeyInfoBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 1100px;
+  width: 1145px;
   height: 550px;
   margin: 30px;
 `;
 
-const BookImg = styled.img`
-  width: 35%;
+const ImageSlide = styled.div`
+  position: relative;
+  width: 400px;
   height: 100%;
+`;
+
+const SlideBox = styled.div`
+  position: relative;
+  width: 100%;
+  margin: auto;
+  overflow-x: hidden;
+  background-color: white;
+`;
+
+const SlideList = styled.div<CurrentImgProps>`
+  width: 1300px;
+  transition: all 30ms ease 0s;
+  overflow: hidden;
+  transition: all 0.3s;
+  transform: translate3d(${(props) => props.Cm * -400}px, 0px, 0px);
+  animation: smoothslide 0.3s ease-in-out;
+  @keyframes smoothslide {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+`;
+
+const SlideContent = styled.div`
+  display: table;
+  float: left;
+  width: 400px;
+  height: 100%;
+  text-align: center;
+`;
+
+const ButtonProps = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 200px;
+  width: 50px;
+  height: 50px;
+  padding: 15px;
+  color: grey;
+  vertical-align: middle;
+  cursor: pointer;
+`;
+
+const ButtonPrev = styled(ButtonProps)`
+  left: -50px; ;
+`;
+const ButtonNext = styled(ButtonProps)`
+  right: -50px;
+`;
+
+const BookImg = styled.img`
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  width: 400px;
+  height: 540px;
   object-fit: fill;
 `;
 
@@ -180,7 +243,7 @@ const IconProps = styled.div`
 `;
 
 const Heart = styled(IconProps)``;
-const Watch = styled(IconProps)``;
+const Visit = styled(IconProps)``;
 const Date = styled(IconProps)``;
 const Letter = styled(IconProps)``;
 
@@ -239,9 +302,7 @@ const HeartButton = styled.button`
   font-weight: 500;
   color: rgb(242, 242, 242, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
-  /* &:hover {
-    background-color: rgba(178, 176, 176, 0.8);
-  } */
+
   i {
     color: red;
     font-size: 20px;
@@ -274,20 +335,80 @@ const Details = () => {
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
+  const [userInfo, setUserInfo] = useRecoilState(userState);
+  const storeId = useSetRecoilState(storeContentId);
+  const [currentImg, setCurrentImg] = useState(0);
   const setVisible = useSetRecoilState(chatRoomVisible);
   const setChatRoomFrame = useSetRecoilState(chatRoomFrame);
-  // const [isSold, setIsSold] = useState(false);
-  const [userData, setUserData] = useState<UserState>(useRecoilValue(userState));
-  const UserCheck = useRecoilValue(userState);
+
   const token = useRecoilValue(loginState);
 
+  useEffect(() => {
+    getSingleData();
+  }, []);
+
+  useEffect(() => {
+    try {
+      const matches = userInfo?.likes?.filter((el) => el.productId === Number(id));
+      if (matches?.length) {
+        setIsHeartPressed(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    let newUser: UserState = userInfo;
+    if (isHeartPressed) {
+      let matches = userInfo?.likes?.filter((like) => like?.productId === Number(id));
+      if (matches.length === 0) {
+        newUser = {
+          ...userInfo,
+          likes: [
+            ...userInfo.likes,
+            {
+              createdAt: "",
+              id: 0,
+              productId: Number(id),
+              updatedAt: "",
+              userId: userInfo.id,
+            },
+          ],
+        };
+      }
+    } else {
+      let reducedLikes = userInfo?.likes?.filter((like) => like?.productId !== Number(id));
+      if (reducedLikes?.length !== userInfo?.likes?.length) {
+        newUser = {
+          ...userInfo,
+          likes: reducedLikes,
+        };
+      }
+    }
+    setUserInfo(newUser);
+  }, [isHeartPressed]);
+
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, exchanged, createdAt, locations, nickname } = bookDetailInfo as BookInfo;
-  // console.log("이미지", images[0]);
+  const { title, images, content, quality, exchanged, createdAt, locations, nickname, visit } =
+    bookDetailInfo as BookInfo;
+
+  const onChangeContent = (pageDelta: any) => {
+    const lastImgPageNum = images.length - 1;
+    const newCurrentPageNum = currentImg + pageDelta;
+
+    if (newCurrentPageNum < 0) {
+      setCurrentImg(lastImgPageNum);
+    } else if (newCurrentPageNum > lastImgPageNum) {
+      setCurrentImg(0);
+    } else {
+      setCurrentImg(newCurrentPageNum);
+    }
+  };
+
   const date = timeForToday(createdAt);
   const navigate = useNavigate();
-  const isWriter = UserCheck?.nickname === nickname;
-  console.log(isWriter);
+  const isWriter = userInfo?.nickname === nickname;
 
   const getSingleData = async () => {
     const data = await getSingleBookInfo(Number(id), token);
@@ -301,9 +422,11 @@ const Details = () => {
   };
 
   const handleClickHeart = async () => {
+    //로그인 포스트
     setIsHeartPressed(!isHeartPressed);
     try {
       await postHeart(Number(id), token);
+      // setUserInfo({ ...userInfo });
     } catch (e) {
       console.error(e);
     }
@@ -312,6 +435,12 @@ const Details = () => {
     navigate("/myinfo");
   };
 
+  const handleClickModify = () => {
+    storeId(Number(id));
+    localStorage.setItem("modify_id", String(id));
+    localStorage.setItem("whichmap", "수정");
+    navigate("/modify");
+  };
   const handleClickDelete = async () => {
     await deleteContent(Number(id));
     navigate("/search");
@@ -328,23 +457,42 @@ const Details = () => {
     });
   };
 
-  //테스트용!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  useEffect(() => {
-    setUserData(UserCheck);
-    getSingleData();
-    //get user likes
-  }, []);
-
   return isPc ? (
     <Container>
       <TitleBox>
         <Title>상세보기</Title>
       </TitleBox>
       <KeyInfoBox>
-        <BookImg src={images && images[0].url} />
+        <ImageSlide>
+          <SlideBox>
+            <SlideList Cm={currentImg}>
+              {images?.map((img, idx) => {
+                return (
+                  <SlideContent>
+                    <BookImg key={idx} src={img?.url} />
+                  </SlideContent>
+                );
+              })}
+              {/* <BookImg src={images && images[0].url} /> */}
+            </SlideList>
+          </SlideBox>
+          {images?.length >= 2 ? (
+            <>
+              <ButtonPrev
+                onClick={() => {
+                  onChangeContent(-1);
+                }}>
+                <i className="fas fa-chevron-left"></i>
+              </ButtonPrev>
+              <ButtonNext
+                onClick={() => {
+                  onChangeContent(+1);
+                }}>
+                <i className="fas fa-chevron-right"></i>
+              </ButtonNext>
+            </>
+          ) : null}
+        </ImageSlide>
         <KeyInfo>
           <BookTitle>{title}</BookTitle>
           <BorderBottom />
@@ -363,13 +511,13 @@ const Details = () => {
                       <StatusCheck>
                         <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status"></CheckList>
+                        <CheckList type="radio" id="cannot" name="status" defaultChecked></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
                   </BookStatusBox>
                   <ModifyButtonBox>
-                    <ModifyButton>수정</ModifyButton>
+                    <ModifyButton onClick={handleClickModify}>수정</ModifyButton>
                     <ModifyButton onClick={handleClickDelete}>삭제</ModifyButton>
                   </ModifyButtonBox>
                 </Div>
@@ -381,10 +529,11 @@ const Details = () => {
               <i className="fas fa-heart"></i>
             </Heart>
             <Line> </Line>
-            <Watch>
+            <Visit>
               <i className="fas fa-eye"></i>
-            </Watch>
+            </Visit>
             <Line> </Line>
+            <Letter>{visit}</Letter>
             <Date>
               <i className="fas fa-clock"></i>
             </Date>

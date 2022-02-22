@@ -46,14 +46,39 @@ export const currentLatitude = atom<number>({
   default: 0,
 });
 
+export const modifyLatitude = atom<number>({
+  key: "modifyLatitude",
+  default: 0,
+});
+
 export const currentLongtitude = atom<number>({
   key: "currentLongtitude",
+  default: 0,
+});
+
+export const modifyLongtitude = atom<number>({
+  key: "modifyLongtitude",
   default: 0,
 });
 
 export const currentaddress = atom<string>({
   key: "address",
   default: "",
+});
+
+export const modifyAddress = atom<string>({
+  key: "address",
+  default: "",
+});
+
+export const storeContentId = atom<number | null>({
+  key: "id",
+  default: null,
+});
+
+export const chatlist = atom({
+  key: "chatlist",
+  default: {},
 });
 
 export const bookSearch = atom<string>({

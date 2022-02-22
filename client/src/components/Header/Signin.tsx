@@ -158,6 +158,7 @@ const Signin = () => {
     const { email, password } = getValues();
     try {
       const { userInfo, token } = await postSignin({ email, password, keep });
+      console.log(userInfo);
       setUser(userInfo);
       setLogin(token);
       localStorage.setItem("token", token);
