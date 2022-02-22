@@ -177,3 +177,11 @@ export const getChatRoomList = async (token: string | null) => {
   } = await axios.get(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } });
   return chatroom;
 };
+
+export const getLocationList = async (token: string | null) => {
+  const {
+    data: { userLocation, productLocation },
+  } = await axios.get(`${URL}/location`, { headers: { Authorization: `jwt ${token}` } });
+
+  return { userLocation, productLocation };
+};

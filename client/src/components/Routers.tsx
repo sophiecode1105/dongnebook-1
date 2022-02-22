@@ -9,6 +9,7 @@ import Header from "./Header/Header";
 import Mypage from "./Header/Mypage";
 import Signin from "./Header/Signin";
 import Signup from "./Header/Signup";
+import { KakaoTest } from "../pages/KakaoTest";
 
 const Routers = () => {
   return (
@@ -24,6 +25,7 @@ const Routers = () => {
         <Route path="/chat/:id" element={<ChatRoom />} />
         <Route path="/myinfo" element={<Mypage />} />
         <Route path="/search/:id" element={<Detail />} />
+        <Route path="/kakao" element={<KakaoTest />} />
       </Routes>
     </BrowserRouter>
   );
