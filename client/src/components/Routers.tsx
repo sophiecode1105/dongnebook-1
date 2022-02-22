@@ -11,6 +11,8 @@ import Mypage from "../pages/Mypage";
 import Signin from "./Header/Signin";
 import Signup from "./Header/Signup";
 import Account from "./Mypage/Account";
+import { KakaoTest } from "../pages/KakaoTest";
+
 
 const Routers = () => {
   return (
@@ -27,6 +29,7 @@ const Routers = () => {
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/kakao" element={<KakaoTest />} />
       </Routes>
     </BrowserRouter>
   );
