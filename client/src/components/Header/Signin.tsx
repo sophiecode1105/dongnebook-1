@@ -15,7 +15,7 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 66px;
+  padding: 66px 10px 10px 10px;
 `;
 
 const LoginBox = styled.div`

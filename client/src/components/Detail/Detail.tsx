@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
 import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday } from "../../api";
-import { BookInfo, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
+import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
-import { imageStorage, loginState, storeContentId, userState } from "../../state/state";
+import { chatRoomFrame, chatRoomVisible, imageStorage, loginState, storeContentId, userState } from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -338,6 +338,8 @@ const Details = () => {
   const [userInfo, setUserInfo] = useRecoilState(userState);
   const storeId = useSetRecoilState(storeContentId);
   const [currentImg, setCurrentImg] = useState(0);
+  const setVisible = useSetRecoilState(chatRoomVisible);
+  const setChatRoomFrame = useSetRecoilState(chatRoomFrame);
 
   const token = useRecoilValue(loginState);
 
@@ -410,6 +412,12 @@ const Details = () => {
 
   const getSingleData = async () => {
     const data = await getSingleBookInfo(Number(id), token);
+    setChatRoomFrame({
+      nickname: data.nickname,
+      title: data.title,
+      bookImg: data.images[0].url,
+      productId: data.id,
+    } as ChatRoomFrameType);
     setBookDetailInfo(data);
   };
 
@@ -473,15 +481,13 @@ const Details = () => {
               <ButtonPrev
                 onClick={() => {
                   onChangeContent(-1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-left"></i>
               </ButtonPrev>
               <ButtonNext
                 onClick={() => {
                   onChangeContent(+1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-right"></i>
               </ButtonNext>
             </>
@@ -556,7 +562,9 @@ const Details = () => {
                 <HeartButton onClick={handleClickHeart}>
                   {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
                 </HeartButton>
-                <TouchButton isWriter={isWriter}>연락하기</TouchButton>
+                <TouchButton isWriter={isWriter} onClick={() => setVisible(true)}>
+                  연락하기
+                </TouchButton>
               </>
             )}
           </ButtonBox>

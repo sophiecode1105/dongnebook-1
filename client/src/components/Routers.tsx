@@ -22,7 +22,6 @@ const Routers = () => {
         <Route path="/upload" element={<Upload />} />
         <Route path="/search" element={<Search />} />
         <Route path="/chat" element={<Chat />} />
-        <Route path="/chat/:id" element={<ChatRoom />} />
         <Route path="/myinfo" element={<Mypage />} />
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
