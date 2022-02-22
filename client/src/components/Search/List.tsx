@@ -5,8 +5,8 @@ import Booklist from "./BookList";
 
 const Container = styled.section`
   padding: 0px 15px;
-  width: 100%;
-  max-width: 1200px;
+  width: 85%;
+  max-width: 1000px;
   display: flex;
   justify-content: center;
   margin: 0 auto;

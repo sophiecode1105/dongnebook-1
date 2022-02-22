@@ -125,6 +125,13 @@ const Label = styled.label`
   }
 `;
 
+const LabelWrap = styled.div`
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+`;
+
 const ImgFile = styled.input`
   text-decoration: none;
   width: 100%;
@@ -499,14 +506,7 @@ const Upload = () => {
           </InformBox>
           <Uploads>
             <InputBox>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "stretch",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-              >
+              <LabelWrap>
                 <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
@@ -545,7 +545,7 @@ const Upload = () => {
                     </ImgMapList>
                   );
                 })}
-              </div>
+              </LabelWrap>
               <Errorbox>{errors.img?.message}</Errorbox>
             </InputBox>
           </Uploads>
