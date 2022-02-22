@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sendMessage } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
@@ -6,13 +6,13 @@ import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 const ChatRoom = () => {
   const setVisible = useSetRecoilState(chatRoomVisible);
   const frame = useRecoilValue(chatRoomFrame);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
   console.log(frame);
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
     await sendMessage(message, frame.productId);
-    e.currentTarget.value = "";
+    setMessage("");
   };
 
   return (
@@ -36,6 +36,7 @@ const ChatRoom = () => {
             type="text"
             className="rounded-full w-4/5 h-3/4 p-2 placeholder:text-xs mr-2"
             placeholder="메시지를 입력하세요"
+            value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           <button type="submit" className="bg-green-100 font-bold w-20 h-3/4 rounded-2xl">
