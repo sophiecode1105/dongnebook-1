@@ -200,3 +200,11 @@ export const sendMessage = (content: string, productId: number) => {
   const token = localStorage.getItem("token");
   return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
 };
+
+export const getLocationList = async (token: string | null) => {
+  const {
+    data: { userLocation, productLocation },
+  } = await axios.get(`${URL}/location`, { headers: { Authorization: `jwt ${token}` } });
+
+  return { userLocation, productLocation };
+};
