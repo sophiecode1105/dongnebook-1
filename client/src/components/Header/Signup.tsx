@@ -16,8 +16,7 @@ const Container = styled.div`
   width: 100%;
   max-width: 360px;
   margin: auto;
-  padding-top: 66px;
-  padding-bottom: 10px;
+  padding: 66px 10px 10px 10px;
 `;
 
 const SignupBox = styled.div`

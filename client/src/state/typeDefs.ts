@@ -84,7 +84,7 @@ export type isWriterProps = {
   isWriter: Boolean;
 };
 
-export type chatRoomListType = {
+export type chatRooms = {
   id: number;
   productId: number;
   createdAt: Date;
@@ -119,4 +119,17 @@ export type chatRoomListType = {
     updatedAt: Date;
   };
   count: number;
+};
+
+export type ChatListComponentProps = {
+  chatRooms: chatRooms[];
+};
+
+export type ChatRoomFrameType = {
+  nickname: string;
+  bookImg: string;
+  title: string;
+  img?: string;
+  productId: number;
+  chatroomId?: number;
 };

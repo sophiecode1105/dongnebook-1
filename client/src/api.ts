@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserState } from "./state/typeDefs";
+import { BookInfo, UserState } from "./state/typeDefs";
 
 const URL = "http://localhost:4000";
 
@@ -118,13 +118,15 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (id: number | undefined, token: string | null) => {
+export const getSingleBookInfo = async (id: number | undefined, token: string | null): Promise<BookInfo> => {
   try {
     const {
+      data,
       data: { productInfo },
     } = await axios.get(`${URL}/product/${id}`, {
       headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
+    console.log(data);
     return productInfo;
   } catch (e) {
     throw e;
@@ -169,9 +171,21 @@ export const timeForToday = (value: Date) => {
   return `${betweenTimeDay}일전`;
 };
 
-export const getChatRoomList = async (token: string | null) => {
-  const {
-    data: { chatroom },
-  } = await axios.get(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } });
-  return chatroom;
+export const getChatRoomList = () => {
+  const token = localStorage.getItem("token");
+  return fetch(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } })
+    .then((res) => res.json())
+    .then((json) => json.chatroom);
+};
+
+export const enterChatRoom = (id: number) => {
+  const token = localStorage.getItem("token");
+  return fetch(`${URL}/chatroom/${id}`, { headers: { Authorization: `jwt ${token}` } })
+    .then((res) => res.json())
+    .then((json) => json.chatroom[0]);
+};
+
+export const sendMessage = (content: string, productId: number) => {
+  const token = localStorage.getItem("token");
+  return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
 };

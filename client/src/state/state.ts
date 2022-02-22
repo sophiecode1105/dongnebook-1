@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { chatRoomListType, UserInfo, UserState } from "./typeDefs";
+import { ChatRoomFrameType, UserState } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
@@ -56,12 +56,17 @@ export const currentaddress = atom<string>({
   default: "",
 });
 
-export const chatRoomList = atom<chatRoomListType[]>({
-  key: "chatRoomList",
-  default: [],
-});
-
 export const bookSearch = atom<string>({
   key: "bookSearch",
   default: "",
+});
+
+export const chatRoomVisible = atom<boolean>({
+  key: "chatRoomVisible",
+  default: false,
+});
+
+export const chatRoomFrame = atom<ChatRoomFrameType>({
+  key: "chatRoomFrame",
+  default: {} as ChatRoomFrameType,
 });

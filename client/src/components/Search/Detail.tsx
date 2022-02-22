@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
 import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday } from "../../api";
-import { BookInfo, isWriterProps, UserState } from "../../state/typeDefs";
+import { BookInfo, ChatRoomFrameType, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
-import { loginState, userState } from "../../state/state";
-import { useRecoilValue } from "recoil";
+import { chatRoomFrame, chatRoomVisible, loginState, userState } from "../../state/state";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -274,6 +274,8 @@ const Details = () => {
 
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
+  const setVisible = useSetRecoilState(chatRoomVisible);
+  const setChatRoomFrame = useSetRecoilState(chatRoomFrame);
   // const [isSold, setIsSold] = useState(false);
   const [userData, setUserData] = useState<UserState>(useRecoilValue(userState));
   const UserCheck = useRecoilValue(userState);
@@ -289,6 +291,12 @@ const Details = () => {
 
   const getSingleData = async () => {
     const data = await getSingleBookInfo(Number(id), token);
+    setChatRoomFrame({
+      nickname: data.nickname,
+      title: data.title,
+      bookImg: data.images[0].url,
+      productId: data.id,
+    } as ChatRoomFrameType);
     setBookDetailInfo(data);
   };
 
@@ -405,7 +413,9 @@ const Details = () => {
                 <HeartButton onClick={handleClickHeart}>
                   {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
                 </HeartButton>
-                <TouchButton isWriter={isWriter}>연락하기</TouchButton>
+                <TouchButton isWriter={isWriter} onClick={() => setVisible(true)}>
+                  연락하기
+                </TouchButton>
               </>
             )}
           </ButtonBox>

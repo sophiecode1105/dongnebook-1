@@ -1,22 +1,11 @@
-import { useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useQuery } from "react-query";
 import { getChatRoomList } from "../api";
 import ChatList from "../components/Chat/ChatList";
-import { chatRoomList, loginState, userState } from "../state/state";
+import Loading from "../components/Loading";
 
 const Chat = () => {
-  const token: string | null = useRecoilValue(loginState);
-  const setChatRoomList = useSetRecoilState(chatRoomList);
-
-  const fetchData = async () => {
-    setChatRoomList(await getChatRoomList(token));
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  return <ChatList />;
+  const { isLoading, data: chatRooms } = useQuery("allChatRooms", getChatRoomList);
+  return isLoading ? <Loading /> : <ChatList chatRooms={chatRooms} />;
 };
 
 export default Chat;
