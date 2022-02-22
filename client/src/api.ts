@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserState } from "./state/typeDefs";
+import { BookInfo, UserState } from "./state/typeDefs";
 
 const URL = "http://localhost:4000";
 
@@ -85,7 +85,8 @@ export const getUserInfo = async (token: string | null): Promise<UserState> => {
 
 export const postContent = async (body: any, token: string) => {
   try {
-    await axios.post(`${URL}/product/post`, body, { headers: { Authorization: `jwt ${token}` } });
+    let resp = await axios.post(`${URL}/product/post`, body, { headers: { Authorization: `jwt ${token}` } });
+    return resp.status;
   } catch (e) {
     throw e;
   }
@@ -93,7 +94,8 @@ export const postContent = async (body: any, token: string) => {
 
 export const patchExchange = async (id: number) => {
   try {
-    await axios.patch(`${URL}/product/${id}/exchange`);
+    let resp = await axios.patch(`${URL}/product/${id}/exchange`);
+    return resp.status;
   } catch (e) {
     throw e;
   }
@@ -118,11 +120,15 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (id: number | undefined, token: string | null) => {
+export const getSingleBookInfo = async (id: number | undefined, token: string | null): Promise<BookInfo> => {
   try {
     const {
+      data,
       data: { productInfo },
-    } = await axios.get(`${URL}/product/${id}`, { headers: { Authorization: `jwt ${token}`, withCredentials: true } });
+    } = await axios.get(`${URL}/product/${id}`, {
+      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
+    });
+    console.log(data);
     return productInfo;
   } catch (e) {
     throw e;
@@ -148,7 +154,16 @@ export const postHeart = async (id: number | undefined, token: string | null) =>
   }
 };
 
-export const timeForToday = (value: string) => {
+export const patchContent = async (id: number, body: any, token: string | null) => {
+  try {
+    let resp = await axios.patch(`${URL}/product/${id}`, body, { headers: { Authorization: `jwt ${token}` } });
+    return resp.status;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const timeForToday = (value: Date) => {
   const today = new Date();
   const timeValue = new Date(value);
 
@@ -164,18 +179,26 @@ export const timeForToday = (value: string) => {
   }
 
   const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
-  if (betweenTimeDay < 365) {
-    return `${betweenTimeDay}일전`;
-  }
-
-  return `${Math.floor(betweenTimeDay / 365)}년전`;
+  return `${betweenTimeDay}일전`;
 };
 
-export const getChatRoomList = async (token: string | null) => {
-  const {
-    data: { chatroom },
-  } = await axios.get(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } });
-  return chatroom;
+export const getChatRoomList = () => {
+  const token = localStorage.getItem("token");
+  return fetch(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } })
+    .then((res) => res.json())
+    .then((json) => json.chatroom);
+};
+
+export const enterChatRoom = (id: number) => {
+  const token = localStorage.getItem("token");
+  return fetch(`${URL}/chatroom/${id}`, { headers: { Authorization: `jwt ${token}` } })
+    .then((res) => res.json())
+    .then((json) => json.chatroom[0]);
+};
+
+export const sendMessage = (content: string, productId: number) => {
+  const token = localStorage.getItem("token");
+  return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
 };
 
 export const getLocationList = async (token: string | null) => {

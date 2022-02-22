@@ -6,8 +6,9 @@ export type UserState = {
   email: string;
   password?: string;
   locationId: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
+  likes: likes[];
   locations: locations;
 };
 
@@ -17,8 +18,8 @@ export type UserInfo = {
     nickname: string;
     admin: boolean;
     email: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
   };
 };
 
@@ -29,8 +30,8 @@ export type BookInfo = {
     id: number;
     url: string;
     productId: number;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
   }[];
   content: string;
   visit: number;
@@ -38,8 +39,8 @@ export type BookInfo = {
   exchanged: Boolean;
   userId: number;
   nickname: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   locations: locations;
 };
 
@@ -55,15 +56,15 @@ export type ListProps = {
   quality: string;
   exchanged: Boolean;
   userId: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   locations: locations;
   images: {
     id: number;
     url: string;
     productId: number;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
   }[];
 };
 
@@ -71,15 +72,77 @@ export type ErrorProps = {
   error: string | undefined;
 };
 
+export type CurrentImgProps = {
+  Cm: number;
+};
+
 type locations = {
   id: number;
   lat: number;
   lon: number;
   address: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type likes = {
   createdAt: string;
+  id: number;
+  productId: number;
   updatedAt: string;
+  userId: number;
 };
 
 export type isWriterProps = {
   isWriter: Boolean;
+};
+
+export type chatRooms = {
+  id: number;
+  productId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  users: {
+    id: number;
+    chatroomId: number;
+    userId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    users: UserState;
+  }[];
+  chats: {
+    id: number;
+    userId: number;
+    content: string;
+    read: boolean;
+    chatroomId: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+  product: {
+    id: number;
+    title: string;
+    content: string;
+    quality: string;
+    exchanged: boolean;
+    nickname: string;
+    locationId: number;
+    visit: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  count: number;
+};
+
+export type ChatListComponentProps = {
+  chatRooms: chatRooms[];
+};
+
+export type ChatRoomFrameType = {
+  nickname: string;
+  bookImg: string;
+  title: string;
+  img?: string;
+  productId: number;
+  chatroomId?: number;
 };

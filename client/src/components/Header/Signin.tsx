@@ -15,7 +15,7 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
   max-width: 360px;
-  padding-top: 66px;
+  padding: 66px 10px 10px 10px;
 `;
 
 const LoginBox = styled.div`
@@ -158,6 +158,7 @@ const Signin = () => {
     const { email, password } = getValues();
     try {
       const { userInfo, token } = await postSignin({ email, password, keep });
+      console.log(userInfo);
       setUser(userInfo);
       setLogin(token);
       localStorage.setItem("token", token);
