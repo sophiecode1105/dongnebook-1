@@ -96,7 +96,12 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
 
     let isLike: any;
     if (authorization) {
-      const token = verify(authorization.split(" ")[1]);
+      let token;
+      try {
+        token = verify(authorization.split(" ")[1]);
+      } catch (err) {
+        return res.status(401).json({ message: "로그인을 다시해주세요", err });
+      }
       const checkLike = await client.product.findMany({
         where: {
           id: findId,
@@ -238,15 +243,21 @@ export const exchangedProduct = async (req: express.Request, res: express.Respon
   try {
     const { productId } = req.params;
 
+    const productInfo = await client.product.findUnique({
+      where: {
+        id: Number(productId),
+      },
+    });
     await client.product.update({
       where: {
         id: Number(productId),
       },
       data: {
-        exchanged: true,
+        exchanged: !productInfo.exchanged,
       },
     });
-    return res.status(200).json({ message: "거래가 완료되었습니다.", state: true });
+
+    return res.status(200).json({ message: "거래상태가 변경되었습니다.", state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
