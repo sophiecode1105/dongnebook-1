@@ -432,7 +432,7 @@ const Details = () => {
     }
   };
   const handleChangePage = () => {
-    navigate("/myinfo");
+    navigate("/mypage");
   };
 
   const handleClickModify = () => {
@@ -481,13 +481,15 @@ const Details = () => {
               <ButtonPrev
                 onClick={() => {
                   onChangeContent(-1);
-                }}>
+                }}
+              >
                 <i className="fas fa-chevron-left"></i>
               </ButtonPrev>
               <ButtonNext
                 onClick={() => {
                   onChangeContent(+1);
-                }}>
+                }}
+              >
                 <i className="fas fa-chevron-right"></i>
               </ButtonNext>
             </>

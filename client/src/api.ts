@@ -128,7 +128,6 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
     } = await axios.get(`${URL}/product/${id}`, {
       headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
-    console.log(data);
     return productInfo;
   } catch (e) {
     throw e;
@@ -158,6 +157,25 @@ export const patchContent = async (id: number, body: any, token: string | null) 
   try {
     let resp = await axios.patch(`${URL}/product/${id}`, body, { headers: { Authorization: `jwt ${token}` } });
     return resp.status;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getMemberInfo = async (token: string | null) => {
+  try {
+    const {
+      data: { allProductList },
+    } = await axios.get(`${URL}/user/mypage`, { headers: { Authorization: `jwt ${token}` } });
+    return allProductList;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const deleteAccount = async (token: string | null) => {
+  try {
+    await axios.delete(`${URL}/user/delete`, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }

@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { bookSearch, loginState } from "../../state/state";
-import { searchBook } from "../../api";
 import { useState } from "react";
 
 const Container = styled.div`
@@ -13,12 +12,12 @@ const Container = styled.div`
   justify-content: center;
   width: 100%;
   padding: 66px 0px 20px 0px;
-  max-width: 1400px;
+  max-width: 1200px;
   position: relative;
 `;
 
 const TitleBox = styled.div`
-  width: 1100px;
+  width: 85%;
   border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   padding-bottom: 10px;
 `;

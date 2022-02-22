@@ -41,8 +41,6 @@ const SignupForm = styled.form`
 `;
 
 const Input = styled.input<ErrorProps>`
-  text-decoration: none;
-  border: none;
   padding: 20px 20px;
   font-size: 15px;
   border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
