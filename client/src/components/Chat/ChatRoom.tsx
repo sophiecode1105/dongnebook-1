@@ -1,19 +1,52 @@
-import { FormEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { sendMessage } from "../../api";
-import { chatRoomFrame, chatRoomVisible } from "../../state/state";
+import { sendMessage, socket, timeStamp } from "../../api";
+import { chatRoomFrame, chatRoomVisible, userState } from "../../state/state";
+import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
   const setVisible = useSetRecoilState(chatRoomVisible);
   const frame = useRecoilValue(chatRoomFrame);
-  const [message, setMessage] = useState("");
-  console.log(frame);
+  const myInfo = useRecoilValue(userState);
+  const [message, setMessage] = useState<string>("");
+  const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
     await sendMessage(message, frame.productId);
-    e.currentTarget.value = "";
+    socket.emit("new_message", frame.chatroomId, myInfo.nickname, message, () => {
+      setChats((prev) => [
+        ...prev,
+        {
+          id: chats.length + 1,
+          userId: myInfo.id,
+          content: message,
+          read: false,
+          chatroomId: frame.chatroomId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as Chat,
+      ]);
+    });
+    setMessage("");
   };
+
+  useEffect(() => {
+    socket.on("receive_message", (name: string, message: string) => {
+      setChats((prev) => [
+        ...prev,
+        {
+          id: chats.length + 1,
+          userId: frame.userId,
+          content: message,
+          read: false,
+          chatroomId: frame.chatroomId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as Chat,
+      ]);
+    });
+  }, []);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
@@ -30,12 +63,33 @@ const ChatRoom = () => {
             <h2 className="flex items-center">{frame.title}</h2>
           </div>
         </div>
-        <ul className="h-full overflow-y-scroll p-3"></ul>
+        <ul className="h-full overflow-y-scroll p-3">
+          {chats?.map((chat) =>
+            myInfo.id === chat.userId ? (
+              <li className="flex justify-end items-end mb-2" key={chat.id}>
+                <span className="mr-2">{timeStamp(chat.createdAt)}</span>
+                <p className="break bg-slate-200 rounded-b-lg rounded-tl-lg p-2">{chat.content}</p>
+              </li>
+            ) : (
+              <li className="flex flex-col items-start mb-2" key={chat.id}>
+                <div className="flex items-center">
+                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full" />
+                  <h1>{frame.nickname}</h1>
+                </div>
+                <div className="flex items-end">
+                  <p className="break bg-slate-200 rounded-b-lg rounded-tr-lg p-2">{chat.content}</p>
+                  <span className="ml-2">{timeStamp(chat.createdAt)}</span>
+                </div>
+              </li>
+            )
+          )}
+        </ul>
         <form className="bg-slate-100 w-full h-20 flex justify-center items-center px-2" onSubmit={submitMessage}>
           <input
             type="text"
             className="rounded-full w-4/5 h-3/4 p-2 placeholder:text-xs mr-2"
             placeholder="메시지를 입력하세요"
+            value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           <button type="submit" className="bg-green-100 font-bold w-20 h-3/4 rounded-2xl">

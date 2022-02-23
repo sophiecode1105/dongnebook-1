@@ -33,3 +33,7 @@ body {
     transform: translateY(0px);
   }
 }
+
+.break {
+  word-break: break-all;
+}
