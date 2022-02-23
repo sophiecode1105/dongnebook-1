@@ -44,13 +44,14 @@ export const live = (req, res, next) => {
     socket.onAny((event: any) => {
       console.log(`Socket Event : ${event}`);
     });
+
     socket.on("enter_room", (roomName: number) => {
       socket.join(roomName);
       count[roomName] = socket.adapter.rooms.get(roomName)?.size;
     });
 
-    socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
-      socket.to(room).emit("receive_message", name, value, date);
+    socket.on("new_message", (room: number, name: string, value: string, done: any) => {
+      socket.to(room).emit("receive_message", name, value);
       console.log("방번호:", room, "이름", name, "내용", value);
       done();
     });
@@ -213,7 +214,9 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res
+      .status(200)
+      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }

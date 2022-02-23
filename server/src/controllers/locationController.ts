@@ -15,8 +15,8 @@ export const getLocation = async (req: express.Request, res: express.Response) =
       },
     });
     let userLocation = {
-      lat: 37.496590501605496,
-      lon: 127.02469765019322,
+      lat: 37.4965544495086,
+      lon: 127.02475418053183,
       address: "서울시 서초구 서초동",
     };
     if (authorization.split(" ")[1] !== "null") {
