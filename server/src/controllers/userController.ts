@@ -51,7 +51,7 @@ export const postCertify = async (req: express.Request, res: express.Response) =
       });
       return res.status(200).json({ message: "인증 성공", number, state: true }); // 클라이언트에게 보내기
     } else {
-      return res.status(403).json({ message: "이미 가입된 회원입니다.", state: false });
+      return res.status(200).json({ message: "이미 가입된 회원입니다.", state: false });
     }
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });

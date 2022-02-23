@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Upload from "../pages/Book";
 import Chat from "../pages/Chat";
+import { KakaoTest } from "../pages/KakoTest";
 import Main from "../pages/Main";
 import Search from "../pages/Search";
 import ChatRoom from "./Chat/ChatRoom";
@@ -11,8 +12,6 @@ import Mypage from "../pages/Mypage";
 import Signin from "./Header/Signin";
 import Signup from "./Header/Signup";
 import Account from "./Mypage/Account";
-import { KakaoTest } from "../pages/KakaoTest";
-
 
 const Routers = () => {
   return (
