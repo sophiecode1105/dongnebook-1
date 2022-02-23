@@ -10,7 +10,6 @@ const ChatRoom = () => {
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
-  console.log(frame, myInfo);
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
