@@ -3,13 +3,13 @@ import Upload from "../pages/Book";
 import Chat from "../pages/Chat";
 import Main from "../pages/Main";
 import Search from "../pages/Search";
-import ChatRoom from "./Chat/ChatRoom";
 import Detail from "./Detail/Detail";
 import Modify from "./Detail/Modify";
 import Header from "./Header/Header";
 import Mypage from "./Header/Mypage";
 import Signin from "./Header/Signin";
 import Signup from "./Header/Signup";
+import Socket from "./socket.client";
 
 const Routers = () => {
   return (
@@ -25,6 +25,7 @@ const Routers = () => {
         <Route path="/myinfo" element={<Mypage />} />
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
+        <Route path="/test" element={<Socket />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,7 +1,9 @@
 import axios from "axios";
 import { BookInfo, UserState } from "./state/typeDefs";
+import socketIOClient from "socket.io-client";
 
 const URL = "http://localhost:4000";
+export const socket = socketIOClient(`${URL}`);
 
 type Nick = { nickname: string };
 export const postNickcheck = async (body: Nick) => {
@@ -199,4 +201,12 @@ export const enterChatRoom = (id: number) => {
 export const sendMessage = (content: string, productId: number) => {
   const token = localStorage.getItem("token");
   return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
+};
+
+export const timeStamp = (value: Date) => {
+  const date = new Date(value);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
 };
