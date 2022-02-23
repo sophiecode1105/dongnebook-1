@@ -130,7 +130,6 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
     } = await axios.get(`${URL}/product/${id}`, {
       headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
-    console.log(data);
     return productInfo;
   } catch (e) {
     throw e;
@@ -160,6 +159,25 @@ export const patchContent = async (id: number, body: any, token: string | null) 
   try {
     let resp = await axios.patch(`${URL}/product/${id}`, body, { headers: { Authorization: `jwt ${token}` } });
     return resp.status;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getMemberInfo = async (token: string | null) => {
+  try {
+    const {
+      data: { allProductList },
+    } = await axios.get(`${URL}/user/mypage`, { headers: { Authorization: `jwt ${token}` } });
+    return allProductList;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const deleteAccount = async (token: string | null) => {
+  try {
+    await axios.delete(`${URL}/user/delete`, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
@@ -203,10 +221,19 @@ export const sendMessage = (content: string, productId: number) => {
   return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
 };
 
+<<<<<<< HEAD
 export const timeStamp = (value: Date) => {
   const date = new Date(value);
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
   return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+=======
+export const getLocationList = async (token: string | null) => {
+  const {
+    data: { userLocation, productLocation },
+  } = await axios.get(`${URL}/location`, { headers: { Authorization: `jwt ${token}` } });
+
+  return { userLocation, productLocation };
+>>>>>>> 8a77e9421b01a9c00fed8bd1815f9c3befe3a08f
 };

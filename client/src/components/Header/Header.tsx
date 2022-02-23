@@ -46,13 +46,15 @@ const Header = () => {
             {login ? (
               <Link
                 to="/chat"
-                className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200">
+                className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200"
+              >
                 <span className="text-sm font-bold">채팅</span>
               </Link>
             ) : null}
             <Link
-              to={login ? "/myinfo" : "/signup"}
-              className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200">
+              to={login ? "/mypage" : "/signup"}
+              className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200"
+            >
               <span className="text-sm font-bold">{login ? "내정보" : "회원가입"}</span>
             </Link>
             <Link
@@ -63,35 +65,41 @@ const Header = () => {
                   setLogin(null);
                 }
               }}
-              className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200">
+              className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200"
+            >
               <span className="text-sm font-bold">{login ? "로그아웃" : "로그인"}</span>
             </Link>
           </nav>
           <i
             onClick={() => setClick((prev) => !prev)}
-            className="md:hidden fas fa-bars text-2xl hover:text-green-600 cursor-pointer transition duration-200"></i>
+            className="md:hidden fas fa-bars text-2xl hover:text-green-600 cursor-pointer transition duration-200"
+          ></i>
           <nav
             className={`md: justify-center items-centerhidden absolute md:hidden right-0 top-14 bg-white w-full header--shadow -z-50 p-3 ${
               click ? "sidebar--slide" : "hidden"
-            }`}>
+            }`}
+          >
             <Link
               onClick={() => setClick((prev) => !prev)}
               to="/search"
-              className="flex flex-col hover:text-green-600 text-center cursor-pointer transition duration-200 mb-3">
+              className="flex flex-col hover:text-green-600 text-center cursor-pointer transition duration-200 mb-3"
+            >
               <span className="text-sm font-bold">검색</span>
             </Link>
             {login ? (
               <Link
                 onClick={() => setClick((prev) => !prev)}
                 to="/chat"
-                className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200 mb-3">
+                className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200 mb-3"
+              >
                 <span className="text-sm font-bold">채팅</span>
               </Link>
             ) : null}
             <Link
               onClick={() => setClick((prev) => !prev)}
-              to={login ? "/myinfo" : "/signup"}
-              className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200 mb-3">
+              to={login ? "/mypage" : "/signup"}
+              className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200 mb-3"
+            >
               <span className="text-sm font-bold">{login ? "내정보" : "회원가입"}</span>
             </Link>
             <Link
@@ -104,7 +112,8 @@ const Header = () => {
                 setClick((prev) => !prev);
               }}
               to={login ? "/" : "/signin"}
-              className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200">
+              className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200"
+            >
               <span className="text-sm font-bold">{login ? "로그아웃" : "로그인"}</span>
             </Link>
           </nav>

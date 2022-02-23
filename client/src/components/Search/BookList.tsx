@@ -1,8 +1,6 @@
-import { useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ListProps } from "../../state/typeDefs";
-import { useEffect } from "react";
 
 const Container = styled(Link)`
   display: flex;
