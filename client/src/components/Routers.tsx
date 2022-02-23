@@ -4,7 +4,6 @@ import Chat from "../pages/Chat";
 import { KakaoTest } from "../pages/KakoTest";
 import Main from "../pages/Main";
 import Search from "../pages/Search";
-import ChatRoom from "./Chat/ChatRoom";
 import Detail from "./Detail/Detail";
 import Modify from "./Detail/Modify";
 import Header from "./Header/Header";
@@ -28,7 +27,6 @@ const Routers = () => {
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/kakao" element={<KakaoTest />} />
       </Routes>
     </BrowserRouter>
   );

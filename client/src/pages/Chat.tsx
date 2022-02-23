@@ -1,10 +1,22 @@
-import { useQuery } from "react-query";
+import { useEffect, useState } from "react";
 import { getChatRoomList } from "../api";
 import ChatList from "../components/Chat/ChatList";
 import Loading from "../components/Loading";
 
 const Chat = () => {
-  const { isLoading, data: chatRooms } = useQuery("allChatRooms", getChatRoomList);
+  const [chatRooms, setChatRooms] = useState([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const fetchData = async () => {
+    const data = await getChatRoomList();
+    setChatRooms(data);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return isLoading ? <Loading /> : <ChatList chatRooms={chatRooms} />;
 };
 
