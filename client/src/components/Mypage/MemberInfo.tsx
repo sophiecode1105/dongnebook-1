@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
-import { loginState, userState } from "../../state/state";
+import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { deleteAccount, getMemberInfo, getUserInfo } from "../../api";
+import { deleteAccount } from "../../api";
+import { loginState } from "../../state/state";
 import Swal from "sweetalert2";
+import { UserState } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;
@@ -13,6 +13,7 @@ const Container = styled.div`
   align-items: center;
   height: 35%;
   width: 320px;
+  border: 1px solid blue;
 `;
 
 const UserInfoBox = styled.div`
@@ -63,19 +64,8 @@ const Button = styled.button`
   border-radius: 5px;
 `;
 
-const MemberInfo = () => {
-  const [user, setUser] = useRecoilState(userState);
-
-  const getUserInfo = async () => {
-    const userInfo = await getMemberInfo(token || "token");
-    console.log(userInfo);
-    setUser(userInfo);
-  };
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+const MemberInfo = ({ user }: any) => {
   const [token, setToken] = useRecoilState(loginState);
-
   const navigate = useNavigate();
   const { img, nickname, locations } = user;
 

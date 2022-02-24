@@ -500,7 +500,7 @@ const Details = () => {
           <BorderBottom />
           <UserInfoBox>
             <UserBox>
-              <UserAvatar src={avatar} />
+              <UserAvatar src={userInfo.img} />
               <UserNickname>{nickname}</UserNickname>
             </UserBox>
             {isWriter ? (

@@ -159,3 +159,11 @@ export type Chat = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type LikeList = {
+  id: number;
+  userId: number;
+  productId: number;
+  createdAt: string;
+  updatedAt: string;
+};
