@@ -256,14 +256,14 @@ type FormData = {
 
 const Account = () => {
   const [user, setUser] = useRecoilState(userState);
-  // const { img, nickname, email, locations } = user;
+  const { img, nickname, email, locations } = user;
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [searchResult, setSearchResult] = useState(user.locations?.address);
-  const [latitude, setLattitude] = useState(user.locations?.lat);
-  const [longtitude, setLongtitude] = useState(user.locations?.lon);
-  const [avatarImg, setAvatarImg] = useState<string | undefined>(user.img);
+  const [searchResult, setSearchResult] = useState(locations?.address);
+  const [latitude, setLattitude] = useState(locations?.lat);
+  const [longtitude, setLongtitude] = useState(locations?.lon);
+  const [avatarImg, setAvatarImg] = useState<string | undefined>(img);
   const token = useRecoilValue(loginState);
   const navigate = useNavigate();
 
@@ -279,14 +279,20 @@ const Account = () => {
   } = useForm<FormData>({ mode: "onChange" });
 
   useEffect(() => {
-    setValue("nick", user.nickname);
-    setValue("location", user.locations?.address);
-  }, []);
+    setValue("nick", nickname);
+    setValue("location", locations?.address);
+    setAvatarImg(img);
+  }, [user]);
 
   const getNick = async () => {
     let formVerified = await trigger("nick");
     if (formVerified) {
       const { nick } = getValues();
+      if (nick === nickname) {
+        setNickValid(true);
+        setNickCheck("현재 사용중인 닉네임입니다");
+        return;
+      }
       let valid = await postNickcheck({ nickname: nick });
       if (valid) {
         setNickValid(true);
@@ -294,6 +300,7 @@ const Account = () => {
       } else {
         setNickValid(false);
         setNickCheck("이미 사용중인 닉네임입니다");
+        setValue("nick", "");
       }
     }
   };
@@ -334,7 +341,7 @@ const Account = () => {
     return new Promise(async (res, rej) => {
       const { nick, password, image } = getValues();
       const formData = new FormData();
-      formData.append("email", user.email);
+      formData.append("email", email);
       formData.append("nickname", nick);
       formData.append("password", password);
       formData.append("file", image[0]);
@@ -351,6 +358,15 @@ const Account = () => {
   };
 
   const onSubmit = async () => {
+    if (nickCheck === "") {
+      Swal.fire({
+        text: "닉네임 중복확인이 필요합니다",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#2f6218",
+        icon: "warning",
+      });
+      return;
+    }
     try {
       let successful = await patchData();
       if (successful) {
@@ -407,7 +423,7 @@ const Account = () => {
           />
         </Label>
         <InputLabel>이메일(변경불가)</InputLabel>
-        <Email>{user.email}</Email>
+        <Email>{email}</Email>
         <InputLabel>닉네임</InputLabel>
         <Wrap>
           <NarrowInput
