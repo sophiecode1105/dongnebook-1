@@ -26,13 +26,7 @@ export type UserInfo = {
 export type BookInfo = {
   id: number;
   title: string;
-  images: {
-    id: number;
-    url: string;
-    productId: number;
-    createdAt: Date;
-    updatedAt: Date;
-  }[];
+  images: Images[];
   content: string;
   visit: number;
   quality: string;
@@ -59,13 +53,7 @@ export type ListProps = {
   createdAt: Date;
   updatedAt: Date;
   locations: locations;
-  images: {
-    id: number;
-    url: string;
-    productId: number;
-    createdAt: Date;
-    updatedAt: Date;
-  }[];
+  images: Images[];
 };
 
 export interface Nickprops {
@@ -134,6 +122,7 @@ export type chatRooms = {
     visit: number;
     createdAt: Date;
     updatedAt: Date;
+    images: Images[];
   };
   count: number;
 };
@@ -144,9 +133,29 @@ export type ChatListComponentProps = {
 
 export type ChatRoomFrameType = {
   nickname: string;
+  userId: number;
   bookImg: string;
   title: string;
   img?: string;
   productId: number;
   chatroomId?: number;
+  chats?: Chat[];
+};
+
+export type Images = {
+  id: number;
+  url: string;
+  productId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Chat = {
+  id: number;
+  userId: number;
+  content: string;
+  read: boolean;
+  chatroomId: number;
+  createdAt: Date;
+  updatedAt: Date;
 };

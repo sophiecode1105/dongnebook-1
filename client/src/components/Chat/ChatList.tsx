@@ -1,11 +1,27 @@
 import { useSetRecoilState } from "recoil";
-import { enterChatRoom, timeForToday } from "../../api";
+import { enterChatRoom, socket, timeForToday } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
-import { ChatListComponentProps } from "../../state/typeDefs";
+import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
 
 const ChatList = ({ chatRooms }: ChatListComponentProps) => {
   const setVisible = useSetRecoilState(chatRoomVisible);
   const setChatroomFrame = useSetRecoilState(chatRoomFrame);
+
+  const fetchData = async (id: number) => {
+    const data: chatRooms = await enterChatRoom(id);
+    setChatroomFrame({
+      nickname: data.users[0].users.nickname,
+      userId: data.users[0].users.id,
+      bookImg: data.product.images[0].url,
+      title: data.product.title,
+      productId: data.productId,
+      img: data.users[0].users.img,
+      chatroomId: data.id,
+      chats: data.chats,
+    } as ChatRoomFrameType);
+    socket.emit("enter_room", id);
+    setVisible(true);
+  };
 
   return (
     <div className="h-[90vh] pt-20 max-w-md w-full m-auto p-2">
@@ -17,14 +33,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
           const { content, createdAt } = chatRoom.chats[0];
 
           return (
-            <li
-              key={idx}
-              onClick={async () => {
-                const data = await enterChatRoom(id);
-                console.log(data);
-                setVisible(true);
-              }}
-              className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
+            <li key={idx} onClick={() => fetchData(id)} className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
               <div className="rounded-full flex items-center justify-center p-1">
                 <img src={img} className="rounded-full w-12 h-12" />
               </div>

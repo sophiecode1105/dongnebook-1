@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc -p .",
     "dev": "nodemon --exec ts-node src/init.ts",
+    "start": "node build/init.js",
     "migrate": "npx prisma migrate dev",
     "studio": "npx prisma studio",
     "premigrate": "rm -rf prisma/migrations"

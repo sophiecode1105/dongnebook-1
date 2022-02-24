@@ -1,10 +1,10 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import client from "../../client";
-
+import express from "express";
 const users = client.user;
 
-export const githubLogin = async (req, res) => {
+export const githubLogin = async (req: express.Request, res: express.Response) => {
   const { code } = req.body;
   const {
     data: { access_token },
@@ -35,11 +35,22 @@ export const githubLogin = async (req, res) => {
     .replace(/[^a-z]+/g, "")
     .substr(0, 5);
   if (!user) {
-    user = await users.create({
+    await client.location.create({
       data: {
-        email: "string",
-        nickname,
-        admin: false,
+        lat: 37.4965544495086,
+        lon: 127.02475418053183,
+        address: "서울시 서초구 서초동",
+        users: {
+          create: {
+            nickname: Math.random()
+              .toString(36)
+              .replace(/[^a-z]+/g, "")
+              .substr(0, 5),
+            admin: false,
+            email,
+            img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/31644921016560.png",
+          },
+        },
       },
     });
   }
