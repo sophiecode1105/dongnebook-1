@@ -60,15 +60,11 @@ const Map = () => {
   const imageOption = { offset: new window.kakao.maps.Point(35, 69) };
   const makerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-  // 주소-좌표 변환 객체를 생성합니다
-  // const geocoder = new window.kakao.maps.services.Geocoder();
   function searchDetailAddrFromCoords(coords: any, callback: any) {
-    // 좌표로 법정동 상세 주소 정보를 요청합니다
     geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
   }
 
   function displayMarker(locPosition: any, map: KakaoMap, marker: any) {
-    // 마커를 생성합니다
     searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
       storeaddress(
         result[0]?.address.region_1depth_name +
@@ -113,9 +109,6 @@ const Map = () => {
         marker.setPosition(mouseEvent.latLng);
         marker.setMap(map);
 
-        // console.log("위도", mouseEvent.latLng?.getLat());
-        // console.log("경도", mouseEvent.latLng?.getLng());
-
         latitude(mouseEvent.latLng?.getLat());
         longtitude(mouseEvent.latLng?.getLng());
 
@@ -131,8 +124,7 @@ const Map = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       let lat = localStorage.getItem("whichmap") === "등록" ? position.coords.latitude : modifyLat;
       let lon = localStorage.getItem("whichmap") === "등록" ? position.coords.longitude : modifyLon;
-      // console.log("맵에들어가는lat", lat);
-      // console.log("맵에들가는lon", lon);
+
       let locPosition = new window.kakao.maps.LatLng(lat, lon);
       let kakaoMap = new window.kakao.maps.Map(container, {
         center: locPosition,
@@ -158,9 +150,7 @@ const Map = () => {
     return () => {
       setMap(null);
       setMarker(null);
-      // setCurrentLocation({});
     };
-    // 지도 중심좌표를 접속위치로 변경합니다
   }, []);
 
   useEffect(() => {
@@ -174,23 +164,14 @@ const Map = () => {
     places.keywordSearch(searchContent, (result: any, status: any) => {
       if (status === window.kakao.maps.services.Status.OK) {
         setMapSearchResults(result);
-        // console.log("results -> ", result);
-        // const firstItem = result[0];
-        // const { y, x } = firstItem;Z
-
-        // const moveLatLng = new window.kakao.maps.LatLng(y, x);
-        // map?.panTo(moveLatLng);
       } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
         alert("검색 결과가 없습니다.");
       } else {
-        // alert("서비스에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
     });
   }, [searchContent]);
 
   useEffect(() => {
-    // marker?.setPosition(moveLatLng);
-    // map?.setCenter(moveLatLng);
     let coords: any = currentLocation;
     const moveLatLng = new window.kakao.maps.LatLng(coords.y, coords.x);
     searchDetailAddrFromCoords(moveLatLng, function (result: any, status: any) {

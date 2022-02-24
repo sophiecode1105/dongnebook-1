@@ -114,7 +114,6 @@ const Label = styled.label`
   align-items: center;
   position: relative;
   z-index: 1;
-
   width: 150px;
   height: 150px;
   border: 1px solid #dcdbe3;
@@ -181,7 +180,6 @@ const Textarea = styled.textarea<ErrorProps>`
 
 const ButtonBox = styled(DisplayRow)`
   width: 100%;
-
   /* border: 2px solid purple; */
 `;
 
@@ -321,7 +319,6 @@ const SearchResult = styled.div`
   background-color: white;
   padding: 2px;
   cursor: pointer;
-
   /* position: absolute; */
 `;
 //file받아오고 file수만큼 이미지를 만들어준다.
@@ -347,6 +344,7 @@ const Upload = () => {
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
+  console.log(imageUrls);
 
   const side = useRef<HTMLDivElement>(null);
   const {

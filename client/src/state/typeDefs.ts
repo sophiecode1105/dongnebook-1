@@ -58,6 +58,10 @@ export type ListProps = {
   images: Images[];
 };
 
+export interface Nickprops {
+  nickValid?: boolean;
+}
+
 export type ErrorProps = {
   error: string | undefined;
 };
