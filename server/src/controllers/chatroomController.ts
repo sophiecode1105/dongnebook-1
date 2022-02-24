@@ -5,10 +5,11 @@ import client from "../client";
 import { userFinder, verify } from "../token/verify";
 import { instrument } from "@socket.io/admin-ui";
 const socketIo = require("socket.io");
-
 let count = {};
 
-export const live = (req, res, next) => {
+// require("events").EventEmitter.prototype._maxListeners = 999999999999;
+
+export const live = (req: any, res: any, next: any) => {
   const io = socketIo(server, {
     cors: {
       origin: true,
@@ -16,7 +17,6 @@ export const live = (req, res, next) => {
       credentials: true,
     },
   });
-
   instrument(io, {
     auth: false,
   });
@@ -47,6 +47,8 @@ export const live = (req, res, next) => {
 
     socket.on("enter_room", (roomName: number) => {
       socket.join(roomName);
+      console.log("누구누구있니");
+      console.log(socket.adapter.rooms);
       count[roomName] = socket.adapter.rooms.get(roomName)?.size;
     });
 
@@ -56,8 +58,15 @@ export const live = (req, res, next) => {
       done();
     });
 
+    socket.on("out_room", (roomName: number) => {
+      socket.leave(roomName);
+      console.log("나기가 방");
+    });
+
     socket.on("disconnecting", function () {
       const roomName = publicRooms(socket.id);
+      socket.leave(roomName);
+      console.log("나가기 방");
       count[roomName] -= 1;
     });
 
@@ -68,6 +77,10 @@ export const live = (req, res, next) => {
 
   next();
 };
+// var MyObj = live; //EventEmitter 상속
+// util.inherits(MyObj, EventEmitter);
+// var myObj = new MyObj();
+// myObj.setMaxListeners(20);
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {
@@ -214,9 +227,7 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res
-      .status(200)
-      .json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
+    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }

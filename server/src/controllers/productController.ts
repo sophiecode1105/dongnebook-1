@@ -3,7 +3,6 @@ import client from "../client";
 import FuzzySearch from "fuzzy-search";
 import { productFinder, userFinder, verify } from "../token/verify";
 import { JwtPayload } from "jsonwebtoken";
-import { off } from "process";
 
 export const getAllProduct = async (req: express.Request, res: express.Response) => {
   try {
