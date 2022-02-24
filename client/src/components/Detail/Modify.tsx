@@ -389,7 +389,6 @@ const Modify = () => {
 
   const getSingleData = async (id: number) => {
     const data = await getSingleBookInfo(id, token);
-    console.log("싱글데이터", data);
     setValue("title", data.title);
     setValue("content", data.content);
     const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
