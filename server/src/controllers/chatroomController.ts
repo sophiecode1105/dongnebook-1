@@ -5,10 +5,11 @@ import client from "../client";
 import { userFinder, verify } from "../token/verify";
 import { instrument } from "@socket.io/admin-ui";
 const socketIo = require("socket.io");
-
 let count = {};
 
-export const live = (req, res, next) => {
+// require("events").EventEmitter.prototype._maxListeners = 999999999999;
+
+export const live = (req: any, res: any, next: any) => {
   const io = socketIo(server, {
     cors: {
       origin: true,
@@ -16,7 +17,6 @@ export const live = (req, res, next) => {
       credentials: true,
     },
   });
-
   instrument(io, {
     auth: false,
   });
@@ -44,19 +44,29 @@ export const live = (req, res, next) => {
     socket.onAny((event: any) => {
       console.log(`Socket Event : ${event}`);
     });
+
     socket.on("enter_room", (roomName: number) => {
       socket.join(roomName);
+      console.log("누구누구있니");
+      console.log(socket.adapter.rooms);
       count[roomName] = socket.adapter.rooms.get(roomName)?.size;
     });
 
-    socket.on("new_message", (room: number, name: string, value: string, date: number, done: any) => {
-      socket.to(room).emit("receive_message", name, value, date);
+    socket.on("new_message", (room: number, name: string, value: string, done: any) => {
+      socket.to(room).emit("receive_message", name, value);
       console.log("방번호:", room, "이름", name, "내용", value);
       done();
     });
 
+    socket.on("out_room", (roomName: number) => {
+      socket.leave(roomName);
+      console.log("나기가 방");
+    });
+
     socket.on("disconnecting", function () {
       const roomName = publicRooms(socket.id);
+      socket.leave(roomName);
+      console.log("나가기 방");
       count[roomName] -= 1;
     });
 
@@ -67,6 +77,10 @@ export const live = (req, res, next) => {
 
   next();
 };
+// var MyObj = live; //EventEmitter 상속
+// util.inherits(MyObj, EventEmitter);
+// var myObj = new MyObj();
+// myObj.setMaxListeners(20);
 
 export const postChatroom = async (req: express.Request, res: express.Response) => {
   try {

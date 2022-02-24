@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Upload from "../pages/Book";
 import Chat from "../pages/Chat";
+import { KakaoTest } from "../pages/KakoTest";
 import Main from "../pages/Main";
 import Search from "../pages/Search";
 import Detail from "./Detail/Detail";
@@ -26,6 +27,7 @@ const Routers = () => {
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/around" element={<KakaoTest />} />
       </Routes>
     </BrowserRouter>
   );
