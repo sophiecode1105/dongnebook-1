@@ -101,6 +101,17 @@ export const patchExchange = async (id: number) => {
   }
 };
 
+export const patchAccount = async (body: any, token: string) => {
+  try {
+    const {
+      data: { state },
+    } = await axios.patch(`${URL}/user/mypage`, body, { headers: { Authorization: `jwt ${token}` } });
+    return state;
+  } catch (e) {
+    throw e;
+  }
+};
+
 export const deleteContent = async (id: number | undefined) => {
   try {
     await axios.delete(`${URL}/product/${id}`);
@@ -165,9 +176,9 @@ export const patchContent = async (id: number, body: any, token: string | null) 
 export const getMemberInfo = async (token: string | null) => {
   try {
     const {
-      data: { allProductList },
+      data: { userInfo },
     } = await axios.get(`${URL}/user/mypage`, { headers: { Authorization: `jwt ${token}` } });
-    return allProductList;
+    return userInfo;
   } catch (e) {
     throw e;
   }

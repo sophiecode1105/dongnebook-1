@@ -68,6 +68,10 @@ export type ListProps = {
   }[];
 };
 
+export interface Nickprops {
+  nickValid?: boolean;
+}
+
 export type ErrorProps = {
   error: string | undefined;
 };
