@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import { enterChatRoom, socket, timeForToday } from "../../api";
+import { enterChatRoom, timeForToday } from "../../api";
+import { socket } from "../../pages/Chat";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
 
@@ -9,6 +11,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   const fetchData = async (id: number) => {
     const data: chatRooms = await enterChatRoom(id);
+    console.log(data);
     setChatroomFrame({
       nickname: data.users[0].users.nickname,
       userId: data.users[0].users.id,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { sendMessage, socket, timeStamp } from "../../api";
+import { sendMessage, timeStamp } from "../../api";
+import { socket } from "../../pages/Chat";
 import { chatRoomFrame, chatRoomVisible, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
@@ -13,12 +14,12 @@ const ChatRoom = () => {
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
-    await sendMessage(message, frame.productId);
-    socket.emit("new_message", frame.chatroomId, myInfo.nickname, message, () => {
+
+    socket.emit("new_message", frame.chatroomId, myInfo.nickname, message, async () => {
       setChats((prev) => [
         ...prev,
         {
-          id: chats.length + 1,
+          id: Date.now(),
           userId: myInfo.id,
           content: message,
           read: false,
@@ -27,16 +28,17 @@ const ChatRoom = () => {
           updatedAt: new Date(),
         } as Chat,
       ]);
+      await sendMessage(message, frame.productId);
     });
     setMessage("");
   };
 
-  useEffect(() => {
+  useEffect((): any => {
     socket.on("receive_message", (name: string, message: string) => {
       setChats((prev) => [
         ...prev,
         {
-          id: chats.length + 1,
+          id: Date.now(),
           userId: frame.userId,
           content: message,
           read: false,
@@ -46,15 +48,26 @@ const ChatRoom = () => {
         } as Chat,
       ]);
     });
+    return socket.emit("out_room", frame.chatroomId);
   }, []);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
-      <div onClick={() => setVisible(false)} className="w-screen h-screen"></div>
+      <div
+        onClick={() => {
+          socket.emit("out_room", frame.chatroomId);
+          setVisible(false);
+        }}
+        className="w-screen h-screen"></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
         <div className="p-3 chatroom--shadow">
           <div className="flex justify-between mb-3 text-xl">
-            <i onClick={() => setVisible(false)} className="fas fa-arrow-left cursor-pointer "></i>
+            <i
+              onClick={() => {
+                socket.emit("out_room", frame.chatroomId);
+                setVisible(false);
+              }}
+              className="fas fa-arrow-left cursor-pointer "></i>
             <h1 className="font-bold">{frame.nickname}</h1>
             <i className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>
@@ -64,14 +77,14 @@ const ChatRoom = () => {
           </div>
         </div>
         <ul className="h-full overflow-y-scroll p-3">
-          {chats?.map((chat) =>
+          {chats?.map((chat, idx) =>
             myInfo.id === chat.userId ? (
-              <li className="flex justify-end items-end mb-2" key={chat.id}>
+              <li className="flex justify-end items-end mb-2" key={idx}>
                 <span className="mr-2">{timeStamp(chat.createdAt)}</span>
                 <p className="break bg-slate-200 rounded-b-lg rounded-tl-lg p-2">{chat.content}</p>
               </li>
             ) : (
-              <li className="flex flex-col items-start mb-2" key={chat.id}>
+              <li className="flex flex-col items-start mb-2" key={idx}>
                 <div className="flex items-center">
                   <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full" />
                   <h1>{frame.nickname}</h1>

@@ -1,3 +1,5 @@
+import { Socket } from "net";
+
 export type UserState = {
   id: number;
   nickname: string;
