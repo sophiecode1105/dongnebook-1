@@ -27,6 +27,7 @@ const Routers = () => {
         <Route path="/modify" element={<Modify />} />
         <Route path="/search/:id" element={<Detail />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/around" element={<KakaoTest />} />
       </Routes>
     </BrowserRouter>
   );
