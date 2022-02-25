@@ -6,7 +6,6 @@ export const URL = "http://localhost:4000";
 
 export const socket = io("http://localhost:5000", {
   transports: ["websocket"],
-
   auth: { token: localStorage.getItem("token") },
 });
 
@@ -144,18 +143,12 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (
-  id: number | undefined,
-  token: string | null
-): Promise<BookInfo> => {
+export const getSingleBookInfo = async (id: number | undefined, token: string | null): Promise<BookInfo> => {
   try {
     const {
-      data,
       data: { productInfo },
     } = await axios.get(`${URL}/product/${id}`, {
-      headers: token
-        ? { Authorization: `jwt ${token}`, withCredentials: true }
-        : { withCredentials: true },
+      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
     return productInfo;
   } catch (e) {
@@ -176,11 +169,7 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(
-      `${URL}/product/${id?.toString()}`,
-      {},
-      { headers: { Authorization: `jwt ${token}` } }
-    );
+    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }
@@ -233,29 +222,6 @@ export const timeForToday = (value: Date) => {
 
   const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
   return `${betweenTimeDay}일전`;
-};
-
-export const getChatRoomList = () => {
-  const token = localStorage.getItem("token");
-  return fetch(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } })
-    .then((res) => res.json())
-    .then((json) => json.chatroom);
-};
-
-export const enterChatRoom = (id: number) => {
-  const token = localStorage.getItem("token");
-  return fetch(`${URL}/chatroom/${id}`, { headers: { Authorization: `jwt ${token}` } })
-    .then((res) => res.json())
-    .then((json) => json.chatroom[0]);
-};
-
-export const sendMessage = (content: string, productId: number) => {
-  const token = localStorage.getItem("token");
-  return axios.post(
-    `${URL}/chatroom`,
-    { content, productId },
-    { headers: { Authorization: `jwt ${token}` } }
-  );
 };
 
 export const timeStamp = (value: Date) => {

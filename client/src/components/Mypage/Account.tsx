@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getMemberInfo, patchAccount, postNickcheck } from "../../api";
+import { patchAccount, postNickcheck } from "../../api";
 import { ErrorProps, Nickprops } from "../../state/typeDefs";
 import { useForm, ValidationRule } from "react-hook-form";
-import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import { loginState, searchLocation, userState } from "../../state/state";
+import { useRecoilValue } from "recoil";
+import { loginState, userState } from "../../state/state";
 import lock from "../../img/lock.png";
 import lockcheck from "../../img/lockcheck.png";
 import Swal from "sweetalert2";
@@ -119,9 +119,6 @@ const Email = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.2);
   margin-bottom: 15px;
 `;
-const Div = styled.div`
-  border: 1px solid green;
-`;
 
 const WideInput = styled(Input)`
   width: 100%;
@@ -202,15 +199,6 @@ const InputContainer = styled.div`
   position: relative;
   width: 100%;
 `;
-const SearchBar = styled.input`
-  text-decoration: none;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  width: 60%;
-  padding: 8px;
-  &:focus {
-    outline-color: green;
-  }
-`;
 
 const SearchButton = styled.button`
   cursor: pointer;
@@ -255,7 +243,7 @@ type FormData = {
 };
 
 const Account = () => {
-  const [user, setUser] = useRecoilState(userState);
+  const user = useRecoilValue(userState);
   const { img, nickname, email, locations } = user;
   const [nickCheck, setNickCheck] = useState("");
   const [nickValid, setNickValid] = useState(false);
@@ -282,7 +270,7 @@ const Account = () => {
     setValue("nick", nickname);
     setValue("location", locations?.address);
     setAvatarImg(img);
-  }, [user]);
+  }, [img, locations?.address, nickname, setValue]);
 
   const getNick = async () => {
     let formVerified = await trigger("nick");

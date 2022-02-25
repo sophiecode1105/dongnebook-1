@@ -1,5 +1,4 @@
 import { atom } from "recoil";
-import { Socket } from "socket.io-client";
 import { ChatRoomFrameType, UserState, LikeList, BookInfo } from "./typeDefs";
 
 export const userState = atom<UserState>({

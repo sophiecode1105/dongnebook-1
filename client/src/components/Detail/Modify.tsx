@@ -1,28 +1,23 @@
 import styled from "styled-components";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  contentStorage,
   currentaddress,
   currentLatitude,
   currentLocationStorage,
   currentLongtitude,
-  imageStorage,
   loginState,
   mapResultsStorage,
   modifyLatitude,
   modifyLongtitude,
   searchLocation,
   storeContentId,
-  titleStorage,
 } from "../../state/state";
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
-import { setConstantValue } from "typescript";
-import { BookInfo } from "../../state/typeDefs";
 
 declare global {
   interface Window {
@@ -188,17 +183,12 @@ const Textarea = styled.textarea<ErrorProps>`
 
 const ButtonBox = styled(DisplayRow)`
   width: 100%;
-
-  /* border: 2px solid purple; */
 `;
 
 const BookImg = styled.img`
-  /* margin: 15px; */
   width: 100%;
   max-height: 100%;
   object-fit: contain;
-  /* height: 150px; */
-  /* border: 1px solid #dcdbe3; */
 `;
 
 const ImgTitle = styled.div`
@@ -267,7 +257,6 @@ const LocationWrap = styled.div`
 const SearchBar = styled.input`
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  /* border-radius: 10px; */
   width: 60%;
   padding: 8px;
   &:focus {
@@ -276,7 +265,6 @@ const SearchBar = styled.input`
 `;
 
 const SearchButton = styled.button`
-  /* height: 40px; */
   cursor: pointer;
   background-color: #2f6218;
   border: 0;
@@ -317,8 +305,6 @@ const SearchResult = styled.div`
   background-color: white;
   padding: 2px;
   cursor: pointer;
-
-  /* position: absolute; */
 `;
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
@@ -387,28 +373,31 @@ const Modify = () => {
     }
   };
 
-  const getSingleData = async (id: number) => {
-    const data = await getSingleBookInfo(id, token);
-    setValue("title", data.title);
-    setValue("content", data.content);
-    const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
-    radiobuttonValue.checked = true;
-    setModifyQuality(data.quality);
-    let modifyImg = data.images;
-    let imgData: any[] = [];
-    for (let i = 0; i < modifyImg.length; i++) {
-      imgData.push(modifyImg[i].url);
-    }
+  const getSingleData = useCallback(
+    async (id: number) => {
+      const data = await getSingleBookInfo(id, token);
+      setValue("title", data.title);
+      setValue("content", data.content);
+      const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
+      radiobuttonValue.checked = true;
+      setModifyQuality(data.quality);
+      let modifyImg = data.images;
+      let imgData: any[] = [];
+      for (let i = 0; i < modifyImg.length; i++) {
+        imgData.push(modifyImg[i].url);
+      }
 
-    setPatchImageUrls((prev) => {
-      return [...prev, ...imgData];
-    });
-    setImageUrls((prev) => {
-      return [...prev, ...imgData];
-    });
-    modifyLat(data.locations.lat);
-    modifyLon(data.locations.lon);
-  };
+      setPatchImageUrls((prev) => {
+        return [...prev, ...imgData];
+      });
+      setImageUrls((prev) => {
+        return [...prev, ...imgData];
+      });
+      modifyLat(data.locations.lat);
+      modifyLon(data.locations.lon);
+    },
+    [modifyLat, modifyLon, setValue, token]
+  );
 
   const patchData = async () => {
     return new Promise(async (res, rej) => {
@@ -462,18 +451,21 @@ const Modify = () => {
     setLocation(location);
   };
 
-  const handleClickOutside = (event: CustomEvent<MouseEvent>) => {
-    if (isOpen && !side?.current?.contains(event.target as Node)) {
-      setIsOpen(!isOpen);
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: CustomEvent<MouseEvent>) => {
+      if (isOpen && !side?.current?.contains(event.target as Node)) {
+        setIsOpen(!isOpen);
+      }
+    },
+    [isOpen]
+  );
 
   useEffect(() => {
     window.addEventListener("click", handleClickOutside as EventListener);
     return () => {
       window.removeEventListener("click", handleClickOutside as EventListener);
     };
-  }, [isOpen]);
+  }, [isOpen, handleClickOutside]);
 
   useEffect(() => {
     let fetchID = id;
@@ -484,7 +476,7 @@ const Modify = () => {
     return () => {
       localStorage.removeItem("modify_id");
     };
-  }, []);
+  }, [getSingleData, id]);
 
   return (
     <Container>
@@ -542,8 +534,7 @@ const Modify = () => {
                   alignItems: "stretch",
                   justifyContent: "flex-start",
                   width: "100%",
-                }}
-              >
+                }}>
                 <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
@@ -630,8 +621,7 @@ const Modify = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}
-                        >
+                          }}>
                           {searchResult?.address_name}
                         </SearchResult>
                       );
