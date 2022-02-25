@@ -1,9 +1,14 @@
 import axios from "axios";
 import { BookInfo, UserState } from "./state/typeDefs";
-import socketIOClient from "socket.io-client";
+import { io } from "socket.io-client";
 
-const URL = "http://localhost:4000";
-export const socket = socketIOClient(`${URL}`);
+export const URL = "http://localhost:4000";
+
+export const socket = io("http://localhost:5000", {
+  transports: ["websocket"],
+
+  auth: { token: localStorage.getItem("token") },
+});
 
 type Nick = { nickname: string };
 export const postNickcheck = async (body: Nick) => {
@@ -111,7 +116,9 @@ export const patchAccount = async (body: any, token: string) => {
   try {
     const {
       data: { state },
-    } = await axios.patch(`${URL}/user/mypage`, body, { headers: { Authorization: `jwt ${token}` } });
+    } = await axios.patch(`${URL}/user/mypage`, body, {
+      headers: { Authorization: `jwt ${token}` },
+    });
     return state;
   } catch (e) {
     throw e;
@@ -137,13 +144,18 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (id: number | undefined, token: string | null): Promise<BookInfo> => {
+export const getSingleBookInfo = async (
+  id: number | undefined,
+  token: string | null
+): Promise<BookInfo> => {
   try {
     const {
       data,
       data: { productInfo },
     } = await axios.get(`${URL}/product/${id}`, {
-      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
+      headers: token
+        ? { Authorization: `jwt ${token}`, withCredentials: true }
+        : { withCredentials: true },
     });
     return productInfo;
   } catch (e) {
@@ -164,7 +176,11 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
+    await axios.post(
+      `${URL}/product/${id?.toString()}`,
+      {},
+      { headers: { Authorization: `jwt ${token}` } }
+    );
   } catch (e) {
     throw e;
   }
@@ -235,7 +251,11 @@ export const enterChatRoom = (id: number) => {
 
 export const sendMessage = (content: string, productId: number) => {
   const token = localStorage.getItem("token");
-  return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
+  return axios.post(
+    `${URL}/chatroom`,
+    { content, productId },
+    { headers: { Authorization: `jwt ${token}` } }
+  );
 };
 
 export const timeStamp = (value: Date) => {

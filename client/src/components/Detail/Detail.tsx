@@ -1,15 +1,32 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday } from "../../api";
-import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
+import {
+  deleteContent,
+  getSingleBookInfo,
+  patchExchange,
+  postHeart,
+  timeForToday,
+  socket,
+} from "../../api";
+import {
+  BookInfo,
+  ChatRoomFrameType,
+  CurrentImgProps,
+  isWriterProps,
+  UserState,
+} from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
-import avatar from "../../img/avatar.png";
 import MobileDetail from "./MobileDetail";
-import { chatRoomFrame, chatRoomVisible, imageStorage, loginState, storeContentId, userState } from "../../state/state";
+import {
+  chatRoomFrame,
+  chatRoomVisible,
+  loginState,
+  storeContentId,
+  userState,
+} from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
-import axios from "axios";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -412,12 +429,6 @@ const Details = () => {
 
   const getSingleData = async () => {
     const data = await getSingleBookInfo(Number(id), token);
-    setChatRoomFrame({
-      nickname: data.nickname,
-      title: data.title,
-      bookImg: data.images[0].url,
-      productId: data.id,
-    } as ChatRoomFrameType);
     setBookDetailInfo(data);
   };
 
@@ -511,9 +522,19 @@ const Details = () => {
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
                       <StatusCheck>
-                        <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="can"
+                          name="status"
+                          onClick={handleClickExchange}
+                        ></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status" defaultChecked></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="cannot"
+                          name="status"
+                          defaultChecked
+                        ></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
@@ -562,9 +583,38 @@ const Details = () => {
             ) : (
               <>
                 <HeartButton onClick={handleClickHeart}>
-                  {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
+                  {isHeartPressed ? (
+                    <i className="fas fa-heart"></i>
+                  ) : (
+                    <i className="far fa-heart"></i>
+                  )}
                 </HeartButton>
-                <TouchButton isWriter={isWriter} onClick={() => setVisible(true)}>
+                <TouchButton
+                  isWriter={isWriter}
+                  onClick={() => {
+                    socket.emit("enter_room", id, (data: any, chat: any) => {
+                      setChatRoomFrame({
+                        nickname: data.nickname,
+                        title: data.title,
+                        bookImg: data.images[0].url,
+                        productId: data.id,
+                      } as ChatRoomFrameType);
+
+                      if (chat) {
+                        setChatRoomFrame((prev) => {
+                          return {
+                            ...prev,
+                            userId: chat.users[0].users.id,
+                            img: chat.users[0].users.img,
+                            chatroomId: chat.id,
+                            chats: chat.chats,
+                          };
+                        });
+                      }
+                      setVisible(true);
+                    });
+                  }}
+                >
                   연락하기
                 </TouchButton>
               </>

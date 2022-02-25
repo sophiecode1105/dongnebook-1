@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { sendMessage, socket, timeStamp } from "../../api";
-import { chatRoomFrame, chatRoomVisible, userState } from "../../state/state";
+import { sendMessage, timeStamp, socket } from "../../api";
+import { chatRoomFrame, chatRoomVisible, fetchRoom, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
@@ -10,11 +10,12 @@ const ChatRoom = () => {
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
+  const setRoom = useSetRecoilState(fetchRoom);
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
-    await sendMessage(message, frame.productId);
-    socket.emit("new_message", frame.chatroomId, myInfo.nickname, message, () => {
+
+    socket.emit("new_message", frame.productId, myInfo.nickname, message, () => {
       setChats((prev) => [
         ...prev,
         {
@@ -28,6 +29,7 @@ const ChatRoom = () => {
         } as Chat,
       ]);
     });
+
     setMessage("");
   };
 
@@ -50,11 +52,27 @@ const ChatRoom = () => {
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
-      <div onClick={() => setVisible(false)} className="w-screen h-screen"></div>
+      <div
+        onClick={() => {
+          socket.emit("out_room", frame.productId, () => {
+            setRoom((prev: any) => prev + 1);
+          });
+          setVisible(false);
+        }}
+        className="w-screen h-screen"
+      ></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
         <div className="p-3 chatroom--shadow">
           <div className="flex justify-between mb-3 text-xl">
-            <i onClick={() => setVisible(false)} className="fas fa-arrow-left cursor-pointer "></i>
+            <i
+              onClick={() => {
+                socket.emit("out_room", frame.productId, () => {
+                  setRoom((prev: any) => prev + 1);
+                });
+                setVisible(false);
+              }}
+              className="fas fa-arrow-left cursor-pointer "
+            ></i>
             <h1 className="font-bold">{frame.nickname}</h1>
             <i className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>
@@ -77,14 +95,19 @@ const ChatRoom = () => {
                   <h1>{frame.nickname}</h1>
                 </div>
                 <div className="flex items-end">
-                  <p className="break bg-slate-200 rounded-b-lg rounded-tr-lg p-2">{chat.content}</p>
+                  <p className="break bg-slate-200 rounded-b-lg rounded-tr-lg p-2">
+                    {chat.content}
+                  </p>
                   <span className="ml-2">{timeStamp(chat.createdAt)}</span>
                 </div>
               </li>
             )
           )}
         </ul>
-        <form className="bg-slate-100 w-full h-20 flex justify-center items-center px-2" onSubmit={submitMessage}>
+        <form
+          className="bg-slate-100 w-full h-20 flex justify-center items-center px-2"
+          onSubmit={submitMessage}
+        >
           <input
             type="text"
             className="rounded-full w-4/5 h-3/4 p-2 placeholder:text-xs mr-2"
