@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { sendMessage, timeStamp } from "../../api";
-import { socket } from "../../pages/Chat";
-import { chatRoomFrame, chatRoomVisible, userState } from "../../state/state";
+import { sendMessage, timeStamp, socket } from "../../api";
+import { chatRoomFrame, chatRoomVisible, fetchRoom, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
@@ -11,11 +10,12 @@ const ChatRoom = () => {
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
+  const setRoom = useSetRecoilState(fetchRoom);
 
   const submitMessage = async (e: any) => {
     e.preventDefault();
 
-    socket.emit("new_message", frame.chatroomId, myInfo.nickname, message, async () => {
+    socket.emit("new_message", frame.productId, myInfo.nickname, message, () => {
       setChats((prev) => [
         ...prev,
         {
@@ -28,8 +28,8 @@ const ChatRoom = () => {
           updatedAt: new Date(),
         } as Chat,
       ]);
-      await sendMessage(message, frame.productId);
     });
+
     setMessage("");
   };
 
@@ -55,7 +55,9 @@ const ChatRoom = () => {
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
       <div
         onClick={() => {
-          socket.emit("out_room", frame.chatroomId);
+          socket.emit("out_room", frame.productId, () => {
+            setRoom((prev: any) => prev + 1);
+          });
           setVisible(false);
         }}
         className="w-screen h-screen"></div>
@@ -64,7 +66,9 @@ const ChatRoom = () => {
           <div className="flex justify-between mb-3 text-xl">
             <i
               onClick={() => {
-                socket.emit("out_room", frame.chatroomId);
+                socket.emit("out_room", frame.productId, () => {
+                  setRoom((prev: any) => prev + 1);
+                });
                 setVisible(false);
               }}
               className="fas fa-arrow-left cursor-pointer "></i>

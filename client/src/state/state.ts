@@ -1,5 +1,6 @@
 import { atom } from "recoil";
-import { ChatRoomFrameType, UserState } from "./typeDefs";
+import { Socket } from "socket.io-client";
+import { ChatRoomFrameType, UserState, LikeList, BookInfo } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
@@ -94,4 +95,24 @@ export const chatRoomVisible = atom<boolean>({
 export const chatRoomFrame = atom<ChatRoomFrameType>({
   key: "chatRoomFrame",
   default: {} as ChatRoomFrameType,
+});
+
+export const pressLike = atom<LikeList[]>({
+  key: "pressLike",
+  default: [],
+});
+
+export const unableExchange = atom<BookInfo[]>({
+  key: "unableExchange",
+  default: [],
+});
+
+export const ableExchange = atom<BookInfo[]>({
+  key: "ableExchange",
+  default: [],
+});
+
+export const fetchRoom = atom<any>({
+  key: "fetchRoom",
+  default: 0,
 });

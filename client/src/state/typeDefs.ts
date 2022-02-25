@@ -1,5 +1,3 @@
-import { Socket } from "net";
-
 export type UserState = {
   id: number;
   nickname: string;
@@ -160,4 +158,12 @@ export type Chat = {
   chatroomId: number;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type LikeList = {
+  id: number;
+  userId: number;
+  productId: number;
+  createdAt: string;
+  updatedAt: string;
 };
