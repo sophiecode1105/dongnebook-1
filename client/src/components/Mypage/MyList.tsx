@@ -114,8 +114,7 @@ const MyList = ({
             setOnClickExchangenable(true);
             setOnClickUnExchangenable(false);
             setOnClickLike(false);
-          }}
-        >
+          }}>
           게시글
         </Exchangeable>
         <UnExchangeable
@@ -124,8 +123,7 @@ const MyList = ({
             setOnClickExchangenable(false);
             setOnClickUnExchangenable(true);
             setOnClickLike(false);
-          }}
-        >
+          }}>
           교환내역
         </UnExchangeable>
         <Likes
@@ -134,15 +132,14 @@ const MyList = ({
             setOnClickExchangenable(false);
             setOnClickUnExchangenable(false);
             setOnClickLike(true);
-          }}
-        >
+          }}>
           관심목록
         </Likes>
       </SelectionBox>
       <BookListContainer>
         {dataList?.map((list: any, idx: any) => {
           return (
-            <Wrap to={`/search/${list.id}`}>
+            <Wrap to={`/search/${list.id}`} key={idx}>
               <BookImgBox>
                 <BookImg src={list.images[0]?.url} />
                 <Title>{list.title}</Title>

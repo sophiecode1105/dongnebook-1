@@ -1,30 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  deleteContent,
-  getSingleBookInfo,
-  patchExchange,
-  postHeart,
-  timeForToday,
-  socket,
-} from "../../api";
-import {
-  BookInfo,
-  ChatRoomFrameType,
-  CurrentImgProps,
-  isWriterProps,
-  UserState,
-} from "../../state/typeDefs";
+import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday, socket } from "../../api";
+import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
-import {
-  chatRoomFrame,
-  chatRoomVisible,
-  loginState,
-  storeContentId,
-  userState,
-} from "../../state/state";
+import { chatRoomFrame, chatRoomVisible, loginState, storeContentId, userState } from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 
@@ -207,7 +188,6 @@ const BookStatusTitle = styled.div`
 const BookStatusChangeBox = styled.div`
   width: 100%;
   height: 50%;
-  /* border: 1px solid black; */
 `;
 
 const BooksStatusChange = styled.div`
@@ -360,9 +340,68 @@ const Details = () => {
 
   const token = useRecoilValue(loginState);
 
+  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
+  const { title, images, content, quality, createdAt, locations, nickname, visit } = bookDetailInfo as BookInfo;
+  console.log(bookDetailInfo);
+  const onChangeContent = (pageDelta: any) => {
+    const lastImgPageNum = images.length - 1;
+    const newCurrentPageNum = currentImg + pageDelta;
+
+    if (newCurrentPageNum < 0) {
+      setCurrentImg(lastImgPageNum);
+    } else if (newCurrentPageNum > lastImgPageNum) {
+      setCurrentImg(0);
+    } else {
+      setCurrentImg(newCurrentPageNum);
+    }
+  };
+
+  const date = timeForToday(createdAt);
+  const navigate = useNavigate();
+  const isWriter = userInfo?.nickname === nickname;
+
+  const getSingleData = useCallback(async () => {
+    const data = await getSingleBookInfo(Number(id), token);
+    setBookDetailInfo(data);
+  }, [id, token]);
+
+  const handleClickHeart = async () => {
+    //로그인 포스트
+    setIsHeartPressed(!isHeartPressed);
+    try {
+      await postHeart(Number(id), token);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const handleChangePage = () => {
+    navigate("/mypage");
+  };
+
+  const handleClickModify = () => {
+    storeId(Number(id));
+    localStorage.setItem("modify_id", String(id));
+    localStorage.setItem("whichmap", "수정");
+    navigate("/modify");
+  };
+  const handleClickDelete = async () => {
+    await deleteContent(Number(id));
+    navigate("/search");
+  };
+
+  const handleClickExchange = async (e: any) => {
+    await patchExchange(Number(id));
+    Swal.fire({
+      text: "교환완료로 변경되었습니다.",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#2f6218",
+      icon: "success",
+    });
+  };
+
   useEffect(() => {
     getSingleData();
-  }, []);
+  }, [getSingleData]);
 
   useEffect(() => {
     try {
@@ -373,7 +412,7 @@ const Details = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [userInfo]);
+  }, [id, userInfo?.likes]);
 
   useEffect(() => {
     let newUser: UserState = userInfo;
@@ -404,69 +443,7 @@ const Details = () => {
       }
     }
     setUserInfo(newUser);
-  }, [isHeartPressed]);
-
-  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, exchanged, createdAt, locations, nickname, visit } =
-    bookDetailInfo as BookInfo;
-
-  const onChangeContent = (pageDelta: any) => {
-    const lastImgPageNum = images.length - 1;
-    const newCurrentPageNum = currentImg + pageDelta;
-
-    if (newCurrentPageNum < 0) {
-      setCurrentImg(lastImgPageNum);
-    } else if (newCurrentPageNum > lastImgPageNum) {
-      setCurrentImg(0);
-    } else {
-      setCurrentImg(newCurrentPageNum);
-    }
-  };
-
-  const date = timeForToday(createdAt);
-  const navigate = useNavigate();
-  const isWriter = userInfo?.nickname === nickname;
-
-  const getSingleData = async () => {
-    const data = await getSingleBookInfo(Number(id), token);
-    setBookDetailInfo(data);
-  };
-
-  const handleClickHeart = async () => {
-    //로그인 포스트
-    setIsHeartPressed(!isHeartPressed);
-    try {
-      await postHeart(Number(id), token);
-      // setUserInfo({ ...userInfo });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-  const handleChangePage = () => {
-    navigate("/mypage");
-  };
-
-  const handleClickModify = () => {
-    storeId(Number(id));
-    localStorage.setItem("modify_id", String(id));
-    localStorage.setItem("whichmap", "수정");
-    navigate("/modify");
-  };
-  const handleClickDelete = async () => {
-    await deleteContent(Number(id));
-    navigate("/search");
-  };
-
-  const handleClickExchange = async (e: any) => {
-    await patchExchange(Number(id));
-    // setIsSold(true);
-    Swal.fire({
-      text: "교환완료로 변경되었습니다.",
-      confirmButtonText: "확인",
-      confirmButtonColor: "#2f6218",
-      icon: "success",
-    });
-  };
+  }, [id, setUserInfo, userInfo, isHeartPressed]);
 
   return isPc ? (
     <Container>
@@ -479,12 +456,11 @@ const Details = () => {
             <SlideList Cm={currentImg}>
               {images?.map((img, idx) => {
                 return (
-                  <SlideContent>
-                    <BookImg key={idx} src={img?.url} />
+                  <SlideContent key={idx}>
+                    <BookImg src={img?.url} />
                   </SlideContent>
                 );
               })}
-              {/* <BookImg src={images && images[0].url} /> */}
             </SlideList>
           </SlideBox>
           {images?.length >= 2 ? (
@@ -492,15 +468,13 @@ const Details = () => {
               <ButtonPrev
                 onClick={() => {
                   onChangeContent(-1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-left"></i>
               </ButtonPrev>
               <ButtonNext
                 onClick={() => {
                   onChangeContent(+1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-right"></i>
               </ButtonNext>
             </>
@@ -522,19 +496,9 @@ const Details = () => {
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
                       <StatusCheck>
-                        <CheckList
-                          type="radio"
-                          id="can"
-                          name="status"
-                          onClick={handleClickExchange}
-                        ></CheckList>
+                        <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList
-                          type="radio"
-                          id="cannot"
-                          name="status"
-                          defaultChecked
-                        ></CheckList>
+                        <CheckList type="radio" id="cannot" name="status" defaultChecked></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
@@ -583,16 +547,12 @@ const Details = () => {
             ) : (
               <>
                 <HeartButton onClick={handleClickHeart}>
-                  {isHeartPressed ? (
-                    <i className="fas fa-heart"></i>
-                  ) : (
-                    <i className="far fa-heart"></i>
-                  )}
+                  {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
                 </HeartButton>
                 <TouchButton
                   isWriter={isWriter}
                   onClick={() => {
-                    socket.emit("enter_room", id, (data: any, chat: any) => {
+                    socket.emit("enter_room", Number(id), (data: any, chat: any) => {
                       setChatRoomFrame({
                         nickname: data.nickname,
                         title: data.title,
@@ -613,8 +573,7 @@ const Details = () => {
                       }
                       setVisible(true);
                     });
-                  }}
-                >
+                  }}>
                   연락하기
                 </TouchButton>
               </>

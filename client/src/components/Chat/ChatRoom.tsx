@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { sendMessage, timeStamp, socket } from "../../api";
+import { timeStamp, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible, fetchRoom, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
@@ -12,7 +12,7 @@ const ChatRoom = () => {
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
   const setRoom = useSetRecoilState(fetchRoom);
 
-  const submitMessage = async (e: any) => {
+  const submitMessage = async (e: FormEvent) => {
     e.preventDefault();
 
     socket.emit("new_message", frame.productId, myInfo.nickname, message, () => {
@@ -48,8 +48,7 @@ const ChatRoom = () => {
         } as Chat,
       ]);
     });
-    return socket.emit("out_room", frame.chatroomId);
-  }, []);
+  }, [frame.chatroomId, frame.userId]);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">

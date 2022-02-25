@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import MemberInfo from "./MemberInfo";
 import MyList from "./MyList";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { ableExchange, loginState, pressLike, unableExchange, userState } from "../../state/state";
 import { getMemberInfo } from "../../api";
@@ -37,16 +37,17 @@ const Myinfo = () => {
   const [likesList, setLikesList] = useRecoilState(pressLike);
   const token = useRecoilValue(loginState);
 
-  const getUserInfo = async () => {
+  const getUserInfo = useCallback(async () => {
     const { userInfo, likes, exchangeFalse, exchangeTrue } = await getMemberInfo(token || "token");
     setUser(userInfo);
     setExchangeableList(exchangeFalse);
     setUnexchangeableList(exchangeTrue);
     setLikesList(likes);
-  };
+  }, [setExchangeableList, setLikesList, setUnexchangeableList, setUser, token]);
+
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [getUserInfo]);
 
   return (
     <Container>

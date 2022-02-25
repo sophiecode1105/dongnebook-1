@@ -1,5 +1,5 @@
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { enterChatRoom, timeForToday, socket } from "../../api";
+import { useSetRecoilState } from "recoil";
+import { timeForToday, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
 
@@ -8,7 +8,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
   const setChatroomFrame = useSetRecoilState(chatRoomFrame);
 
   const fetchData = (id: number) => {
-    socket.emit("enter_room", id, (data: any, chat: any) => {
+    socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
       setChatroomFrame({
         nickname: chat.users[0].users.nickname,
         userId: chat.users[0].users.id,
@@ -22,8 +22,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
       setVisible(true);
     });
-
-    // const data: chatRooms = await enterChatRoom(id);
   };
 
   return (
@@ -41,7 +39,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
               onClick={() => fetchData(productId)}
               className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
               <div className="rounded-full flex items-center justify-center p-1">
-                <img src={img} className="rounded-full w-12 h-12" />
+                <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
               </div>
               <div className="w-full p-2 flex flex-col justify-between">
                 <div className="flex justify-between">

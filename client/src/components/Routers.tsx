@@ -11,7 +11,6 @@ import Mypage from "../pages/Mypage";
 import Signin from "./Header/Signin";
 import Signup from "./Header/Signup";
 import Account from "./Mypage/Account";
-import SocketTest from "../pages/SocketTest";
 
 const Routers = () => {
   return (
@@ -29,7 +28,6 @@ const Routers = () => {
         <Route path="/search/:id" element={<Detail />} />
         <Route path="/account" element={<Account />} />
         <Route path="/around" element={<KakaoTest />} />
-        <Route path="/socket" element={<SocketTest />} />
       </Routes>
     </BrowserRouter>
   );
