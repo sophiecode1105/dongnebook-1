@@ -12,7 +12,7 @@ let count = {};
 export const live = (req: any, res: any, next: any) => {
   const io = socketIo(server, {
     cors: {
-      origin: true,
+      origin: "*",
       methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
       credentials: true,
     },
