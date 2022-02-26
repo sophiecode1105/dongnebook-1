@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import { socket } from "../api";
 import ChatList from "../components/Chat/ChatList";
 import Loading from "../components/Loading";
-import { fetchRoom } from "../state/state";
 
 const Chat = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const room = useRecoilValue(fetchRoom);
+
   const fetchData = () => {
     socket.emit("get_rooms", (data: any) => {
-      console.log("data");
-      console.log(data);
       setChatRooms(data);
-      setIsLoading(false);
     });
   };
 
@@ -30,7 +25,8 @@ const Chat = () => {
 
   useEffect(() => {
     fetchData();
-  }, [room]);
+    setIsLoading(false);
+  }, []);
 
   return isLoading ? <Loading /> : <ChatList chatRooms={chatRooms} />;
 };

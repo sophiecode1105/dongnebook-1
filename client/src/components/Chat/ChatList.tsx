@@ -19,7 +19,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chatroomId: chat.id,
         chats: chat.chats,
       } as ChatRoomFrameType);
-
       setVisible(true);
     });
   };

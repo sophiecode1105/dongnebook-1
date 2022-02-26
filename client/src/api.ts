@@ -96,6 +96,7 @@ export const postContent = async (body: any, token: string) => {
     let resp = await axios.post(`${URL}/product/post`, body, {
       headers: { Authorization: `jwt ${token}` },
     });
+    console.log(resp);
     return resp.status;
   } catch (e) {
     throw e;

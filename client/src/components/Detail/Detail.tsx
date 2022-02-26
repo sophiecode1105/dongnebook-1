@@ -342,7 +342,6 @@ const Details = () => {
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
   const { title, images, content, quality, createdAt, locations, nickname, visit } = bookDetailInfo as BookInfo;
-  console.log(bookDetailInfo);
   const onChangeContent = (pageDelta: any) => {
     const lastImgPageNum = images.length - 1;
     const newCurrentPageNum = currentImg + pageDelta;

@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
 
   socket.on("enter_room", async (productId: string, done: any) => {
     let userInfo;
-
+    socket.leave("notification");
     console.log("token");
     console.log(token);
 
