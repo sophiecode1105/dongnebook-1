@@ -328,6 +328,9 @@ const Modify = () => {
   const [lat, modifyLat] = useRecoilState(modifyLatitude);
   const [lon, modifyLon] = useRecoilState(modifyLongtitude);
 
+  const [modifyLatitu, setModifyLatitu] = useState();
+  const [modifyLongtitu, setModifyLongtitu] = useState();
+
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const latitude = useRecoilValue(currentLatitude);
@@ -376,13 +379,13 @@ const Modify = () => {
 
   const getSingleData = useCallback(
     async (id: number) => {
-      const data = await getSingleBookInfo(id, token);
-      setValue("title", data.title);
-      setValue("content", data.content);
-      const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
+      const { productInfo } = await getSingleBookInfo(id, token);
+      setValue("title", productInfo.title);
+      setValue("content", productInfo.content);
+      const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
       radiobuttonValue.checked = true;
-      setModifyQuality(data.quality);
-      let modifyImg = data.images;
+      setModifyQuality(productInfo.quality);
+      let modifyImg = productInfo.images;
       let imgData: any[] = [];
       for (let i = 0; i < modifyImg.length; i++) {
         imgData.push(modifyImg[i].url);
@@ -394,11 +397,8 @@ const Modify = () => {
       setImageUrls((prev) => {
         return [...prev, ...imgData];
       });
-
-      modifyLat(data.locations.lat);
-      console.log("겟싱글데이타 로케이션");
-      console.log(data.locations);
-      modifyLon(data.locations.lon);
+      modifyLat(productInfo.locations.lat);
+      modifyLon(productInfo.locations.lon);
     },
     [modifyLat, modifyLon, setValue, token]
   );

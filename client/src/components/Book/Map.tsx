@@ -40,7 +40,7 @@ const Loading = styled.img`
   margin-top: 10px;
 `;
 
-const Map = () => {
+const Map = ({ modifyLatitu, modifyLongtitu }: { modifyLatitu: any; modifyLongtitu: any }) => {
   const place = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<KakaoMap | null>(null);
@@ -139,8 +139,12 @@ const Map = () => {
     const container = place.current;
 
     navigator.geolocation.getCurrentPosition((position) => {
-      let lat = localStorage.getItem("whichmap") === "등록" ? position.coords.latitude : modifyLat;
-      let lon = localStorage.getItem("whichmap") === "등록" ? position.coords.longitude : modifyLon;
+      console.log("처음찍히는거", modifyLatitu);
+      console.log("처음찍히는거", modifyLongtitu);
+      let lat = localStorage.getItem("whichmap") === "등록" ? position.coords.latitude : modifyLatitu;
+      let lon = localStorage.getItem("whichmap") === "등록" ? position.coords.longitude : modifyLongtitu;
+      console.log("첫렌더링ㅇ이안되는이유?", modifyLatitu);
+      console.log("두번째렌더링ㅇ이안되는이유?", modifyLongtitu);
 
       let locPosition = new window.kakao.maps.LatLng(lat, lon);
       let kakaoMap = new window.kakao.maps.Map(container, {
@@ -151,7 +155,7 @@ const Map = () => {
         setMapLoaded(true);
       });
 
-      kakaoMap.setCenter(locPosition);
+      // kakaoMap.setCenter(locPosition);
       let newMarker = new window.kakao.maps.Marker({
         map: map,
         position: locPosition,
