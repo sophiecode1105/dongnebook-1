@@ -28,8 +28,10 @@ const ChatRoom = () => {
           updatedAt: new Date(),
         } as Chat,
       ]);
+      const ul: any = document.querySelector("#chat__list");
+      const height = ul.scrollHeight;
+      ul.scrollTo({ top: height });
     });
-
     setMessage("");
   };
 
@@ -42,22 +44,31 @@ const ChatRoom = () => {
           userId: frame.userId,
           content: message,
           read: false,
-          chatroomId: frame.chatroomId,
           createdAt: new Date(),
           updatedAt: new Date(),
         } as Chat,
       ]);
+      const ul: any = document.querySelector("#chat__list");
+      if (ul) {
+        const height = ul.scrollHeight;
+        ul.scrollTo({ top: height });
+      }
     });
-  }, [frame.chatroomId, frame.userId]);
+    return () =>
+      socket.emit("out_room", frame.productId, () => {
+        setRoom((prev: any) => prev + 1);
+      });
+  }, [frame.userId]);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
       <div
         onClick={() => {
+          setVisible(false);
           socket.emit("out_room", frame.productId, () => {
             setRoom((prev: any) => prev + 1);
+            socket.emit("notification", "notification");
           });
-          setVisible(false);
         }}
         className="w-screen h-screen"></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
@@ -65,10 +76,11 @@ const ChatRoom = () => {
           <div className="flex justify-between mb-3 text-xl">
             <i
               onClick={() => {
+                setVisible(false);
                 socket.emit("out_room", frame.productId, () => {
                   setRoom((prev: any) => prev + 1);
+                  socket.emit("notification", "notification");
                 });
-                setVisible(false);
               }}
               className="fas fa-arrow-left cursor-pointer "></i>
             <h1 className="font-bold">{frame.nickname}</h1>
@@ -79,7 +91,7 @@ const ChatRoom = () => {
             <h2 className="flex items-center">{frame.title}</h2>
           </div>
         </div>
-        <ul className="h-full overflow-y-scroll p-3">
+        <ul className="h-full overflow-y-scroll p-3" id="chat__list">
           {chats?.map((chat, idx) =>
             myInfo.id === chat.userId ? (
               <li className="flex justify-end items-end mb-2" key={idx}>
@@ -89,7 +101,7 @@ const ChatRoom = () => {
             ) : (
               <li className="flex flex-col items-start mb-2" key={idx}>
                 <div className="flex items-center">
-                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full" />
+                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full mb-2" />
                   <h1>{frame.nickname}</h1>
                 </div>
                 <div className="flex items-end">

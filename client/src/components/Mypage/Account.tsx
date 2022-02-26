@@ -255,8 +255,6 @@ const Account = () => {
   const token = useRecoilValue(loginState);
   const navigate = useNavigate();
 
-  console.log(user);
-
   const {
     register,
     setValue,
@@ -265,12 +263,6 @@ const Account = () => {
     trigger,
     formState: { errors },
   } = useForm<FormData>({ mode: "onChange" });
-
-  useEffect(() => {
-    setValue("nick", nickname);
-    setValue("location", locations?.address);
-    setAvatarImg(img);
-  }, [img, locations?.address, nickname, setValue]);
 
   const getNick = async () => {
     let formVerified = await trigger("nick");
@@ -382,6 +374,12 @@ const Account = () => {
     value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
     message: "8자이상 / 영문 / 숫자 / 특수문자를 조합해주세요",
   };
+
+  useEffect(() => {
+    setValue("nick", nickname);
+    setValue("location", locations?.address);
+    setAvatarImg(img);
+  }, [img, locations?.address, nickname, setValue]);
 
   return (
     <Container>
