@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
@@ -18,6 +18,7 @@ import {
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
+import { Map2 } from "../Book/Map2";
 
 declare global {
   interface Window {
@@ -324,8 +325,8 @@ const Modify = () => {
   const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
   const setCurrentLocation = useSetRecoilState(currentLocationStorage);
-  const modifyLat = useSetRecoilState(modifyLatitude);
-  const modifyLon = useSetRecoilState(modifyLongtitude);
+  const [lat, modifyLat] = useRecoilState(modifyLatitude);
+  const [lon, modifyLon] = useRecoilState(modifyLongtitude);
 
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
@@ -393,7 +394,10 @@ const Modify = () => {
       setImageUrls((prev) => {
         return [...prev, ...imgData];
       });
+
       modifyLat(data.locations.lat);
+      console.log("겟싱글데이타 로케이션");
+      console.log(data.locations);
       modifyLon(data.locations.lon);
     },
     [modifyLat, modifyLon, setValue, token]
@@ -511,11 +515,26 @@ const Modify = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="새상품같음"
+                  value="새상품같음"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="약간헌책"
+                  value="약간헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="많이헌책"
+                  value="많이헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -534,7 +553,8 @@ const Modify = () => {
                   alignItems: "stretch",
                   justifyContent: "flex-start",
                   width: "100%",
-                }}>
+                }}
+              >
                 <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
@@ -607,7 +627,11 @@ const Modify = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchBar
+                    type="text"
+                    placeholder="건물,지역 검색"
+                    {...register("location")}
+                  ></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
@@ -621,7 +645,8 @@ const Modify = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}>
+                          }}
+                        >
                           {searchResult?.address_name}
                         </SearchResult>
                       );
@@ -629,7 +654,7 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map />
+              <Map2 />
             </LocationWrap>
           </Uploads>
         </UploadInform>

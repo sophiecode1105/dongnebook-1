@@ -48,7 +48,9 @@ const Map = () => {
   const [infowindow, setInfoWindow] = useState<any>(
     useCallback(() => new window.kakao.maps.InfoWindow({ zindex: 1 }), [])
   );
-  const [geocoder, setGeocoder] = useState<any>(useCallback(() => new window.kakao.maps.services.Geocoder(), []));
+  const [geocoder, setGeocoder] = useState<any>(
+    useCallback(() => new window.kakao.maps.services.Geocoder(), [])
+  );
   const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
   const latitude = useSetRecoilState(currentLatitude);
   const longtitude = useSetRecoilState(currentLongtitude);
@@ -90,7 +92,8 @@ const Map = () => {
           : "";
         detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
 
-        let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+        let content =
+          '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
 
         marker.setPosition(locPosition);
         marker.setMap(map);
@@ -114,7 +117,8 @@ const Map = () => {
             : "";
           detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
 
-          let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+          let content =
+            '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
 
           map?.setCenter(mouseEvent.latLng);
           marker.setPosition(mouseEvent.latLng);
@@ -205,7 +209,8 @@ const Map = () => {
           : "";
         detailAddr += "<div>지번 주소 : " + result[0]?.address?.address_name + "</div>";
 
-        let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+        let content =
+          '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
         marker?.setPosition(moveLatLng);
         marker?.setMap(map);
         map?.panTo(moveLatLng);
@@ -214,7 +219,16 @@ const Map = () => {
         infowindow.open(map, marker);
       }
     });
-  }, [infowindow, latitude, longtitude, marker, searchDetailAddrFromCoords, storeaddress, currentLocation, map]);
+  }, [
+    infowindow,
+    latitude,
+    longtitude,
+    marker,
+    searchDetailAddrFromCoords,
+    storeaddress,
+    currentLocation,
+    map,
+  ]);
 
   return (
     <ExchangeLocation ref={place}>

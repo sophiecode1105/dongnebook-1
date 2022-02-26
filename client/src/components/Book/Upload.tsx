@@ -10,13 +10,15 @@ import {
   currentLongtitude,
   loginState,
   mapResultsStorage,
+  modifyLatitude,
+  modifyLongtitude,
   searchLocation,
 } from "../../state/state";
 import Swal from "sweetalert2";
-import Map from "./Map";
 import { useEffect } from "react";
 import { postContent } from "../../api";
 import { useCallback } from "react";
+import { Map2 } from "./Map2";
 
 declare global {
   interface Window {
@@ -334,6 +336,11 @@ const Upload = () => {
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
+  const setLat = useSetRecoilState(modifyLatitude);
+  const setLon = useSetRecoilState(modifyLongtitude);
+
+  const setMapSearchResults = useSetRecoilState(mapResultsStorage);
+  const searchContent = useRef("");
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -342,7 +349,7 @@ const Upload = () => {
     watch,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({ mode: "onChange" });
+  } = useForm<FormData>({ mode: "onSubmit" });
 
   const { title } = watch();
   const { content } = watch();
@@ -393,8 +400,9 @@ const Upload = () => {
 
   const searchPlace = async () => {
     setIsOpen(!isOpen);
-    const { location } = getValues();
-    setLocation(location);
+    // const { location } = getValues();
+
+    setLocation(searchContent.current);
   };
 
   const handleClickOutside = useCallback(
@@ -429,12 +437,34 @@ const Upload = () => {
     }
   };
 
+  const setLatlon = useCallback(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      if (position) {
+        setLat(position.coords.latitude);
+        setLon(position.coords.longitude);
+      } else {
+        setLat(0);
+        setLon(0);
+      }
+    });
+  }, [setLat, setLon]);
   useEffect(() => {
+    setLatlon();
     window.addEventListener("click", handleClickOutside as EventListener);
+    const places = new window.kakao.maps.services.Places();
+
+    places.keywordSearch(searchContent.current, (result: any, status: any) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        setMapSearchResults(result);
+      } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+        alert("검색 결과가 없습니다.");
+      }
+    });
+
     return () => {
       window.removeEventListener("click", handleClickOutside as EventListener);
     };
-  }, [handleClickOutside]);
+  }, [handleClickOutside, setLatlon, setMapSearchResults]);
 
   return (
     <Container>
@@ -469,11 +499,26 @@ const Upload = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="새상품같음"
+                  value="새상품같음"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="약간헌책"
+                  value="약간헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="많이헌책"
+                  value="많이헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -560,7 +605,13 @@ const Upload = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchBar
+                    type="text"
+                    placeholder="건물,지역 검색"
+                    onChange={(e) => {
+                      searchContent.current = e.target.value;
+                    }}
+                  ></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
@@ -574,7 +625,8 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}>
+                          }}
+                        >
                           {searchResult?.address_name}
                         </SearchResult>
                       );
@@ -582,7 +634,7 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map />
+              <Map2 />
             </LocationWrap>
           </Uploads>
         </UploadInform>
