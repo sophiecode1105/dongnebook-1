@@ -254,6 +254,9 @@ export const exchangedProduct = async (req: express.Request, res: express.Respon
       data: {
         exchanged: !productInfo.exchanged,
       },
+      include: {
+        locations: true,
+      },
     });
 
     return res.status(200).json({ message: "거래상태가 변경되었습니다.", state: true });

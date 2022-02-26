@@ -102,8 +102,6 @@ const MyList = ({
     setDataList(exchangeableList);
   }, [exchangeableList]);
 
-  console.log("아니 왜 이런 시련을", dataList);
-
   return (
     <Container>
       <SelectionBox>
@@ -144,7 +142,7 @@ const MyList = ({
       <BookListContainer>
         {dataList?.map((list: any, idx: any) => {
           return (
-            <Wrap to={`/search/${list.id}`}>
+            <Wrap to={`/search/${list.id}`} key={idx}>
               <BookImgBox>
                 <BookImg src={list.images[0]?.url} />
                 <Title>{list.title}</Title>

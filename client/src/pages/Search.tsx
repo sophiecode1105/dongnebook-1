@@ -1,7 +1,7 @@
 import List from "../components/Search/List";
 import { useState } from "react";
 import SearchBar from "../components/Search/Searchbar";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { getBookList, searchBook } from "../api";
 import { useEffect } from "react";
 import { BookInfo } from "../state/typeDefs";

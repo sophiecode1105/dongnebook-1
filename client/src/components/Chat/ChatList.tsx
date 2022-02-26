@@ -1,5 +1,5 @@
 import { useSetRecoilState } from "recoil";
-import { enterChatRoom, socket, timeForToday } from "../../api";
+import { timeForToday, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
 
@@ -7,20 +7,21 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
   const setVisible = useSetRecoilState(chatRoomVisible);
   const setChatroomFrame = useSetRecoilState(chatRoomFrame);
 
-  const fetchData = async (id: number) => {
-    const data: chatRooms = await enterChatRoom(id);
-    setChatroomFrame({
-      nickname: data.users[0].users.nickname,
-      userId: data.users[0].users.id,
-      bookImg: data.product.images[0].url,
-      title: data.product.title,
-      productId: data.productId,
-      img: data.users[0].users.img,
-      chatroomId: data.id,
-      chats: data.chats,
-    } as ChatRoomFrameType);
-    socket.emit("enter_room", id);
-    setVisible(true);
+  const fetchData = (id: number) => {
+    socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
+      setChatroomFrame({
+        nickname: chat.users[0].users.nickname,
+        userId: chat.users[0].users.id,
+        bookImg: chat.product.images[0].url,
+        title: chat.product.title,
+        productId: chat.productId,
+        img: chat.users[0].users.img,
+        chatroomId: chat.id,
+        chats: chat.chats,
+      } as ChatRoomFrameType);
+
+      setVisible(true);
+    });
   };
 
   return (
@@ -28,14 +29,17 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
       <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">채팅목록</h1>
       <ul className="h-full overflow-y-scroll">
         {chatRooms?.map((chatRoom, idx) => {
-          const { count, id } = chatRoom;
+          const { count, productId } = chatRoom;
           const { img, nickname } = chatRoom.users[0].users;
           const { content, createdAt } = chatRoom.chats[0];
 
           return (
-            <li key={idx} onClick={() => fetchData(id)} className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
+            <li
+              key={idx}
+              onClick={() => fetchData(productId)}
+              className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
               <div className="rounded-full flex items-center justify-center p-1">
-                <img src={img} className="rounded-full w-12 h-12" />
+                <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
               </div>
               <div className="w-full p-2 flex flex-col justify-between">
                 <div className="flex justify-between">

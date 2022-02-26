@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { deleteAccount } from "../../api";
 import { loginState } from "../../state/state";
 import Swal from "sweetalert2";
-import { UserState } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;

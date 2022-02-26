@@ -110,3 +110,8 @@ export const ableExchange = atom<BookInfo[]>({
   key: "ableExchange",
   default: [],
 });
+
+export const fetchRoom = atom<any>({
+  key: "fetchRoom",
+  default: 0,
+});

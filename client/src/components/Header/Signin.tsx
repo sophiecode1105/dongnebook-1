@@ -5,7 +5,7 @@ import { useForm, ValidationRule } from "react-hook-form";
 import { postSignin } from "../../api";
 import { useSetRecoilState } from "recoil";
 import { loginState, userState } from "../../state/state";
-import { ErrorProps, UserState } from "../../state/typeDefs";
+import { ErrorProps } from "../../state/typeDefs";
 
 const Container = styled.div`
   display: flex;

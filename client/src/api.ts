@@ -1,9 +1,13 @@
 import axios from "axios";
 import { BookInfo, UserState } from "./state/typeDefs";
-import socketIOClient from "socket.io-client";
+import { io } from "socket.io-client";
 
-const URL = "http://localhost:4000";
-export const socket = socketIOClient(`${URL}`);
+export const URL = "http://localhost:4000";
+
+export const socket = io("http://localhost:5000", {
+  transports: ["websocket"],
+  auth: { token: localStorage.getItem("token") },
+});
 
 type Nick = { nickname: string };
 export const postNickcheck = async (body: Nick) => {
@@ -111,7 +115,9 @@ export const patchAccount = async (body: any, token: string) => {
   try {
     const {
       data: { state },
-    } = await axios.patch(`${URL}/user/mypage`, body, { headers: { Authorization: `jwt ${token}` } });
+    } = await axios.patch(`${URL}/user/mypage`, body, {
+      headers: { Authorization: `jwt ${token}` },
+    });
     return state;
   } catch (e) {
     throw e;
@@ -217,25 +223,6 @@ export const timeForToday = (value: Date) => {
 
   const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
   return `${betweenTimeDay}일전`;
-};
-
-export const getChatRoomList = () => {
-  const token = localStorage.getItem("token");
-  return fetch(`${URL}/chatroom`, { headers: { Authorization: `jwt ${token}` } })
-    .then((res) => res.json())
-    .then((json) => json.chatroom);
-};
-
-export const enterChatRoom = (id: number) => {
-  const token = localStorage.getItem("token");
-  return fetch(`${URL}/chatroom/${id}`, { headers: { Authorization: `jwt ${token}` } })
-    .then((res) => res.json())
-    .then((json) => json.chatroom[0]);
-};
-
-export const sendMessage = (content: string, productId: number) => {
-  const token = localStorage.getItem("token");
-  return axios.post(`${URL}/chatroom`, { content, productId }, { headers: { Authorization: `jwt ${token}` } });
 };
 
 export const timeStamp = (value: Date) => {
