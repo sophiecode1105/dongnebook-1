@@ -84,7 +84,6 @@ const IconBox = styled.div`
 const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
   const isLogin = useRecoilValue(loginState);
   const navigate = useNavigate();
-  const [textSearch, setTextSearch] = useState("");
   const search = useSetRecoilState(bookSearch);
 
   const handleCheckLogin = () => {
@@ -103,8 +102,7 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTextSearch(e.target.value);
-    search(textSearch);
+    search(e.target.value);
   };
 
   return (

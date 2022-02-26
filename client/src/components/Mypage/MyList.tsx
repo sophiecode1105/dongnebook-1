@@ -22,22 +22,22 @@ type borderProps = {
   border: boolean;
 };
 
-const Exchangeable = styled.div<borderProps>`
-  margin-right: 10px;
+const DuplicateProps = styled.div<borderProps>`
   font-size: 20px;
   border-bottom: ${(props) => (props.border ? "2px solid green" : "null")};
+  padding: 3px;
+  cursor: pointer;
 `;
 
-const UnExchangeable = styled.div<borderProps>`
+const Exchangeable = styled(DuplicateProps)`
   margin-right: 10px;
-  font-size: 20px;
-  border-bottom: ${(props) => (props.border ? "2px solid green" : "null")};
 `;
 
-const Likes = styled.div<borderProps>`
-  font-size: 20px;
-  border-bottom: ${(props) => (props.border ? "2px solid green" : "null")};
+const UnExchangeable = styled(DuplicateProps)`
+  margin-right: 10px;
 `;
+
+const Likes = styled(DuplicateProps)``;
 
 const BookListContainer = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -45,10 +45,9 @@ const BookListContainer = styled.div`
   width: 100%;
   height: 100%;
   display: grid;
-  padding-left: 30px;
+  padding: 30px 0px 0px 30px;
   grid-gap: 20px;
   margin-top: 10px;
-  border: 1px solid red;
 `;
 
 const Wrap = styled(Link)`
@@ -94,7 +93,7 @@ const MyList = ({
   unExchangeableList: BookInfo[];
   likesList: LikeList[];
 }) => {
-  const [onClickExchangeable, setOnClickExchangenable] = useState(false);
+  const [onClickExchangeable, setOnClickExchangenable] = useState(true);
   const [onClickUnExchangeable, setOnClickUnExchangenable] = useState(false);
   const [onClickLike, setOnClickLike] = useState(false);
   const [dataList, setDataList] = useState<any>();
@@ -102,8 +101,6 @@ const MyList = ({
   useEffect(() => {
     setDataList(exchangeableList);
   }, [exchangeableList]);
-
-  console.log("아니 왜 이런 시련을", dataList);
 
   return (
     <Container>
@@ -114,7 +111,9 @@ const MyList = ({
             setOnClickExchangenable(true);
             setOnClickUnExchangenable(false);
             setOnClickLike(false);
-          }}>
+            setDataList(exchangeableList);
+          }}
+        >
           게시글
         </Exchangeable>
         <UnExchangeable
@@ -123,7 +122,9 @@ const MyList = ({
             setOnClickExchangenable(false);
             setOnClickUnExchangenable(true);
             setOnClickLike(false);
-          }}>
+            setDataList(unExchangeableList);
+          }}
+        >
           교환내역
         </UnExchangeable>
         <Likes
@@ -132,7 +133,9 @@ const MyList = ({
             setOnClickExchangenable(false);
             setOnClickUnExchangenable(false);
             setOnClickLike(true);
-          }}>
+            setDataList(likesList);
+          }}
+        >
           관심목록
         </Likes>
       </SelectionBox>
