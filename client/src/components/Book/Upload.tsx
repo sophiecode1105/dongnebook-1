@@ -574,7 +574,8 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}>
+                          }}
+                        >
                           {searchResult?.address_name}
                         </SearchResult>
                       );
@@ -582,7 +583,6 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map />
             </LocationWrap>
           </Uploads>
         </UploadInform>
