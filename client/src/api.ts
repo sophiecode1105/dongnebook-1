@@ -137,15 +137,15 @@ export const getBookList = async () => {
   }
 };
 
-export const getSingleBookInfo = async (id: number | undefined, token: string | null): Promise<BookInfo> => {
+export const getSingleBookInfo = async (id: number | undefined, token: string | null) => {
   try {
     const {
       data,
-      data: { productInfo },
+      data: { productInfo, likeCount },
     } = await axios.get(`${URL}/product/${id}`, {
       headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
-    return productInfo;
+    return { productInfo, likeCount };
   } catch (e) {
     throw e;
   }

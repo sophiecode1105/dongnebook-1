@@ -151,10 +151,11 @@ const UserBox = styled.div`
   display: flex;
 `;
 const UserAvatar = styled.img`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   margin-right: 20px;
+  object-fit: cover;
 `;
 const UserNickname = styled.div`
   color: rgba(0, 0, 0, 0.5);
@@ -162,6 +163,8 @@ const UserNickname = styled.div`
   align-items: center;
   width: 120px;
   margin-right: 20px;
+  font-size: 20px;
+  font-weight: bold;
 `;
 
 const UserModifyBox = styled.div`
@@ -337,6 +340,7 @@ const Details = () => {
   const [isHeartPressed, setIsHeartPressed] = useState(false);
   const [userInfo, setUserInfo] = useRecoilState(userState);
   const storeId = useSetRecoilState(storeContentId);
+  const [likeCount, setLikeCount] = useState(0);
   const [currentImg, setCurrentImg] = useState(0);
   const setVisible = useSetRecoilState(chatRoomVisible);
   const setChatRoomFrame = useSetRecoilState(chatRoomFrame);
@@ -411,14 +415,15 @@ const Details = () => {
   const isWriter = userInfo?.nickname === nickname;
 
   const getSingleData = async () => {
-    const data = await getSingleBookInfo(Number(id), token);
+    const { productInfo, likeCount } = await getSingleBookInfo(Number(id), token);
     setChatRoomFrame({
-      nickname: data.nickname,
-      title: data.title,
-      bookImg: data.images[0].url,
-      productId: data.id,
+      nickname: productInfo.nickname,
+      title: productInfo.title,
+      bookImg: productInfo.images[0].url,
+      productId: productInfo.id,
     } as ChatRoomFrameType);
-    setBookDetailInfo(data);
+    setBookDetailInfo(productInfo);
+    setLikeCount(likeCount);
   };
 
   const handleClickHeart = async () => {
@@ -531,6 +536,7 @@ const Details = () => {
               <i className="fas fa-heart"></i>
             </Heart>
             <Line> </Line>
+            <Letter>{likeCount}</Letter>
             <Visit>
               <i className="fas fa-eye"></i>
             </Visit>

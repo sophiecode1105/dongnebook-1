@@ -341,6 +341,9 @@ const Modify = () => {
   const modifyLat = useSetRecoilState(modifyLatitude);
   const modifyLon = useSetRecoilState(modifyLongtitude);
 
+  const [modifyLatitu, setModifyLatitu] = useState();
+  const [modifyLongtitu, setModifyLongtitu] = useState();
+
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const latitude = useRecoilValue(currentLatitude);
@@ -388,13 +391,13 @@ const Modify = () => {
   };
 
   const getSingleData = async (id: number) => {
-    const data = await getSingleBookInfo(id, token);
-    setValue("title", data.title);
-    setValue("content", data.content);
-    const radiobuttonValue = document.getElementById(data.quality) as HTMLInputElement;
+    const { productInfo } = await getSingleBookInfo(id, token);
+    setValue("title", productInfo.title);
+    setValue("content", productInfo.content);
+    const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
     radiobuttonValue.checked = true;
-    setModifyQuality(data.quality);
-    let modifyImg = data.images;
+    setModifyQuality(productInfo.quality);
+    let modifyImg = productInfo.images;
     let imgData: any[] = [];
     for (let i = 0; i < modifyImg.length; i++) {
       imgData.push(modifyImg[i].url);
@@ -406,8 +409,8 @@ const Modify = () => {
     setImageUrls((prev) => {
       return [...prev, ...imgData];
     });
-    modifyLat(data.locations.lat);
-    modifyLon(data.locations.lon);
+    setModifyLatitu(productInfo.locations.lat);
+    setModifyLongtitu(productInfo.locations.lon);
   };
 
   const patchData = async () => {
@@ -639,7 +642,7 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map />
+              <Map modifyLatitu={modifyLatitu} modifyLongtitu={modifyLongtitu} />
             </LocationWrap>
           </Uploads>
         </UploadInform>

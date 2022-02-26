@@ -344,6 +344,7 @@ const Upload = () => {
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
+
   console.log(imageUrls);
 
   const side = useRef<HTMLDivElement>(null);
@@ -601,7 +602,6 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map />
             </LocationWrap>
           </Uploads>
         </UploadInform>

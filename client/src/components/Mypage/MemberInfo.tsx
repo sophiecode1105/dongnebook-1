@@ -13,7 +13,8 @@ const Container = styled.div`
   align-items: center;
   height: 35%;
   width: 320px;
-  border: 1px solid blue;
+  padding: 35px;
+  /* border: 1px solid blue; */
 `;
 
 const UserInfoBox = styled.div`
@@ -25,8 +26,8 @@ const UserInfoBox = styled.div`
 `;
 
 const UserAvatar = styled.img`
-  width: 75px;
-  height: 75px;
+  width: 100px;
+  height: 100px;
   border-radius: 50px;
   margin-right: 20px;
   object-fit: cover;
@@ -45,7 +46,7 @@ const Nickname = styled.div`
 const Address = styled.div``;
 
 const ButtonBox = styled.div`
-  margin-top: 15px;
+  margin-top: 50px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -54,14 +55,17 @@ const ButtonBox = styled.div`
 
 const Button = styled.button`
   text-align: center;
-  width: 30%;
+  width: 40%;
   height: 100%;
   cursor: pointer;
   font-size: 15px;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 5px;
-  margin: 2px;
+  padding: 5px 12px;
   border-radius: 5px;
+`;
+
+const Mbutton = styled(Button)`
+  margin-left: 20px;
 `;
 
 const MemberInfo = ({ user }: any) => {
@@ -103,7 +107,7 @@ const MemberInfo = ({ user }: any) => {
       </UserInfoBox>
       <ButtonBox>
         <Button onClick={handleClickRemove}>탈퇴</Button>
-        <Button onClick={handleChangePage}>수정</Button>
+        <Mbutton onClick={handleChangePage}>수정</Mbutton>
       </ButtonBox>
     </Container>
   );
