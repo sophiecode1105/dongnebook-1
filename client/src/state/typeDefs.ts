@@ -56,6 +56,10 @@ export type ListProps = {
   images: Images[];
 };
 
+export interface Nickprops {
+  nickValid?: boolean;
+}
+
 export type ErrorProps = {
   error: string | undefined;
 };
@@ -154,4 +158,12 @@ export type Chat = {
   chatroomId: number;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type LikeList = {
+  id: number;
+  userId: number;
+  productId: number;
+  createdAt: string;
+  updatedAt: string;
 };

@@ -1,102 +1,72 @@
-import express from "express";
-import { JwtPayload } from "jsonwebtoken";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import server from "../app";
 import client from "../client";
 import { userFinder, verify } from "../token/verify";
-import { instrument } from "@socket.io/admin-ui";
-const socketIo = require("socket.io");
+
+const httpServer = createServer();
+
+// export const live = (req: any, res: any, next: any) => {
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+    credentials: true,
+  },
+});
+
 let count = {};
 
-// require("events").EventEmitter.prototype._maxListeners = 999999999999;
-
-export const live = (req: any, res: any, next: any) => {
-  const io = socketIo(server, {
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-      credentials: true,
+function publicRooms(id: any) {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
     },
-  });
-  instrument(io, {
-    auth: false,
-  });
+  } = io;
 
-  function publicRooms(id) {
-    const {
-      sockets: {
-        adapter: { sids, rooms },
-      },
-    } = io;
-
-    const publicRooms = [];
-    rooms.forEach((room, key) => {
-      if (sids.get(key) === undefined) {
-        if (room.has(`${id}`)) {
-          publicRooms.push(key);
-        }
+  const publicRooms = [];
+  rooms.forEach((room, key) => {
+    if (sids.get(key) === undefined) {
+      if (room.has(`${id}`)) {
+        publicRooms.push(key);
       }
-    });
-
-    return publicRooms[0];
-  }
-
-  io.on("connection", (socket) => {
-    socket.onAny((event: any) => {
-      console.log(`Socket Event : ${event}`);
-    });
-
-    socket.on("enter_room", (roomName: number) => {
-      socket.join(roomName);
-      console.log("누구누구있니");
-      console.log(socket.adapter.rooms);
-      count[roomName] = socket.adapter.rooms.get(roomName)?.size;
-    });
-
-    socket.on("new_message", (room: number, name: string, value: string, done: any) => {
-      socket.to(room).emit("receive_message", name, value);
-      console.log("방번호:", room, "이름", name, "내용", value);
-      done();
-    });
-
-    socket.on("out_room", (roomName: number) => {
-      socket.leave(roomName);
-      console.log("나기가 방");
-    });
-
-    socket.on("disconnecting", function () {
-      const roomName = publicRooms(socket.id);
-      socket.leave(roomName);
-      console.log("나가기 방");
-      count[roomName] -= 1;
-    });
-
-    socket.on("disconnect", function () {
-      console.log("user disconnected: ", socket.id);
-    });
+    }
   });
 
-  next();
-};
-// var MyObj = live; //EventEmitter 상속
-// util.inherits(MyObj, EventEmitter);
-// var myObj = new MyObj();
-// myObj.setMaxListeners(20);
+  return publicRooms[0];
+}
 
-export const postChatroom = async (req: express.Request, res: express.Response) => {
-  try {
-    const { productId, content } = req.body;
-    const authorization = req.headers.authorization;
+io.on("connection", (socket) => {
+  socket.onAny((event: any) => {
+    console.log(`Socket Event : ${event}`);
+  });
+  const { token } = socket.handshake.auth;
 
-    let data: string | JwtPayload;
+  socket.on("notification", async (productId: string, done: any) => {
+    socket.join(productId);
+  });
+
+  socket.on("enter_room", async (productId: string, done: any) => {
+    let userInfo;
+
+    console.log("token");
+    console.log(token);
+
     try {
-      data = verify(authorization.split(" ")[1]);
+      userInfo = verify(token);
     } catch (err) {
-      return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
+      console.log(err);
     }
 
-    const userInfo = await userFinder(data["email"]);
+    socket.join(productId);
 
-    let chatroom = await client.chatroom.findMany({
+    console.log("누구누구있니");
+    console.log(io.sockets.adapter.rooms);
+
+    count[productId] = io.sockets.adapter.rooms.get(productId)?.size;
+    console.log("count[productId]");
+    console.log(count[productId]);
+    let chatroomFind = await client.chatroom.findMany({
       where: {
         productId: Number(productId),
         users: {
@@ -106,6 +76,73 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
         },
       },
     });
+    const productInfo = await client.product.findUnique({
+      where: { id: Number(productId) },
+      include: { images: true },
+    });
+
+    if (chatroomFind.length !== 0) {
+      await client.chatroom.update({
+        where: {
+          id: chatroomFind[0].id,
+        },
+        data: {
+          chats: {
+            updateMany: {
+              where: {
+                userId: {
+                  not: userInfo["id"],
+                },
+              },
+              data: {
+                read: true,
+              },
+            },
+          },
+        },
+      });
+
+      const chatroom = await client.chatroom.findMany({
+        where: {
+          id: chatroomFind[0].id,
+        },
+        include: {
+          users: {
+            where: {
+              users: {
+                id: {
+                  not: userInfo.id,
+                },
+              },
+            },
+            select: {
+              users: true,
+            },
+          },
+          chats: true,
+          product: {
+            include: {
+              images: true,
+            },
+          },
+        },
+      });
+      done(productInfo, chatroom[0]);
+    } //채팅방이 있을때
+    //채팅방이 없을때는
+
+    done(productInfo);
+  });
+
+  socket.on("new_message", async (productId: string, name: string, content: string, done: any) => {
+    let userInfo;
+
+    try {
+      userInfo = verify(token);
+    } catch (err) {
+      console.log(err);
+    }
+
     const otherInfo = await client.user.findMany({
       where: {
         products: {
@@ -116,8 +153,19 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
       },
     });
 
-    if (chatroom.length === 0) {
-      chatroom[0] = await client.chatroom.create({
+    let chatroomFind = await client.chatroom.findMany({
+      where: {
+        productId: Number(productId),
+        users: {
+          some: {
+            userId: userInfo.id,
+          },
+        },
+      },
+    });
+
+    if (chatroomFind.length === 0) {
+      chatroomFind[0] = await client.chatroom.create({
         data: {
           users: {
             create: [
@@ -142,30 +190,68 @@ export const postChatroom = async (req: express.Request, res: express.Response) 
       });
     }
 
+    console.log("채팅내역 생성하기전 카운트 프로덕트");
+    console.log(count[productId]);
+
     await client.chat.create({
       data: {
         userId: userInfo["id"],
         content,
-        chatroomId: chatroom[0]["id"],
+        chatroomId: chatroomFind[0]["id"],
         read: count[productId] === 2 ? true : false,
       },
     });
 
-    return res.status(201).json({ message: "채팅 완료", chatroom: chatroom[0], state: true });
-  } catch (err) {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
-  }
-};
+    done();
+    socket.to("notification").emit("receive_message");
+    socket.to(productId).emit("receive_message", name, content);
 
-export const getchatroom = async (req: express.Request, res: express.Response) => {
-  try {
-    const authorization = req.headers.authorization;
+    console.log("방번호:", productId, "이름", name, "내용", content);
+  });
 
+  socket.on("out_room", (roomName: string, done) => {
+    socket.leave(roomName);
+    count[roomName] -= 1;
+    done();
+    console.log("나기가 방");
+  });
+
+  socket.on("delete_room", async (productId: string) => {
+    socket.leave(productId);
+
+    let userInfo;
+    try {
+      userInfo = verify(token);
+    } catch (err) {
+      console.log(err);
+    }
+
+    let chatroomFind = await client.chatroom.findMany({
+      where: {
+        productId: Number(productId),
+        users: {
+          some: {
+            userId: userInfo.id,
+          },
+        },
+      },
+    });
+
+    await client.chatroom.deleteMany({
+      where: {
+        id: chatroomFind[0].id,
+      },
+    });
+
+    console.log("방 삭제");
+  });
+
+  socket.on("get_rooms", async (done: any) => {
     let data;
     try {
-      data = verify(authorization.split(" ")[1]);
+      data = verify(token);
     } catch (err) {
-      return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
+      console.log(err);
     }
     const userInfo = await userFinder(data["email"]);
 
@@ -227,89 +313,25 @@ export const getchatroom = async (req: express.Request, res: express.Response) =
       el["count"] = notReadChat[idx].chats.length;
     });
 
-    return res.status(200).json({ message: "채팅방 조회 완료", id: userInfo.id, chatroom, state: true });
-  } catch (err) {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
-  }
-};
+    done(chatroom);
+  });
 
-export const enterChatroom = async (req: express.Request, res: express.Response) => {
-  try {
-    const authorization = req.headers.authorization;
+  socket.on("disconnecting", function () {
+    const roomName = publicRooms(socket.id);
+    socket.leave(roomName);
+    console.log("디스커넥팅");
+    count[roomName] -= 1;
+  });
 
-    const { chatroomId } = req.params; //채팅방 id
-    let userInfo;
+  socket.on("disconnect", function () {
+    console.log("user disconnected: ", socket.id);
+  });
+});
 
-    try {
-      userInfo = verify(authorization.split(" ")[1]);
-    } catch (err) {
-      return res.status(401).json({ message: "로그인이 필요한 서비스입니다.", state: false });
-    }
+//   next();
+// };
+const PORT = 5000;
 
-    await client.chatroom.update({
-      where: {
-        id: Number(chatroomId),
-      },
-      data: {
-        chats: {
-          updateMany: {
-            where: {
-              userId: {
-                not: userInfo["id"],
-              },
-            },
-            data: {
-              read: true,
-            },
-          },
-        },
-      },
-    });
-
-    const chatroom = await client.chatroom.findMany({
-      where: {
-        id: Number(chatroomId),
-      },
-      include: {
-        users: {
-          where: {
-            users: {
-              id: {
-                not: userInfo.id,
-              },
-            },
-          },
-          select: {
-            users: true,
-          },
-        },
-        chats: true,
-        product: {
-          include: {
-            images: true,
-          },
-        },
-      },
-    });
-
-    return res.status(200).json({ message: "채팅방 입장 완료", chatroom, state: true });
-  } catch (err) {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
-  }
-};
-
-export const deleteChatroom = async (req: express.Request, res: express.Response) => {
-  try {
-    const { chatroomId } = req.params; //채팅방 id
-
-    await client.chatroom.deleteMany({
-      where: {
-        id: Number(chatroomId),
-      },
-    });
-
-    return res.status(200).json({ message: "채팅방 삭제 완료", state: true });
-  } catch (err) {
-    return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
-  }
-};
+httpServer.listen(PORT, () => {
+  console.log(`listening on port http://localhost:${PORT}`);
+});

@@ -4,22 +4,19 @@ import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  contentStorage,
   currentaddress,
   currentLatitude,
   currentLocationStorage,
   currentLongtitude,
-  imageStorage,
   loginState,
   mapResultsStorage,
   searchLocation,
-  titleStorage,
 } from "../../state/state";
 import Swal from "sweetalert2";
 import Map from "./Map";
 import { useEffect } from "react";
 import { postContent } from "../../api";
-import { resolve } from "node:path/win32";
+import { useCallback } from "react";
 
 declare global {
   interface Window {
@@ -114,7 +111,6 @@ const Label = styled.label`
   align-items: center;
   position: relative;
   z-index: 1;
-
   width: 150px;
   height: 150px;
   border: 1px solid #dcdbe3;
@@ -181,17 +177,12 @@ const Textarea = styled.textarea<ErrorProps>`
 
 const ButtonBox = styled(DisplayRow)`
   width: 100%;
-
-  /* border: 2px solid purple; */
 `;
 
 const BookImg = styled.img`
-  /* margin: 15px; */
   width: 100%;
   max-height: 100%;
   object-fit: contain;
-  /* height: 150px; */
-  /* border: 1px solid #dcdbe3; */
 `;
 
 const ImgTitle = styled.div`
@@ -260,7 +251,6 @@ const LocationWrap = styled.div`
 const SearchBar = styled.input`
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  /* border-radius: 10px; */
   width: 60%;
   padding: 8px;
   &:focus {
@@ -269,7 +259,6 @@ const SearchBar = styled.input`
 `;
 
 const SearchButton = styled.button`
-  /* height: 40px; */
   cursor: pointer;
   background-color: #2f6218;
   border: 0;
@@ -321,8 +310,6 @@ const SearchResult = styled.div`
   background-color: white;
   padding: 2px;
   cursor: pointer;
-
-  /* position: absolute; */
 `;
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
@@ -362,7 +349,7 @@ const Upload = () => {
 
   const postData = async () => {
     return new Promise(async (res, rej) => {
-      const { title, content, img, quality } = getValues();
+      const { title, content, quality } = getValues();
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
@@ -410,13 +397,14 @@ const Upload = () => {
     setLocation(location);
   };
 
-  const handleClickOutside = (event: CustomEvent<MouseEvent>) => {
-    // console.log("작동되냐");
-    if (isOpen && !side?.current?.contains(event.target as Node)) {
-      // console.log("외않되");
-      setIsOpen(!isOpen);
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: CustomEvent<MouseEvent>) => {
+      if (isOpen && !side?.current?.contains(event.target as Node)) {
+        setIsOpen(!isOpen);
+      }
+    },
+    [setIsOpen, isOpen]
+  );
 
   const convertFileToURL = (file: File) => {
     return new Promise<string>((res, rej) => {
@@ -442,19 +430,11 @@ const Upload = () => {
   };
 
   useEffect(() => {
-    setCurrentLocation({});
-  }, []);
-
-  useEffect(() => {
     window.addEventListener("click", handleClickOutside as EventListener);
     return () => {
       window.removeEventListener("click", handleClickOutside as EventListener);
     };
-  }, [isOpen]);
-
-  // useEffect(() => {
-  //   console.log("k");
-  // }, [imageUrls]);
+  }, [handleClickOutside]);
 
   return (
     <Container>
@@ -594,8 +574,7 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}
-                        >
+                          }}>
                           {searchResult?.address_name}
                         </SearchResult>
                       );

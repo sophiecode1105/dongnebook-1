@@ -1,5 +1,10 @@
 import styled from "styled-components";
 import MemberInfo from "./MemberInfo";
+import MyList from "./MyList";
+import { useCallback, useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { ableExchange, loginState, pressLike, unableExchange, userState } from "../../state/state";
+import { getMemberInfo } from "../../api";
 
 const Container = styled.div`
   display: flex;
@@ -10,7 +15,6 @@ const Container = styled.div`
   padding: 66px 0px 20px 0px;
   max-width: 1200px;
   height: 100vh;
-  border: 1px solid red;
 `;
 
 const MypageBox = styled.div`
@@ -27,12 +31,31 @@ const MypageTitle = styled.div`
 `;
 
 const Myinfo = () => {
+  const [user, setUser] = useRecoilState(userState);
+  const [exchangeableList, setExchangeableList] = useRecoilState(ableExchange);
+  const [unExchangeableList, setUnexchangeableList] = useRecoilState(unableExchange);
+  const [likesList, setLikesList] = useRecoilState(pressLike);
+  const token = useRecoilValue(loginState);
+
+  const getUserInfo = useCallback(async () => {
+    const { userInfo, likes, exchangeFalse, exchangeTrue } = await getMemberInfo(token || "token");
+    setUser(userInfo);
+    setExchangeableList(exchangeFalse);
+    setUnexchangeableList(exchangeTrue);
+    setLikesList(likes);
+  }, [setExchangeableList, setLikesList, setUnexchangeableList, setUser, token]);
+
+  useEffect(() => {
+    getUserInfo();
+  }, [getUserInfo]);
+
   return (
     <Container>
       <MypageBox>
         <MypageTitle>마이페이지</MypageTitle>
       </MypageBox>
-      <MemberInfo />
+      <MemberInfo user={user} />
+      <MyList exchangeableList={exchangeableList} unExchangeableList={unExchangeableList} likesList={likesList} />
     </Container>
   );
 };

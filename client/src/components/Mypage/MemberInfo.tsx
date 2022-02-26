@@ -1,9 +1,8 @@
 import styled from "styled-components";
-import { useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
-import { loginState, userState } from "../../state/state";
+import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
 import { deleteAccount } from "../../api";
+import { loginState } from "../../state/state";
 import Swal from "sweetalert2";
 
 const Container = styled.div`
@@ -13,6 +12,7 @@ const Container = styled.div`
   align-items: center;
   height: 35%;
   width: 320px;
+  border: 1px solid blue;
 `;
 
 const UserInfoBox = styled.div`
@@ -28,6 +28,7 @@ const UserAvatar = styled.img`
   height: 75px;
   border-radius: 50px;
   margin-right: 20px;
+  object-fit: cover;
 `;
 
 const InfoBox = styled.div`
@@ -43,6 +44,7 @@ const Nickname = styled.div`
 const Address = styled.div``;
 
 const ButtonBox = styled.div`
+  margin-top: 15px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -61,10 +63,8 @@ const Button = styled.button`
   border-radius: 5px;
 `;
 
-const MemberInfo = () => {
-  const user = useRecoilValue(userState);
+const MemberInfo = ({ user }: any) => {
   const [token, setToken] = useRecoilState(loginState);
-
   const navigate = useNavigate();
   const { img, nickname, locations } = user;
 
@@ -78,7 +78,7 @@ const MemberInfo = () => {
       confirmButtonText: "확인",
       confirmButtonColor: "#2f6218",
       cancelButtonText: "취소",
-      cancelButtonColor: "#b2b0b0;",
+      cancelButtonColor: "#b2b0b0",
       showCancelButton: true,
       reverseButtons: true,
       icon: "warning",

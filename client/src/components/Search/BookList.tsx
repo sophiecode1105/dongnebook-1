@@ -37,7 +37,7 @@ const Location = styled.div`
 `;
 
 const Booklist = ({ list }: { list: ListProps }) => {
-  const { id, title, content, locations, images } = list;
+  const { id, title, locations, images } = list;
 
   return (
     <Container to={`${id}`}>
