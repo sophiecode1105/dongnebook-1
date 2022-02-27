@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
@@ -11,12 +11,14 @@ import {
   loginState,
   mapResultsStorage,
   searchLocation,
+  userState,
 } from "../../state/state";
 import Swal from "sweetalert2";
 import Map from "./Map";
 import { useEffect } from "react";
 import { postContent } from "../../api";
 import { useCallback } from "react";
+import loading from "../../img/loading.gif";
 
 declare global {
   interface Window {
@@ -311,6 +313,20 @@ const SearchResult = styled.div`
   padding: 2px;
   cursor: pointer;
 `;
+
+const MapLoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  height: 400px;
+  color: grey;
+`;
+const LoadingConatiner = styled.img`
+  margin-top: 10px;
+`;
+
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
   img: FileList;
@@ -327,13 +343,14 @@ const Upload = () => {
   const [imageStore, setImageStore] = useState<any[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
-  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
+  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
-  const latitude = useRecoilValue(currentLatitude);
-  const longtitude = useRecoilValue(currentLongtitude);
+  const userInfo = useRecoilValue(userState);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
+
+  console.log("유저이포", userInfo.locations);
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -359,8 +376,8 @@ const Upload = () => {
         }
       }
       formData.append("quality", quality);
-      formData.append("lat", String(latitude));
-      formData.append("lon", String(longtitude));
+      formData.append("lat", String(currentLocation.y));
+      formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
       let status = await postContent(formData, token || "token");
       if (Number(status) < 300) {
@@ -376,7 +393,7 @@ const Upload = () => {
     if (quality === null) {
       return Swal.fire({
         text: "상품 상태를 선택해주세요",
-        confirmButtonText: "확인",
+        confirmButtonText: "확f인",
         confirmButtonColor: "#2f6218",
         icon: "warning",
       });
@@ -435,6 +452,23 @@ const Upload = () => {
       window.removeEventListener("click", handleClickOutside as EventListener);
     };
   }, [handleClickOutside]);
+
+  useEffect(() => {
+    (async () => {
+      let permission = await navigator.permissions.query({ name: "geolocation" });
+      if (permission.state === "granted") {
+        navigator.geolocation.getCurrentPosition((position) => {
+          setCurrentLocation({ x: position.coords.longitude, y: position.coords.latitude });
+        });
+      } else {
+        setCurrentLocation({ x: userInfo.locations.lat, y: userInfo.locations.lon });
+      }
+    })();
+
+    return () => {
+      setCurrentLocation({ addressName: "", x: 0, y: 0 });
+    };
+  }, []);
 
   return (
     <Container>
@@ -583,6 +617,14 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
+              {currentLocation.x && currentLocation.y ? (
+                <Map mapLat={currentLocation?.y} mapLong={currentLocation?.x} />
+              ) : (
+                <MapLoadingContainer>
+                  now loading...
+                  <LoadingConatiner src={loading} />
+                </MapLoadingContainer>
+              )}
             </LocationWrap>
           </Uploads>
         </UploadInform>

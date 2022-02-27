@@ -1,17 +1,13 @@
 import styled from "styled-components";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
-  currentLatitude,
   currentLocationStorage,
-  currentLongtitude,
   loginState,
   mapResultsStorage,
-  modifyLatitude,
-  modifyLongtitude,
   searchLocation,
   storeContentId,
 } from "../../state/state";
@@ -323,17 +319,13 @@ const Modify = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
-  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
-  const modifyLat = useSetRecoilState(modifyLatitude);
-  const modifyLon = useSetRecoilState(modifyLongtitude);
+  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
 
   const [modifyLatitu, setModifyLatitu] = useState();
   const [modifyLongtitu, setModifyLongtitu] = useState();
 
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
-  const latitude = useRecoilValue(currentLatitude);
-  const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
   const id = useRecoilValue(storeContentId);
@@ -376,31 +368,28 @@ const Modify = () => {
     }
   };
 
-  const getSingleData = useCallback(
-    async (id: number) => {
-      const { productInfo } = await getSingleBookInfo(id, token);
-      setValue("title", productInfo.title);
-      setValue("content", productInfo.content);
-      const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
-      radiobuttonValue.checked = true;
-      setModifyQuality(productInfo.quality);
-      let modifyImg = productInfo.images;
-      let imgData: any[] = [];
-      for (let i = 0; i < modifyImg.length; i++) {
-        imgData.push(modifyImg[i].url);
-      }
+  const getSingleData = async (id: number) => {
+    const { productInfo } = await getSingleBookInfo(id, token);
+    setValue("title", productInfo.title);
+    setValue("content", productInfo.content);
+    const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
+    radiobuttonValue.checked = true;
+    setModifyQuality(productInfo.quality);
+    let modifyImg = productInfo.images;
+    let imgData: any[] = [];
+    for (let i = 0; i < modifyImg.length; i++) {
+      imgData.push(modifyImg[i].url);
+    }
 
-      setPatchImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      setImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      modifyLat(productInfo.locations.lat);
-      modifyLon(productInfo.locations.lon);
-    },
-    [modifyLat, modifyLon, setValue, token]
-  );
+    setPatchImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setModifyLatitu(productInfo.locations.lat);
+    setModifyLongtitu(productInfo.locations.lon);
+  };
 
   const patchData = async () => {
     return new Promise(async (res, rej) => {
@@ -424,8 +413,8 @@ const Modify = () => {
       } else {
         formData.append("quality", quality);
       }
-      formData.append("lat", String(latitude));
-      formData.append("lon", String(longtitude));
+      formData.append("lat", String(currentLocation.y));
+      formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
 
       let status = await patchContent(Number(id), formData, token || "token");
@@ -479,7 +468,13 @@ const Modify = () => {
     return () => {
       localStorage.removeItem("modify_id");
     };
-  }, [getSingleData, id]);
+  }, [id]);
+
+  useEffect(() => {
+    return () => {
+      setCurrentLocation({ addressName: "", x: 0, y: 0 });
+    };
+  }, []);
 
   return (
     <Container>
@@ -618,13 +613,15 @@ const Modify = () => {
                 </SearchBox>
                 {isOpen ? (
                   <SearchResultBox ref={side}>
-                    {mapSearchResults.map((searchResult: { address_name: string }, key) => {
+                    {mapSearchResults.map((searchResult: any, key) => {
                       return (
                         <SearchResult
                           key={key}
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
+                            setModifyLatitu(searchResult.y);
+                            setModifyLongtitu(searchResult.x);
                           }}
                         >
                           {searchResult?.address_name}
@@ -634,7 +631,7 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map modifyLatitu={modifyLatitu} modifyLongtitu={modifyLongtitu} />
+              {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
             </LocationWrap>
           </Uploads>
         </UploadInform>

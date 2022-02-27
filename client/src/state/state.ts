@@ -36,9 +36,13 @@ export const mapResultsStorage = atom({
   default: [],
 });
 
-export const currentLocationStorage = atom({
+export const currentLocationStorage = atom<any>({
   key: "currentLocation",
-  default: {},
+  default: {
+    addressName: "",
+    x: 0,
+    y: 0,
+  },
 });
 
 export const currentLatitude = atom<number>({
