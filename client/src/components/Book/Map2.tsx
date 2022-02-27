@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { getLocationList } from "../../api";
 import {
+  currentaddress,
   currentLocationStorage,
   loginState,
   modifyLatitude,
@@ -40,6 +41,8 @@ export const Map2 = () => {
   const searchResult = useRecoilValue(currentLocationStorage);
   const searchMap = useRef(null);
 
+  const storeaddress = useSetRecoilState(currentaddress);
+
   function searchPlaces(map: any) {
     const keyword = keywords.current?.value;
     var ps = new window.kakao.maps.services.Places();
@@ -60,13 +63,7 @@ export const Map2 = () => {
       }
       map.setBounds(bounds); // 검색된 장소 위치를 기준을 지도 범위 재설정
 
-      markers.current = getTarget(
-        map.getCenter(),
-        map,
-        markers.current,
-        markered.current,
-        productLocations.current
-      );
+      markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
     });
   }
 
@@ -76,31 +73,26 @@ export const Map2 = () => {
     geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
   }, []);
 
-  // const displayMarker = useCallback(
-  //   (locPosition: any, map: KakaoMap, marker: any) => {
-  //     searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
-  //       storeaddress(
-  //         result[0]?.address.region_1depth_name +
-  //           " " +
-  //           result[0]?.address.region_2depth_name +
-  //           " " +
-  //           result[0]?.address.region_3depth_name
-  //       );
+  const displayMarker = useCallback((locPosition: any) => {
+    searchDetailAddrFromCoords(locPosition, function (result: any, status: any) {
+      storeaddress(
+        result[0]?.address.region_1depth_name +
+          " " +
+          result[0]?.address.region_2depth_name +
+          " " +
+          result[0]?.address.region_3depth_name
+      );
+      // let detailAddr = !!result[0]?.road_address
+      //   ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"
+      //   : "";
+      // detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
 
-  //       let detailAddr = !!result[0]?.road_address
-  //         ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"
-  //         : "";
-  //       detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
+      // const content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
 
-  //       let content =
-  //         '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
-
-  //       marker.setPosition(locPosition);
-  //       marker.setMap(map);
-
-  //       infowindow.setContent(content);
-  //       infowindow.open(map, marker);
-  //     });
+      // infowindow.setContent(content);
+      // infowindow.open(map, marker);
+    });
+  }, []);
 
   const getTarget = useCallback(
     (qa: any, map: any, markers: any, marker: any, productLocation: any) => {
@@ -217,6 +209,8 @@ export const Map2 = () => {
     marker.setMap(map); // 지도에 마커를 표시합니다
 
     let qa = options.center; // 마커가 표시될 위치입니다 (지도의 중심 좌표)
+
+    displayMarker(qa);
 
     await setInfo.then((data) => {
       const { userLocation, productLocation } = data;

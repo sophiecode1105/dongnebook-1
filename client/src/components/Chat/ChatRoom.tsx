@@ -15,7 +15,7 @@ const ChatRoom = () => {
   const outRoom = () => {
     socket.emit("out_room", frame.productId, () => {
       setVisible(false);
-      socket.emit("notification", "notification");
+      socket.emit("notification");
       socket.emit("get_rooms", (data: any) => {
         setChatRooms(data);
       });

@@ -26,6 +26,7 @@ declare global {
   }
 }
 
+const Test = styled.div``;
 const DisplayRow = styled.div`
   display: flex;
   align-items: center;
@@ -499,26 +500,11 @@ const Upload = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox
-                  type="radio"
-                  id="새상품같음"
-                  value="새상품같음"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox
-                  type="radio"
-                  id="약간헌책"
-                  value="약간헌책"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox
-                  type="radio"
-                  id="많이헌책"
-                  value="많이헌책"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -634,7 +620,9 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map2 />
+              <Test>
+                <Map2 />
+              </Test>
             </LocationWrap>
           </Uploads>
         </UploadInform>
