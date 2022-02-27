@@ -67,10 +67,10 @@ const ChatRoom = () => {
           setVisible(false);
           socket.emit("out_room", frame.productId, () => {
             setRoom((prev: any) => prev + 1);
-            socket.emit("notification", "notification");
           });
         }}
-        className="w-screen h-screen"></div>
+        className="w-screen h-screen"
+      ></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
         <div className="p-3 chatroom--shadow">
           <div className="flex justify-between mb-3 text-xl">
@@ -79,10 +79,10 @@ const ChatRoom = () => {
                 setVisible(false);
                 socket.emit("out_room", frame.productId, () => {
                   setRoom((prev: any) => prev + 1);
-                  socket.emit("notification", "notification");
                 });
               }}
-              className="fas fa-arrow-left cursor-pointer "></i>
+              className="fas fa-arrow-left cursor-pointer "
+            ></i>
             <h1 className="font-bold">{frame.nickname}</h1>
             <i className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>

@@ -31,12 +31,13 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
           const { count, productId } = chatRoom;
           const { img, nickname } = chatRoom.users[0].users;
           const { content, createdAt } = chatRoom.chats[0];
-
+          console.log(count);
           return (
             <li
               key={idx}
               onClick={() => fetchData(productId)}
-              className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
+              className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer"
+            >
               <div className="rounded-full flex items-center justify-center p-1">
                 <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
               </div>
