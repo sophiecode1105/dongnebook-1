@@ -3,9 +3,12 @@ import client from "../client";
 // type Verify = (token: string) => { any };
 
 export function verify(token: string): string | jwt.JwtPayload {
-  const data = jwt.verify(token, process.env.ACCESS_SECRET);
-
-  return data;
+  try {
+    const data = jwt.verify(token, process.env.ACCESS_SECRET);
+    return data;
+  } catch {
+    return;
+  }
 }
 
 export async function userFinder(email: string) {
