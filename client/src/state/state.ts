@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { ChatRoomFrameType, UserState, LikeList, BookInfo } from "./typeDefs";
+import { ChatRoomFrameType, UserState, LikeList, BookInfo, chatRooms } from "./typeDefs";
 
 export const userState = atom<UserState>({
   key: "user",
@@ -118,4 +118,9 @@ export const ableExchange = atom<BookInfo[]>({
 export const fetchRoom = atom<any>({
   key: "fetchRoom",
   default: 0,
+});
+
+export const chatRoomsState = atom<chatRooms[]>({
+  key: "chatRoomsState",
+  default: [],
 });

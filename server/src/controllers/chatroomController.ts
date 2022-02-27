@@ -41,14 +41,15 @@ io.on("connection", (socket) => {
     console.log(`Socket Event : ${event}`);
   });
   const { token } = socket.handshake.auth;
-
-  socket.on("notification", async (productId: string, done: any) => {
-    socket.join(productId);
+  console.log("커넥션@@@@@@@@");
+  console.log(token);
+  socket.on("notification", async () => {
+    socket.join("notification");
   });
 
   socket.on("enter_room", async (productId: string, done: any) => {
     let userInfo;
-
+    socket.leave("notification");
     console.log("token");
     console.log(token);
 
@@ -212,8 +213,8 @@ io.on("connection", (socket) => {
   socket.on("out_room", (roomName: string, done) => {
     socket.leave(roomName);
     count[roomName] -= 1;
-    done();
     console.log("나기가 방");
+    done();
   });
 
   socket.on("delete_room", async (productId: string) => {

@@ -1,7 +1,7 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { timeStamp, socket } from "../../api";
-import { chatRoomFrame, chatRoomVisible, fetchRoom, userState } from "../../state/state";
+import { chatRoomFrame, chatRoomsState, chatRoomVisible, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
@@ -10,7 +10,17 @@ const ChatRoom = () => {
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
-  const setRoom = useSetRecoilState(fetchRoom);
+  const setChatRooms = useSetRecoilState(chatRoomsState);
+
+  const outRoom = () => {
+    socket.emit("out_room", frame.productId, () => {
+      setVisible(false);
+      socket.emit("notification");
+      socket.emit("get_rooms", (data: any) => {
+        setChatRooms(data);
+      });
+    });
+  };
 
   const submitMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -28,12 +38,14 @@ const ChatRoom = () => {
           updatedAt: new Date(),
         } as Chat,
       ]);
+      setMessage("");
+      const ul: any = document.querySelector("#chat__list");
+      const height = ul.scrollHeight;
+      ul.scrollTo({ top: height });
     });
-
-    setMessage("");
   };
 
-  useEffect((): any => {
+  useEffect(() => {
     socket.on("receive_message", (name: string, message: string) => {
       setChats((prev) => [
         ...prev,
@@ -42,35 +54,28 @@ const ChatRoom = () => {
           userId: frame.userId,
           content: message,
           read: false,
-          chatroomId: frame.chatroomId,
           createdAt: new Date(),
           updatedAt: new Date(),
         } as Chat,
       ]);
+      const ul: any = document.querySelector("#chat__list");
+      if (ul) {
+        const height = ul.scrollHeight;
+        ul.scrollTo({ top: height });
+      }
     });
-  }, [frame.chatroomId, frame.userId]);
+    const ul: any = document.querySelector("#chat__list");
+    const height = ul.scrollHeight;
+    ul.scrollTo({ top: height });
+  }, []);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
-      <div
-        onClick={() => {
-          socket.emit("out_room", frame.productId, () => {
-            setRoom((prev: any) => prev + 1);
-          });
-          setVisible(false);
-        }}
-        className="w-screen h-screen"></div>
+      <div onClick={outRoom} className="w-screen h-screen"></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
         <div className="p-3 chatroom--shadow">
           <div className="flex justify-between mb-3 text-xl">
-            <i
-              onClick={() => {
-                socket.emit("out_room", frame.productId, () => {
-                  setRoom((prev: any) => prev + 1);
-                });
-                setVisible(false);
-              }}
-              className="fas fa-arrow-left cursor-pointer "></i>
+            <i onClick={outRoom} className="fas fa-arrow-left cursor-pointer "></i>
             <h1 className="font-bold">{frame.nickname}</h1>
             <i className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>
@@ -79,7 +84,7 @@ const ChatRoom = () => {
             <h2 className="flex items-center">{frame.title}</h2>
           </div>
         </div>
-        <ul className="h-full overflow-y-scroll p-3">
+        <ul className="h-full overflow-y-scroll p-3" id="chat__list">
           {chats?.map((chat, idx) =>
             myInfo.id === chat.userId ? (
               <li className="flex justify-end items-end mb-2" key={idx}>
@@ -89,7 +94,7 @@ const ChatRoom = () => {
             ) : (
               <li className="flex flex-col items-start mb-2" key={idx}>
                 <div className="flex items-center">
-                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full" />
+                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full mb-2" />
                   <h1>{frame.nickname}</h1>
                 </div>
                 <div className="flex items-end">

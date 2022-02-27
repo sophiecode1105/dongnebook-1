@@ -347,10 +347,10 @@ const Upload = () => {
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const userInfo = useRecoilValue(userState);
+  const latitude = useRecoilValue(currentLatitude);
+  const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
-
-  console.log("유저이포", userInfo.locations);
 
   const side = useRef<HTMLDivElement>(null);
   const {

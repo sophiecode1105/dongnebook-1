@@ -11,10 +11,6 @@ const Search = () => {
   const [allProductList, setAllProductList] = useState<BookInfo[]>([]);
   const searchText = useRecoilValue(bookSearch);
 
-  useEffect(() => {
-    getData();
-  }, []);
-
   const getData = async () => {
     const bookList = await getBookList();
     setAllProductList(bookList);
@@ -24,6 +20,10 @@ const Search = () => {
     const data = await searchBook("title", searchText);
     setAllProductList(data);
   };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <>

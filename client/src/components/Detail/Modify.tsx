@@ -14,6 +14,7 @@ import {
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
+import { Map2 } from "../Book/Map2";
 
 declare global {
   interface Window {
@@ -319,7 +320,13 @@ const Modify = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
+<<<<<<< HEAD
   const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
+=======
+  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
+  const [lat, modifyLat] = useRecoilState(modifyLatitude);
+  const [lon, modifyLon] = useRecoilState(modifyLongtitude);
+>>>>>>> a5faec4af1d910dea09bf351234236effbb6c163
 
   const [modifyLatitu, setModifyLatitu] = useState();
   const [modifyLongtitu, setModifyLongtitu] = useState();
@@ -509,11 +516,26 @@ const Modify = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="새상품같음"
+                  value="새상품같음"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="약간헌책"
+                  value="약간헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="많이헌책"
+                  value="많이헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -606,7 +628,11 @@ const Modify = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchBar
+                    type="text"
+                    placeholder="건물,지역 검색"
+                    {...register("location")}
+                  ></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
@@ -631,7 +657,11 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
+<<<<<<< HEAD
               {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
+=======
+              <Map2 />
+>>>>>>> a5faec4af1d910dea09bf351234236effbb6c163
             </LocationWrap>
           </Uploads>
         </UploadInform>

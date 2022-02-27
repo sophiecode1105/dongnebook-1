@@ -188,7 +188,11 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         locations: true,
-        likes: true,
+        likes: {
+          select: {
+            products: true,
+          },
+        },
       },
     });
     const exchangeTrue = await client.product.findMany({

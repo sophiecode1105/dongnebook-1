@@ -4,9 +4,11 @@ import { io } from "socket.io-client";
 
 export const URL = "http://localhost:4000";
 
+const token = localStorage.getItem("token");
+
 export const socket = io("http://localhost:5000", {
   transports: ["websocket"],
-  auth: { token: localStorage.getItem("token") },
+  auth: { token },
 });
 
 type Nick = { nickname: string };
@@ -96,6 +98,7 @@ export const postContent = async (body: any, token: string) => {
     let resp = await axios.post(`${URL}/product/post`, body, {
       headers: { Authorization: `jwt ${token}` },
     });
+    console.log(resp);
     return resp.status;
   } catch (e) {
     throw e;
