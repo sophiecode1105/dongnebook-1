@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
@@ -10,15 +10,15 @@ import {
   currentLongtitude,
   loginState,
   mapResultsStorage,
-  modifyLatitude,
-  modifyLongtitude,
   searchLocation,
+  userState,
 } from "../../state/state";
 import Swal from "sweetalert2";
+import Map from "./Map";
 import { useEffect } from "react";
 import { postContent } from "../../api";
 import { useCallback } from "react";
-import { Map2 } from "./Map2";
+import loading from "../../img/loading.gif";
 
 declare global {
   interface Window {
@@ -26,7 +26,6 @@ declare global {
   }
 }
 
-const Test = styled.div``;
 const DisplayRow = styled.div`
   display: flex;
   align-items: center;
@@ -314,6 +313,20 @@ const SearchResult = styled.div`
   padding: 2px;
   cursor: pointer;
 `;
+
+const MapLoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  height: 400px;
+  color: grey;
+`;
+const LoadingConatiner = styled.img`
+  margin-top: 10px;
+`;
+
 //file받아오고 file수만큼 이미지를 만들어준다.
 type FormData = {
   img: FileList;
@@ -330,18 +343,14 @@ const Upload = () => {
   const [imageStore, setImageStore] = useState<any[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
-  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
+  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
+  const userInfo = useRecoilValue(userState);
   const latitude = useRecoilValue(currentLatitude);
   const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
-  const setLat = useSetRecoilState(modifyLatitude);
-  const setLon = useSetRecoilState(modifyLongtitude);
-
-  const setMapSearchResults = useSetRecoilState(mapResultsStorage);
-  const searchContent = useRef("");
 
   const side = useRef<HTMLDivElement>(null);
   const {
@@ -350,7 +359,7 @@ const Upload = () => {
     watch,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({ mode: "onSubmit" });
+  } = useForm<FormData>({ mode: "onChange" });
 
   const { title } = watch();
   const { content } = watch();
@@ -367,8 +376,8 @@ const Upload = () => {
         }
       }
       formData.append("quality", quality);
-      formData.append("lat", String(latitude));
-      formData.append("lon", String(longtitude));
+      formData.append("lat", String(currentLocation.y));
+      formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
       let status = await postContent(formData, token || "token");
       if (Number(status) < 300) {
@@ -384,7 +393,7 @@ const Upload = () => {
     if (quality === null) {
       return Swal.fire({
         text: "상품 상태를 선택해주세요",
-        confirmButtonText: "확인",
+        confirmButtonText: "확f인",
         confirmButtonColor: "#2f6218",
         icon: "warning",
       });
@@ -401,9 +410,8 @@ const Upload = () => {
 
   const searchPlace = async () => {
     setIsOpen(!isOpen);
-    // const { location } = getValues();
-
-    setLocation(searchContent.current);
+    const { location } = getValues();
+    setLocation(location);
   };
 
   const handleClickOutside = useCallback(
@@ -438,34 +446,29 @@ const Upload = () => {
     }
   };
 
-  const setLatlon = useCallback(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      if (position) {
-        setLat(position.coords.latitude);
-        setLon(position.coords.longitude);
-      } else {
-        setLat(0);
-        setLon(0);
-      }
-    });
-  }, [setLat, setLon]);
   useEffect(() => {
-    setLatlon();
     window.addEventListener("click", handleClickOutside as EventListener);
-    const places = new window.kakao.maps.services.Places();
-
-    places.keywordSearch(searchContent.current, (result: any, status: any) => {
-      if (status === window.kakao.maps.services.Status.OK) {
-        setMapSearchResults(result);
-      } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
-        alert("검색 결과가 없습니다.");
-      }
-    });
-
     return () => {
       window.removeEventListener("click", handleClickOutside as EventListener);
     };
-  }, [handleClickOutside, setLatlon, setMapSearchResults]);
+  }, [handleClickOutside]);
+
+  useEffect(() => {
+    (async () => {
+      let permission = await navigator.permissions.query({ name: "geolocation" });
+      if (permission.state === "granted") {
+        navigator.geolocation.getCurrentPosition((position) => {
+          setCurrentLocation({ x: position.coords.longitude, y: position.coords.latitude });
+        });
+      } else {
+        setCurrentLocation({ x: userInfo.locations.lat, y: userInfo.locations.lon });
+      }
+    })();
+
+    return () => {
+      setCurrentLocation({ addressName: "", x: 0, y: 0 });
+    };
+  }, []);
 
   return (
     <Container>
@@ -591,13 +594,7 @@ const Upload = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar
-                    type="text"
-                    placeholder="건물,지역 검색"
-                    onChange={(e) => {
-                      searchContent.current = e.target.value;
-                    }}
-                  ></SearchBar>
+                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
@@ -620,9 +617,14 @@ const Upload = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Test>
-                <Map2 />
-              </Test>
+              {currentLocation.x && currentLocation.y ? (
+                <Map mapLat={currentLocation?.y} mapLong={currentLocation?.x} />
+              ) : (
+                <MapLoadingContainer>
+                  now loading...
+                  <LoadingConatiner src={loading} />
+                </MapLoadingContainer>
+              )}
             </LocationWrap>
           </Uploads>
         </UploadInform>

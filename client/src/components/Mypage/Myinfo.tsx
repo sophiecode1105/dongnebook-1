@@ -38,11 +38,15 @@ const Myinfo = () => {
   const token = useRecoilValue(loginState);
 
   const getUserInfo = useCallback(async () => {
-    const { userInfo, likes, exchangeFalse, exchangeTrue } = await getMemberInfo(token || "token");
+    const { userInfo, exchangeFalse, exchangeTrue } = await getMemberInfo(token || "token");
     setUser(userInfo);
     setExchangeableList(exchangeFalse);
     setUnexchangeableList(exchangeTrue);
-    setLikesList(likes);
+    let newArrLikes = [];
+    for (let i = 0; i < userInfo?.likes?.length; i++) {
+      newArrLikes.push(userInfo?.likes[i]["products"]);
+    }
+    setLikesList(newArrLikes);
   }, [setExchangeableList, setLikesList, setUnexchangeableList, setUser, token]);
 
   useEffect(() => {

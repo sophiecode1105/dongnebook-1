@@ -36,6 +36,7 @@ export type BookInfo = {
   createdAt: Date;
   updatedAt: Date;
   locations: locations;
+  users: any;
 };
 
 export type KakaoMap = {
@@ -162,8 +163,13 @@ export type Chat = {
 
 export type LikeList = {
   id: number;
-  userId: number;
-  productId: number;
-  createdAt: string;
-  updatedAt: string;
+  title: string;
+  content: string;
+  quality: string;
+  exchanged: boolean;
+  nickname: string;
+  locationId: number;
+  visit: number;
+  createdAt: Date;
+  updatedAt: Date;
 };

@@ -156,12 +156,12 @@ const UserAvatar = styled.img`
   object-fit: cover;
 `;
 const UserNickname = styled.div`
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   width: 120px;
   margin-right: 20px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 `;
 
@@ -345,7 +345,8 @@ const Details = () => {
   const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, createdAt, locations, nickname, visit } = bookDetailInfo as BookInfo;
+  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo as BookInfo;
+
   const onChangeContent = (pageDelta: any) => {
     const lastImgPageNum = images.length - 1;
     const newCurrentPageNum = currentImg + pageDelta;
@@ -365,6 +366,7 @@ const Details = () => {
 
   const getSingleData = useCallback(async () => {
     const { productInfo, likeCount } = await getSingleBookInfo(Number(id), token);
+
     setBookDetailInfo(productInfo);
     setLikeCount(likeCount);
   }, [id, token]);
@@ -373,6 +375,7 @@ const Details = () => {
     //로그인 포스트
     setIsHeartPressed(!isHeartPressed);
     try {
+      console.log("하틑발송");
       await postHeart(Number(id), token);
     } catch (e) {
       console.error(e);
@@ -491,7 +494,7 @@ const Details = () => {
           <BorderBottom />
           <UserInfoBox>
             <UserBox>
-              <UserAvatar src={userInfo.img} />
+              <UserAvatar src={users?.img} />
               <UserNickname>{nickname}</UserNickname>
             </UserBox>
             {isWriter ? (
@@ -591,7 +594,12 @@ const Details = () => {
       </KeyInfoBox>
     </Container>
   ) : (
-    <MobileDetail />
+    <MobileDetail
+      bookDetailInfo={bookDetailInfo}
+      likeCount={likeCount}
+      onChangeContent={onChangeContent}
+      currentImg={currentImg}
+    />
   );
 };
 
