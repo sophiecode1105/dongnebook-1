@@ -1,13 +1,32 @@
 import { createServer } from "http";
 import { JwtPayload } from "jsonwebtoken";
 import { Server } from "socket.io";
-import server from "../app";
-import client from "../client";
-import { userFinder, verify } from "../token/verify";
+import client from "./client";
+import jwt from "jsonwebtoken";
+
+function verify(token: string): string | jwt.JwtPayload {
+  try {
+    const data = jwt.verify(token, process.env.ACCESS_SECRET);
+    return data;
+  } catch {
+    return;
+  }
+}
+async function userFinder(email: string) {
+  try {
+    const userInfo = await client.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    return userInfo;
+  } catch {
+    return;
+  }
+}
 
 const httpServer = createServer();
 
-// export const live = (req: any, res: any, next: any) => {
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -41,17 +60,14 @@ io.on("connection", (socket) => {
   socket.onAny((event: any) => {
     console.log(`Socket Event : ${event}`);
   });
-
-  socket.on("notification", async (done: any) => {
+  socket.on("notification", async () => {
     socket.join("notification");
-    done();
   });
 
   socket.on("enter_room", async (productId: string, done: any) => {
     const { token } = socket.handshake.auth;
     const userInfo: JwtPayload | any = verify(token);
-    console.log("몇명있나");
-    console.log(io.sockets.adapter.rooms);
+
     if (userInfo === undefined) {
       return console.log("토큰이 없습니다.");
     }
@@ -127,6 +143,8 @@ io.on("connection", (socket) => {
     //채팅방이 없을때는
 
     done(productInfo);
+    console.log("몇명있나");
+    console.log(io.sockets.adapter.rooms);
   });
 
   socket.on("new_message", async (productId: string, name: string, content: string, done: any) => {
@@ -191,8 +209,33 @@ io.on("connection", (socket) => {
         read: count[productId] === 2 ? true : false,
       },
     });
+    // const chatroom = await client.chatroom.findMany({
+    //   where: {
+    //     id: chatroomFind[0].id,
+    //   },
+    //   include: {
+    //     users: {
+    //       where: {
+    //         users: {
+    //           id: {
+    //             not: userInfo.id,
+    //           },
+    //         },
+    //       },
+    //       select: {
+    //         users: true,
+    //       },
+    //     },
+    //     chats: true,
+    //     product: {
+    //       include: {
+    //         images: true,
+    //       },
+    //     },
+    //   },
+    // });
 
-    done();
+    // done(chatroom[0]);
     socket.to("notification").emit("receive_message");
     socket.to(productId).emit("receive_message", name, content);
 
@@ -214,25 +257,28 @@ io.on("connection", (socket) => {
       return console.log("토큰이 없습니다.");
     }
     socket.leave(productId);
-
-    let chatroomFind = await client.chatroom.findMany({
-      where: {
-        productId: Number(productId),
-        users: {
-          some: {
-            userId: userInfo.id,
+    try {
+      let chatroomFind = await client.chatroom.findMany({
+        where: {
+          productId: Number(productId),
+          users: {
+            some: {
+              userId: userInfo.id,
+            },
           },
         },
-      },
-    });
+      });
 
-    await client.chatroom.deleteMany({
-      where: {
-        id: chatroomFind[0].id,
-      },
-    });
+      await client.chatroom.deleteMany({
+        where: {
+          id: chatroomFind[0].id,
+        },
+      });
 
-    console.log("방 삭제");
+      console.log("방 삭제");
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   socket.on("get_rooms", async (done: any) => {

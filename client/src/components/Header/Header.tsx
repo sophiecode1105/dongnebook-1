@@ -42,13 +42,13 @@ const Header = () => {
 
           <nav className="md:flex hidden justify-center items-center">
             <Link to="/around" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
-              <span className="text-sm font-bold text-center">주변 도서 한눈에 보기</span>
+              <span className="text-sm font-bold text-center">주변 도서 검색</span>
             </Link>
             <Link
               to="/search"
               className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200 ml-10"
             >
-              <span className="text-sm font-bold text-center">검색</span>
+              <span className="text-sm font-bold text-center">도서 검색</span>
             </Link>
             {login ? (
               <Link
@@ -87,11 +87,18 @@ const Header = () => {
             }`}
           >
             <Link
+              to="/around"
+              onClick={() => setClick((prev) => !prev)}
+              className="flex flex-col hover:text-green-600 text-center cursor-pointer transition duration-200 mb-3"
+            >
+              <span className="text-sm font-bold ">주변 도서 검색</span>
+            </Link>
+            <Link
               onClick={() => setClick((prev) => !prev)}
               to="/search"
               className="flex flex-col hover:text-green-600 text-center cursor-pointer transition duration-200 mb-3"
             >
-              <span className="text-sm font-bold">검색</span>
+              <span className="text-sm font-bold">도서 검색</span>
             </Link>
             {login ? (
               <Link
