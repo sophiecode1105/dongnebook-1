@@ -43,9 +43,8 @@ io.on("connection", (socket) => {
   const { token } = socket.handshake.auth;
   console.log("커넥션@@@@@@@@");
   console.log(token);
-  socket.on("notification", async (done: any) => {
+  socket.on("notification", async () => {
     socket.join("notification");
-    done();
   });
 
   socket.on("enter_room", async (productId: string, done: any) => {
