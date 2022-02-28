@@ -44,7 +44,7 @@ const Booklist = ({ list }: { list: ListProps }) => {
       <BookImgBox>
         <BookImg src={images[0]?.url} />
       </BookImgBox>
-      <Title>{title}</Title>
+      <Title>{title.length < 13 ? title : `${title.slice(0, 13)}..`}</Title>
       <Location>{locations?.address}</Location>
     </Container>
   );

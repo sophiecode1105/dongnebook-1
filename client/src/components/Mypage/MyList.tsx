@@ -145,7 +145,7 @@ const MyList = ({
             <Wrap to={`/search/${list.id}`} key={idx}>
               <BookImgBox>
                 <BookImg src={list.images[0]?.url} />
-                <Title>{list.title}</Title>
+                <Title>{list.title.length < 13 ? list.title : `${list.title.slice(0, 13)}..`}</Title>
                 <Location>{list?.locations?.address}</Location>
               </BookImgBox>
             </Wrap>

@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import iconblack from "../../img/iconblack.png";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import {
   searchLocation,
   mapResultsStorage,
   currentLatitude,
   currentLongtitude,
   currentaddress,
+  currentLocationStorage,
 } from "../../state/state";
 import { KakaoMap } from "../../state/typeDefs";
 
@@ -25,15 +26,17 @@ const ExchangeLocation = styled.div`
 
 const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
   const place = useRef(null);
+  // const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [marker, setMarker] = useState<any>(null);
   const [infowindow, setInfoWindow] = useState<any>(
     useCallback(() => new window.kakao.maps.InfoWindow({ zindex: 1 }), [])
   );
   const [geocoder, setGeocoder] = useState<any>(useCallback(() => new window.kakao.maps.services.Geocoder(), []));
-  const setLatitude = useSetRecoilState(currentLatitude);
-  const setLongitude = useSetRecoilState(currentLongtitude);
+  // const setLatitude = useSetRecoilState(currentLatitude);
+  // const setLongitude = useSetRecoilState(currentLongtitude);
   const storeaddress = useSetRecoilState(currentaddress);
+  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
   const searchContent = useRecoilValue(searchLocation);
   const setMapSearchResults = useSetRecoilState(mapResultsStorage);
   const imageSrc = iconblack;
@@ -98,8 +101,13 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
         marker.setPosition(mouseEvent.latLng);
         marker.setMap(map);
 
-        setLatitude(mouseEvent.latLng?.getLat());
-        setLongitude(mouseEvent.latLng?.getLng());
+        setCurrentLocation({
+          y: mouseEvent.latLng?.getLat(),
+          x: mouseEvent.latLng?.getLng(),
+        });
+
+        // setLatitude(mouseEvent.latLng?.getLat());
+        // setLongitude(mouseEvent.latLng?.getLng());
 
         infowindow.setContent(content);
         infowindow.open(map, marker);
@@ -139,8 +147,8 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
     addClickListener(kakaoMap, newMarker);
     setMarker(newMarker);
     setMap(kakaoMap);
-    setLatitude(lat);
-    setLongitude(lon);
+    // setLatitude(lat);
+    // setLongitude(lon);
 
     return () => {
       setMap(null);

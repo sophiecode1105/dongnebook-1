@@ -193,6 +193,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
             products: {
               include: {
                 images: true,
+                locations: true,
               },
             },
           },
@@ -206,6 +207,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         images: true,
+        locations: true,
       },
     });
     const exchangeFalse = await client.product.findMany({
@@ -215,6 +217,7 @@ export const mypage = async (req: express.Request, res: express.Response) => {
       },
       include: {
         images: true,
+        locations: true,
       },
     });
 
