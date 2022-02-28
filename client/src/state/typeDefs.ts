@@ -8,7 +8,7 @@ export type UserState = {
   locationId: number;
   createdAt: Date;
   updatedAt: Date;
-  likes: likes[];
+  likes: likes[] | any;
   locations: locations;
 };
 

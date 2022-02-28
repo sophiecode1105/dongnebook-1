@@ -1,7 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteContent, getSingleBookInfo, patchExchange, postHeart, timeForToday, socket } from "../../api";
+import {
+  deleteContent,
+  getSingleBookInfo,
+  patchExchange,
+  postHeart,
+  timeForToday,
+  socket,
+  getMemberInfo,
+} from "../../api";
 import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
@@ -159,7 +167,7 @@ const UserNickname = styled.div`
   color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
-  width: 120px;
+  width: 130px;
   margin-right: 20px;
   font-size: 18px;
   font-weight: bold;
@@ -372,10 +380,8 @@ const Details = () => {
   }, [id, token]);
 
   const handleClickHeart = async () => {
-    //로그인 포스트
     setIsHeartPressed(!isHeartPressed);
     try {
-      console.log("하틑발송");
       await postHeart(Number(id), token);
     } catch (e) {
       console.error(e);
@@ -392,8 +398,20 @@ const Details = () => {
     navigate("/modify");
   };
   const handleClickDelete = async () => {
-    await deleteContent(Number(id));
-    navigate("/search");
+    let result = await Swal.fire({
+      text: "게시글을 삭제하시겠습니까?",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#2f6218",
+      cancelButtonText: "취소",
+      cancelButtonColor: "#b2b0b0",
+      showCancelButton: true,
+      reverseButtons: true,
+      icon: "warning",
+    });
+    if (result.isConfirmed) {
+      await deleteContent(Number(id));
+      navigate("/search");
+    }
   };
 
   const handleClickExchange = async (e: any) => {
@@ -406,13 +424,46 @@ const Details = () => {
     });
   };
 
+  const handleClickChat = () => {
+    if (token) {
+      socket.emit("enter_room", Number(id), (data: any, chat: any) => {
+        setChatRoomFrame({
+          nickname: data.nickname,
+          title: data.title,
+          bookImg: data.images[0].url,
+          productId: data.id,
+        } as ChatRoomFrameType);
+
+        if (chat) {
+          setChatRoomFrame((prev) => {
+            return {
+              ...prev,
+              userId: chat.users[0].users.id,
+              img: chat.users[0].users.img,
+              chatroomId: chat.id,
+              chats: chat.chats,
+            };
+          });
+        }
+        setVisible(true);
+      });
+    } else {
+      navigate("/signin");
+    }
+  };
+
+  const getUserInfo = async () => {
+    const { userInfo } = await getMemberInfo(token || "token");
+    setUserInfo(userInfo);
+  };
+
   useEffect(() => {
     getSingleData();
   }, [getSingleData]);
 
   useEffect(() => {
     try {
-      const matches = userInfo?.likes?.filter((el) => el.productId === Number(id));
+      const matches = userInfo?.likes?.filter((el: any) => el.products.id === Number(id));
       if (matches?.length) {
         setIsHeartPressed(true);
       }
@@ -422,35 +473,8 @@ const Details = () => {
   }, [id, userInfo?.likes]);
 
   useEffect(() => {
-    let newUser: UserState = userInfo;
-    if (isHeartPressed) {
-      let matches = userInfo?.likes?.filter((like) => like?.productId === Number(id));
-      if (matches.length === 0) {
-        newUser = {
-          ...userInfo,
-          likes: [
-            ...userInfo.likes,
-            {
-              createdAt: "",
-              id: 0,
-              productId: Number(id),
-              updatedAt: "",
-              userId: userInfo.id,
-            },
-          ],
-        };
-      }
-    } else {
-      let reducedLikes = userInfo?.likes?.filter((like) => like?.productId !== Number(id));
-      if (reducedLikes?.length !== userInfo?.likes?.length) {
-        newUser = {
-          ...userInfo,
-          likes: reducedLikes,
-        };
-      }
-    }
-    setUserInfo(newUser);
-  }, [id, setUserInfo, userInfo, isHeartPressed]);
+    getUserInfo();
+  }, [isHeartPressed]);
 
   return isPc ? (
     <Container>
@@ -559,32 +583,7 @@ const Details = () => {
                 <HeartButton onClick={handleClickHeart}>
                   {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
                 </HeartButton>
-                <TouchButton
-                  isWriter={isWriter}
-                  onClick={() => {
-                    socket.emit("enter_room", Number(id), (data: any, chat: any) => {
-                      setChatRoomFrame({
-                        nickname: data.nickname,
-                        title: data.title,
-                        bookImg: data.images[0].url,
-                        productId: data.id,
-                      } as ChatRoomFrameType);
-
-                      if (chat) {
-                        setChatRoomFrame((prev) => {
-                          return {
-                            ...prev,
-                            userId: chat.users[0].users.id,
-                            img: chat.users[0].users.img,
-                            chatroomId: chat.id,
-                            chats: chat.chats,
-                          };
-                        });
-                      }
-                      setVisible(true);
-                    });
-                  }}
-                >
+                <TouchButton isWriter={isWriter} onClick={handleClickChat}>
                   연락하기
                 </TouchButton>
               </>
@@ -599,6 +598,12 @@ const Details = () => {
       likeCount={likeCount}
       onChangeContent={onChangeContent}
       currentImg={currentImg}
+      userInfo={userInfo}
+      setUserInfo={setUserInfo}
+      token={token}
+      handleClickChat={handleClickChat}
+      handleClickModify={handleClickModify}
+      handleClickDelete={handleClickDelete}
     />
   );
 };

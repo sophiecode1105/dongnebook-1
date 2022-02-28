@@ -608,9 +608,6 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                            {
-                              console.log(searchResult);
-                            }
                           }}
                         >
                           {searchResult?.address_name}

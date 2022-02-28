@@ -413,8 +413,8 @@ const Modify = () => {
       } else {
         formData.append("quality", quality);
       }
-      formData.append("lat", String(modifyLatitu));
-      formData.append("lon", String(modifyLongtitu));
+      formData.append("lat", String(currentLocation.y));
+      formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
 
       let status = await patchContent(Number(id), formData, token || "token");
