@@ -155,6 +155,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
   try {
     const { productId } = req.params;
     const { title, content, quality, lat, lon, address, url } = req.body;
+    console.log(address);
     const authorization = req.headers.authorization;
     if (!authorization) {
       return res.status(400).json({ message: "로그인이 필요한 서비스 입니다.", status: false });
@@ -201,14 +202,15 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
       data: urls,
     });
 
-    const productInfo = await client.product.findMany({
+    const productInfo = await client.product.findUnique({
       where: {
-        nickname: userInfo.nickname,
+        id: Number(productId),
       },
     });
+
     await client.location.update({
       where: {
-        id: productInfo[0].locationId,
+        id: productInfo.locationId,
       },
       data: {
         lat: Number(lat),

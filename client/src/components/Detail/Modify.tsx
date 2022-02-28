@@ -413,8 +413,10 @@ const Modify = () => {
       } else {
         formData.append("quality", quality);
       }
-      formData.append("lat", String(currentLocation.y));
-      formData.append("lon", String(currentLocation.x));
+      formData.append("lat", String(modifyLatitu));
+      console.log("보낼때찍히는거", modifyLatitu);
+      formData.append("lon", String(modifyLongtitu));
+      console.log("address보자", address);
       formData.append("address", address);
 
       let status = await patchContent(Number(id), formData, token || "token");
@@ -631,7 +633,11 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
+              {modifyLatitu && modifyLongtitu ? (
+                <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} />
+              ) : (
+                <div>뭐지{console.log(modifyLatitu)}</div>
+              )}
             </LocationWrap>
           </Uploads>
         </UploadInform>
