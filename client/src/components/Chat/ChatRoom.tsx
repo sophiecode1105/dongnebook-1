@@ -25,19 +25,10 @@ const ChatRoom = () => {
   const submitMessage = async (e: FormEvent) => {
     e.preventDefault();
 
-    socket.emit("new_message", frame.productId, myInfo.nickname, message, () => {
-      setChats((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          userId: myInfo.id,
-          content: message,
-          read: false,
-          chatroomId: frame.chatroomId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as Chat,
-      ]);
+    socket.emit("new_message", frame.productId, myInfo.nickname, message, (data: any) => {
+      console.log("데이타");
+      console.log(data);
+      setChats(data.chats);
       setMessage("");
       const ul: any = document.querySelector("#chat__list");
       const height = ul.scrollHeight;
@@ -46,18 +37,10 @@ const ChatRoom = () => {
   };
 
   useEffect(() => {
-    socket.on("receive_message", (name: string, message: string) => {
-      setChats((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          userId: frame.userId,
-          content: message,
-          read: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as Chat,
-      ]);
+    socket.on("receive_message", (data: any) => {
+      console.log("리시브데이타");
+      console.log(data);
+      setChats(data.chats);
       const ul: any = document.querySelector("#chat__list");
       if (ul) {
         const height = ul.scrollHeight;

@@ -209,35 +209,35 @@ io.on("connection", (socket) => {
         read: count[productId] === 2 ? true : false,
       },
     });
-    // const chatroom = await client.chatroom.findMany({
-    //   where: {
-    //     id: chatroomFind[0].id,
-    //   },
-    //   include: {
-    //     users: {
-    //       where: {
-    //         users: {
-    //           id: {
-    //             not: userInfo.id,
-    //           },
-    //         },
-    //       },
-    //       select: {
-    //         users: true,
-    //       },
-    //     },
-    //     chats: true,
-    //     product: {
-    //       include: {
-    //         images: true,
-    //       },
-    //     },
-    //   },
-    // });
+    const chatroom = await client.chatroom.findMany({
+      where: {
+        id: chatroomFind[0].id,
+      },
+      include: {
+        users: {
+          where: {
+            users: {
+              id: {
+                not: userInfo.id,
+              },
+            },
+          },
+          select: {
+            users: true,
+          },
+        },
+        chats: true,
+        product: {
+          include: {
+            images: true,
+          },
+        },
+      },
+    });
 
-    // done(chatroom[0]);
-    socket.to("notification").emit("receive_message");
-    socket.to(productId).emit("receive_message", name, content);
+    done(chatroom[0]);
+    socket.to("notification").emit("receive_message", chatroom[0]);
+    socket.to(productId).emit("receive_message", chatroom[0]);
 
     console.log("방번호:", productId, "이름", name, "내용", content);
   });

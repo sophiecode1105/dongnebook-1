@@ -3,8 +3,14 @@ import { BookInfo, UserState } from "./state/typeDefs";
 import { io } from "socket.io-client";
 
 export const URL = "http://localhost:4000";
+// export const URL = "https://dongnebook.herokuapp.com";
 
 const token = localStorage.getItem("token");
+
+// export const socket = io("https://dongnebooksocket.herokuapp.com", {
+//   transports: ["websocket"],
+//   auth: { token },
+// });
 
 export const socket = io("http://localhost:5000", {
   transports: ["websocket"],
@@ -242,4 +248,13 @@ export const getLocationList = async (token: string | null) => {
   } = await axios.get(`${URL}/location`, { headers: { Authorization: `jwt ${token}` } });
 
   return { userLocation, productLocation };
+};
+
+export const postSocialLogin = async (type: any, code: any) => {
+  try {
+    const data = await axios.post(`${URL}/oauth/${type}`, { code });
+    return data;
+  } catch (e) {
+    localStorage.removeItem("socialType");
+  }
 };
