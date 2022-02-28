@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BookInfo, UserState } from "./state/typeDefs";
+import { UserState } from "./state/typeDefs";
 import { io } from "socket.io-client";
 
 export const URL = "http://localhost:4000";
