@@ -26,8 +26,6 @@ const ChatRoom = () => {
     e.preventDefault();
 
     socket.emit("new_message", frame.productId, myInfo.nickname, message, (data: any) => {
-      console.log("데이타");
-      console.log(data);
       setChats(data.chats);
       setMessage("");
       const ul: any = document.querySelector("#chat__list");
@@ -38,8 +36,6 @@ const ChatRoom = () => {
 
   useEffect(() => {
     socket.on("receive_message", (data: any) => {
-      console.log("리시브데이타");
-      console.log(data);
       setChats(data.chats);
       const ul: any = document.querySelector("#chat__list");
       if (ul) {

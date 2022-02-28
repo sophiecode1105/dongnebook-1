@@ -5,20 +5,15 @@ import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
-  currentLatitude,
   currentLocationStorage,
-  currentLongtitude,
   loginState,
   mapResultsStorage,
-  modifyLatitude,
-  modifyLongtitude,
   searchLocation,
   storeContentId,
 } from "../../state/state";
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
-import { Map2 } from "../Book/Map2";
 
 declare global {
   interface Window {
@@ -324,17 +319,13 @@ const Modify = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [patchImageUrls, setPatchImageUrls] = useState<string[]>([]);
   const setLocation = useSetRecoilState(searchLocation);
-  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
-  const [lat, modifyLat] = useRecoilState(modifyLatitude);
-  const [lon, modifyLon] = useRecoilState(modifyLongtitude);
+  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
 
   const [modifyLatitu, setModifyLatitu] = useState();
   const [modifyLongtitu, setModifyLongtitu] = useState();
 
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
-  const latitude = useRecoilValue(currentLatitude);
-  const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
   const id = useRecoilValue(storeContentId);
@@ -377,31 +368,28 @@ const Modify = () => {
     }
   };
 
-  const getSingleData = useCallback(
-    async (id: number) => {
-      const { productInfo } = await getSingleBookInfo(id, token);
-      setValue("title", productInfo.title);
-      setValue("content", productInfo.content);
-      const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
-      radiobuttonValue.checked = true;
-      setModifyQuality(productInfo.quality);
-      let modifyImg = productInfo.images;
-      let imgData: any[] = [];
-      for (let i = 0; i < modifyImg.length; i++) {
-        imgData.push(modifyImg[i].url);
-      }
+  const getSingleData = async (id: number) => {
+    const { productInfo } = await getSingleBookInfo(id, token);
+    setValue("title", productInfo.title);
+    setValue("content", productInfo.content);
+    const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
+    radiobuttonValue.checked = true;
+    setModifyQuality(productInfo.quality);
+    let modifyImg = productInfo.images;
+    let imgData: any[] = [];
+    for (let i = 0; i < modifyImg.length; i++) {
+      imgData.push(modifyImg[i].url);
+    }
 
-      setPatchImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      setImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      modifyLat(productInfo.locations.lat);
-      modifyLon(productInfo.locations.lon);
-    },
-    [modifyLat, modifyLon, setValue, token]
-  );
+    setPatchImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setModifyLatitu(productInfo.locations.lat);
+    setModifyLongtitu(productInfo.locations.lon);
+  };
 
   const patchData = async () => {
     return new Promise(async (res, rej) => {
@@ -425,8 +413,8 @@ const Modify = () => {
       } else {
         formData.append("quality", quality);
       }
-      formData.append("lat", String(latitude));
-      formData.append("lon", String(longtitude));
+      formData.append("lat", String(currentLocation.y));
+      formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
 
       let status = await patchContent(Number(id), formData, token || "token");
@@ -480,7 +468,13 @@ const Modify = () => {
     return () => {
       localStorage.removeItem("modify_id");
     };
-  }, [getSingleData, id]);
+  }, [id]);
+
+  useEffect(() => {
+    return () => {
+      setCurrentLocation({ addressName: "", x: 0, y: 0 });
+    };
+  }, []);
 
   return (
     <Container>
@@ -515,26 +509,11 @@ const Modify = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox
-                  type="radio"
-                  id="새상품같음"
-                  value="새상품같음"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox
-                  type="radio"
-                  id="약간헌책"
-                  value="약간헌책"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox
-                  type="radio"
-                  id="많이헌책"
-                  value="많이헌책"
-                  {...register("quality")}
-                ></CheckBox>
+                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -627,24 +606,22 @@ const Modify = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar
-                    type="text"
-                    placeholder="건물,지역 검색"
-                    {...register("location")}
-                  ></SearchBar>
+                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
                 </SearchBox>
                 {isOpen ? (
                   <SearchResultBox ref={side}>
-                    {mapSearchResults.map((searchResult: { address_name: string }, key) => {
+                    {mapSearchResults.map((searchResult: any, key) => {
                       return (
                         <SearchResult
                           key={key}
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
+                            setModifyLatitu(searchResult.y);
+                            setModifyLongtitu(searchResult.x);
                           }}
                         >
                           {searchResult?.address_name}
@@ -654,7 +631,7 @@ const Modify = () => {
                   </SearchResultBox>
                 ) : null}
               </SearchContainer>
-              <Map2 />
+              {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
             </LocationWrap>
           </Uploads>
         </UploadInform>
