@@ -1,12 +1,32 @@
 import { createServer } from "http";
+import { JwtPayload } from "jsonwebtoken";
 import { Server } from "socket.io";
-import server from "../app";
-import client from "../client";
-import { userFinder, verify } from "../token/verify";
+import client from "./client";
+import jwt from "jsonwebtoken";
+
+function verify(token: string): string | jwt.JwtPayload {
+  try {
+    const data = jwt.verify(token, process.env.ACCESS_SECRET);
+    return data;
+  } catch {
+    return;
+  }
+}
+async function userFinder(email: string) {
+  try {
+    const userInfo = await client.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    return userInfo;
+  } catch {
+    return;
+  }
+}
 
 const httpServer = createServer();
 
-// export const live = (req: any, res: any, next: any) => {
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -40,33 +60,23 @@ io.on("connection", (socket) => {
   socket.onAny((event: any) => {
     console.log(`Socket Event : ${event}`);
   });
-  const { token } = socket.handshake.auth;
-  console.log("커넥션@@@@@@@@");
-  console.log(token);
   socket.on("notification", async () => {
     socket.join("notification");
   });
 
   socket.on("enter_room", async (productId: string, done: any) => {
-    let userInfo;
-    socket.leave("notification");
-    console.log("token");
-    console.log(token);
+    const { token } = socket.handshake.auth;
+    const userInfo: JwtPayload | any = verify(token);
 
-    try {
-      userInfo = verify(token);
-    } catch (err) {
-      console.log(err);
+    if (userInfo === undefined) {
+      return console.log("토큰이 없습니다.");
     }
+    socket.leave("notification");
 
     socket.join(productId);
 
-    console.log("누구누구있니");
-    console.log(io.sockets.adapter.rooms);
-
     count[productId] = io.sockets.adapter.rooms.get(productId)?.size;
-    console.log("count[productId]");
-    console.log(count[productId]);
+
     let chatroomFind = await client.chatroom.findMany({
       where: {
         productId: Number(productId),
@@ -133,17 +143,17 @@ io.on("connection", (socket) => {
     //채팅방이 없을때는
 
     done(productInfo);
+    console.log("몇명있나");
+    console.log(io.sockets.adapter.rooms);
   });
 
   socket.on("new_message", async (productId: string, name: string, content: string, done: any) => {
-    let userInfo;
+    const { token } = socket.handshake.auth;
+    const userInfo: JwtPayload | any = verify(token);
 
-    try {
-      userInfo = verify(token);
-    } catch (err) {
-      console.log(err);
+    if (userInfo === undefined) {
+      return console.log("토큰이 없습니다.");
     }
-
     const otherInfo = await client.user.findMany({
       where: {
         products: {
@@ -191,9 +201,6 @@ io.on("connection", (socket) => {
       });
     }
 
-    console.log("채팅내역 생성하기전 카운트 프로덕트");
-    console.log(count[productId]);
-
     await client.chat.create({
       data: {
         userId: userInfo["id"],
@@ -202,10 +209,35 @@ io.on("connection", (socket) => {
         read: count[productId] === 2 ? true : false,
       },
     });
+    const chatroom = await client.chatroom.findMany({
+      where: {
+        id: chatroomFind[0].id,
+      },
+      include: {
+        users: {
+          where: {
+            users: {
+              id: {
+                not: userInfo.id,
+              },
+            },
+          },
+          select: {
+            users: true,
+          },
+        },
+        chats: true,
+        product: {
+          include: {
+            images: true,
+          },
+        },
+      },
+    });
 
-    done();
-    socket.to("notification").emit("receive_message");
-    socket.to(productId).emit("receive_message", name, content);
+    done(chatroom[0]);
+    socket.to("notification").emit("receive_message", chatroom[0]);
+    socket.to(productId).emit("receive_message", chatroom[0]);
 
     console.log("방번호:", productId, "이름", name, "내용", content);
   });
@@ -218,49 +250,51 @@ io.on("connection", (socket) => {
   });
 
   socket.on("delete_room", async (productId: string) => {
-    socket.leave(productId);
+    const { token } = socket.handshake.auth;
+    const userInfo: JwtPayload | any = verify(token);
 
-    let userInfo;
+    if (userInfo === undefined) {
+      return console.log("토큰이 없습니다.");
+    }
+    socket.leave(productId);
     try {
-      userInfo = verify(token);
+      let chatroomFind = await client.chatroom.findMany({
+        where: {
+          productId: Number(productId),
+          users: {
+            some: {
+              userId: userInfo.id,
+            },
+          },
+        },
+      });
+
+      await client.chatroom.deleteMany({
+        where: {
+          id: chatroomFind[0].id,
+        },
+      });
+
+      console.log("방 삭제");
     } catch (err) {
       console.log(err);
     }
-
-    let chatroomFind = await client.chatroom.findMany({
-      where: {
-        productId: Number(productId),
-        users: {
-          some: {
-            userId: userInfo.id,
-          },
-        },
-      },
-    });
-
-    await client.chatroom.deleteMany({
-      where: {
-        id: chatroomFind[0].id,
-      },
-    });
-
-    console.log("방 삭제");
   });
 
   socket.on("get_rooms", async (done: any) => {
-    let data;
-    try {
-      data = verify(token);
-    } catch (err) {
-      console.log(err);
+    const { token } = socket.handshake.auth;
+    const userInfo: JwtPayload | any = verify(token);
+
+    if (userInfo === undefined) {
+      return console.log("토큰이 없습니다.");
     }
-    const userInfo = await userFinder(data["email"]);
+    const userData = await userFinder(userInfo["email"]);
 
     const notReadChat = await client.chatroom.findMany({
       where: {
         users: {
           some: {
-            userId: userInfo.id,
+            userId: userData.id,
           },
         },
       },
@@ -268,7 +302,7 @@ io.on("connection", (socket) => {
         chats: {
           where: {
             userId: {
-              not: userInfo.id,
+              not: userData.id,
             },
             read: false,
           },
@@ -280,7 +314,7 @@ io.on("connection", (socket) => {
       where: {
         users: {
           some: {
-            userId: userInfo.id,
+            userId: userData.id,
           },
         },
       },
@@ -289,7 +323,7 @@ io.on("connection", (socket) => {
           where: {
             users: {
               id: {
-                not: userInfo.id,
+                not: userData.id,
               },
             },
           },
@@ -329,8 +363,6 @@ io.on("connection", (socket) => {
   });
 });
 
-//   next();
-// };
 const PORT = 5000;
 
 httpServer.listen(PORT, () => {

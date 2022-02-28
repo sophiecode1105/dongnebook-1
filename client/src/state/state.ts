@@ -115,11 +115,6 @@ export const ableExchange = atom<BookInfo[]>({
   default: [],
 });
 
-export const fetchRoom = atom<any>({
-  key: "fetchRoom",
-  default: 0,
-});
-
 export const chatRoomsState = atom<chatRooms[]>({
   key: "chatRoomsState",
   default: [],

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
-import { postSignin } from "../../api";
+import { postSignin, postSocialLogin } from "../../api";
 import { useSetRecoilState } from "recoil";
 import { loginState, userState } from "../../state/state";
 import { ErrorProps } from "../../state/typeDefs";
@@ -177,6 +177,24 @@ const Signin = () => {
     }
   };
 
+  const url = new URL(window.location.href);
+
+  const code = url.searchParams.get("code");
+
+  const getSocial = async () => {
+    const data: any = await postSocialLogin(localStorage.getItem("socialType"), code);
+    setUser(data.data.userInfo);
+    setLogin(data.data.token);
+    localStorage.setItem("token", data.data["token"]);
+    navigate("/");
+  };
+
+  useEffect(() => {
+    if (code) {
+      getSocial();
+    }
+  }, []);
+
   const myPattern: ValidationRule<RegExp> = {
     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
     message: "이메일 형식으로 입력해주세요",
@@ -224,11 +242,21 @@ const Signin = () => {
 
       <Signup to="/signup">회원가입</Signup>
       <ButtonContainer>
-        <OauthButton>
+        <OauthButton
+          onClick={() => {
+            localStorage.setItem("socialType", "google");
+          }}
+          href="https://accounts.google.com/o/oauth2/v2/auth?client_id=849456230902-bbj8hno72k1hhlciunde3nc0knp6i28m.apps.googleusercontent.com&redirect_uri=http://localhost:3000/signin&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email"
+        >
           <i className="fab fa-google"></i>
           Google로 로그인
         </OauthButton>
-        <OauthButton>
+        <OauthButton
+          onClick={() => {
+            localStorage.setItem("socialType", "github");
+          }}
+          href="https://github.com/login/oauth/authorize?client_id=1caba106b0f779b40cc8&scope=user:email"
+        >
           <i className="fab fa-github"></i>
           Github로 로그인
         </OauthButton>

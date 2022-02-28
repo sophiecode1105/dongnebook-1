@@ -1,0 +1,34 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": " nodemon --exec ts-node socket.ts",
+    "start": "node build/socket.js",
+    "migrate": "npx prisma migrate dev",
+    "studio": "npx prisma studio",
+    "premigrate": "rm -rf prisma/migrations"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.16",
+    "@types/validator": "^13.7.1",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@types/socket.io": "^3.0.2",
+    "prisma": "^3.0.1",
+    "socket.io": "^4.4.1",
+    "dotenv": "^16.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "@types/jsonwebtoken": "^8.5.8",
+    "cors": "^2.8.5",
+    "@types/cors": "^2.8.12",
+    "@prisma/client": "^3.0.1"
+  }
+}

@@ -17,7 +17,6 @@ const Chat = () => {
 
   useEffect(() => {
     socket.on("receive_message", () => {
-      console.log("리시이이잉이잉이브 받앗다");
       fetchData();
     });
     socket.emit("notification");
