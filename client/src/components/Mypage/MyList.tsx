@@ -144,7 +144,7 @@ const MyList = ({
           return (
             <Wrap to={`/search/${list.id}`} key={idx}>
               <BookImgBox>
-                {/* <BookImg src={list.images[0]?.url} /> */}
+                <BookImg src={list.images[0]?.url} />
                 <Title>{list.title}</Title>
                 <Location>{list?.locations?.address}</Location>
               </BookImgBox>

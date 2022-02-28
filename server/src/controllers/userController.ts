@@ -190,7 +190,11 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         locations: true,
         likes: {
           select: {
-            products: true,
+            products: {
+              include: {
+                images: true,
+              },
+            },
           },
         },
       },
