@@ -13,8 +13,8 @@ declare global {
 
 export const KakaoTest = () => {
   const Container = styled.div`
-    width: 500px;
-    height: 500px;
+    width: 320px;
+    height: 320px;
   `;
 
   let place = useRef(null);
@@ -49,13 +49,7 @@ export const KakaoTest = () => {
 
       map.setBounds(bounds);
 
-      markers.current = getTarget(
-        map.getCenter(),
-        map,
-        markers.current,
-        markered.current,
-        productLocations.current
-      );
+      markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
     });
   }
 

@@ -474,7 +474,7 @@ const Details = () => {
 
   useEffect(() => {
     getUserInfo();
-  }, [isHeartPressed]);
+  }, []);
 
   return isPc ? (
     <Container>

@@ -291,32 +291,42 @@ const Account = () => {
 
     const places = new window.kakao.maps.services.Places();
     places.keywordSearch(location, async (result: any, status: any) => {
-      let address = result[0].address_name;
-      let pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z\s)]/gi;
-      let village = address.replace(pattern, "");
-      setSearchResult(village);
-      setLattitude(result[0].x);
-      setLongtitude(result[0].y);
-      if (village) {
-        let alert = await Swal.fire({
-          text: `${village}`,
-          confirmButtonText: "확인",
-          confirmButtonColor: "#2f6218",
-          denyButtonText: "취소",
-          denyButtonColor: "#b2b0b0",
-          showDenyButton: true,
-          reverseButtons: true,
-          icon: "question",
-        });
-        if (alert.isConfirmed) {
-          setValue("location", village);
-        } else if (alert.isDenied) {
-          setValue("location", "");
+      let address = result[0];
+      let geocoder = new window.kakao.maps.services.Geocoder();
+      console.log(address.y);
+      console.log(address.x);
+      geocoder.coord2Address(Number(address.x), Number(address.y), async (result: any, status: any) => {
+        console.log("result", result);
+        let village =
+          result[0]?.address?.region_1depth_name +
+          " " +
+          result[0]?.address?.region_2depth_name +
+          " " +
+          result[0]?.address?.region_3depth_name;
+
+        if (village) {
+          let alert = await Swal.fire({
+            text: `${village}`,
+            confirmButtonText: "확인",
+            confirmButtonColor: "#2f6218",
+            denyButtonText: "취소",
+            denyButtonColor: "#b2b0b0",
+            showDenyButton: true,
+            reverseButtons: true,
+            icon: "question",
+          });
+          if (alert.isConfirmed) {
+            setValue("location", village);
+            setSearchResult(village);
+            setLattitude(address.y);
+            setLongtitude(address.x);
+          } else if (alert.isDenied) {
+            setValue("location", "");
+          }
         }
-      }
+      });
     });
   };
-
   const patchData = async () => {
     return new Promise(async (res, rej) => {
       const { nick, password, image } = getValues();
