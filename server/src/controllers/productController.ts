@@ -15,7 +15,9 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     });
 
     if (target.length === 0) {
-      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
+      return res
+        .status(200)
+        .json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
     }
     const take = 12;
     const allProductList = await client.product.findMany({
@@ -38,10 +40,14 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     const pages = Math.ceil(target.length / take);
 
     if (allProductList.length === 0) {
-      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList, state: false, pages });
+      return res
+        .status(200)
+        .json({ message: "빈 페이지 입니다.", allProductList, state: false, pages });
     }
 
-    return res.status(200).json({ message: "도서 목록 조회 성공", allProductList, state: true, pages });
+    return res
+      .status(200)
+      .json({ message: "도서 목록 조회 성공", allProductList, state: true, pages });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -81,7 +87,9 @@ export const postProduct = async (req: express.Request, res: express.Response) =
       });
       const productInfo = await productFinder(locationCreate.id);
 
-      return res.status(201).json({ message: "도서 업로드 성공", productInfo: productInfo[0], status: true });
+      return res
+        .status(201)
+        .json({ message: "도서 업로드 성공", productInfo: productInfo[0], status: true });
     } else {
       return res.status(400).json({ message: "도서 정보를 모두 입력해주세요.", status: false });
     }
@@ -146,7 +154,9 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
         },
       });
 
-      return res.status(201).json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
+      return res
+        .status(201)
+        .json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
     } else {
       return res.status(400).json({ message: "해당도서가 없습니다." });
     }
@@ -238,7 +248,9 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
       },
     });
 
-    return res.status(200).json({ message: "도서 정보 수정 성공", updateProductInfo, status: true });
+    return res
+      .status(200)
+      .json({ message: "도서 정보 수정 성공", updateProductInfo, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
@@ -360,8 +372,9 @@ export const searchProduct = async (req: express.Request, res: express.Response)
       caseSensitive: true,
     });
     const result = searcher.search(value as string);
+    const pages = Math.ceil(result.length / 12);
 
-    return res.status(200).json({ message: "도서 찾기 성공", result, status: true });
+    return res.status(200).json({ message: "도서 찾기 성공", result, pages, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
