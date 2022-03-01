@@ -158,7 +158,9 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
       data,
       data: { productInfo, likeCount },
     } = await axios.get(`${URL}/product/${id}`, {
-      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
+      headers: token
+        ? { Authorization: `jwt ${token}`, withCredentials: true }
+        : { withCredentials: true },
     });
     return { productInfo, likeCount };
   } catch (e) {
@@ -179,7 +181,11 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
+    await axios.post(
+      `${URL}/product/${id?.toString()}`,
+      {},
+      { headers: { Authorization: `jwt ${token}` } }
+    );
   } catch (e) {
     throw e;
   }

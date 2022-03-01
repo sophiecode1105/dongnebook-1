@@ -31,7 +31,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
           const { count, productId } = chatRoom;
           const { img, nickname } = chatRoom.users[0].users;
           const { content, createdAt } = chatRoom.chats[0];
-          console.log(count);
+
           return (
             <li
               key={idx}

@@ -13,7 +13,7 @@ declare global {
 
 export const KakaoTest = () => {
   const Container = styled.div`
-    width: 500px;
+    width: 100px;
     height: 500px;
   `;
 
@@ -26,9 +26,6 @@ export const KakaoTest = () => {
   const productLocations = useRef(null);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
-  useEffect(() => {
-    getData();
-  }, []);
 
   function searchPlaces(map: any) {
     const keyword = keywords.current?.value;
@@ -61,6 +58,7 @@ export const KakaoTest = () => {
 
   const getData = async () => {
     const { userLocation, productLocation } = await getLocationList(token);
+
     productLocations.current = productLocation;
 
     const options = {
@@ -172,8 +170,6 @@ export const KakaoTest = () => {
 
       window.kakao.maps.event.addListener(marker, "click", function () {
         //   마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
-        console.log("product");
-        console.log(productInfo);
 
         Nav(`/search/${productInfo.id}`);
       });
@@ -190,9 +186,14 @@ export const KakaoTest = () => {
 
     return markers;
   }
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
+
   return (
     <>
-      <div>KakaoTest</div>
+      {/* <div>KakaoTest</div>
       <div>KakaoTest</div>
       <div>KakaoTest</div>
       <Container ref={place}>카카오프렌즈</Container>
@@ -209,7 +210,7 @@ export const KakaoTest = () => {
         <input type="text" ref={keywords} placeholder="검색어를 입력하세요."></input>
       </form>
 
-      <div>KakaoTest</div>
+      <div>KakaoTest</div> */}
     </>
   );
 };
