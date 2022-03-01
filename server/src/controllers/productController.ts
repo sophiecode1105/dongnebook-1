@@ -21,9 +21,9 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
       where: {
         exchanged: false,
       },
-      take: 4,
+      take: 12,
       cursor: {
-        id: target[0].id - (Number(page) - 1) * 4,
+        id: target[0].id - (Number(page) - 1) * 12,
       },
       orderBy: {
         id: "desc",

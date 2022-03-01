@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useRecoilValue } from "recoil";
@@ -12,11 +12,56 @@ declare global {
 }
 
 export const KakaoTest = () => {
+  const Padding = styled.div`
+    padding: 30px 0px;
+  `;
   const Container = styled.div`
-    width: 100px;
-    height: 500px;
+    width: 330px;
+    height: 400px;
+    margin: auto;
+    position: relative;
+  `;
+  const TitleBox = styled.div`
+    width: 85%;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+    padding-bottom: 10px;
+    justify-content: center;
   `;
 
+  const Title = styled.div`
+    color: black;
+    font-weight: bold;
+    font-size: 23px;
+    padding-left: 5px;
+  `;
+  const Public = styled.div`
+    display: flex;
+    z-index: 60;
+    opacity: 70%;
+    left: 10px;
+    width: 45%;
+    left: 10px;
+  `;
+  const SearchInput = styled.input`
+    display: flex;
+    z-index: 60;
+    opacity: 70%;
+    left: 10px;
+    width: 45%;
+    left: 10px;
+    position: absolute;
+    top: 20px;
+  `;
+  const SearchBox = styled(Public)`
+    flex-direction: column;
+    top: 40px;
+    position: relative;
+
+    background-color: white;
+  `;
+  const SearchList = styled.div`
+    z-index: 60;
+  `;
   let place = useRef(null);
 
   const clickLatlng = useRef<HTMLInputElement>(null);
@@ -24,6 +69,7 @@ export const KakaoTest = () => {
   const markers = useRef([]);
   const markered = useRef(null);
   const productLocations = useRef(null);
+  const [searchPlace, setSearchPlace] = useState([]);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
 
@@ -38,25 +84,17 @@ export const KakaoTest = () => {
     // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
     ps.keywordSearch(keyword, (data: any, status: any, pagination: any) => {
       const bounds = new window.kakao.maps.LatLngBounds();
-
+      setSearchPlace(data);
       for (let i = 0; i < data.length; i++) {
         let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
         bounds.extend(placePosition);
       }
-
       map.setBounds(bounds);
-
-      markers.current = getTarget(
-        map.getCenter(),
-        map,
-        markers.current,
-        markered.current,
-        productLocations.current
-      );
     });
+    // markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
   }
 
-  const getData = async () => {
+  const getData = useCallback(async () => {
     const { userLocation, productLocation } = await getLocationList(token);
 
     productLocations.current = productLocation;
@@ -91,7 +129,7 @@ export const KakaoTest = () => {
         markers.current = getTarget(qa, map, markers.current, marker, productLocation);
       });
     }
-  };
+  }, [getTarget, token]);
 
   function getTarget(qa: any, map: any, markers: any, marker: any, productLocation: any) {
     for (let i = 0; i < markers.length; i++) {
@@ -190,27 +228,31 @@ export const KakaoTest = () => {
   useEffect(() => {
     getData();
   }, [getData]);
-
   return (
-    <>
-      {/* <div>KakaoTest</div>
-      <div>KakaoTest</div>
-      <div>KakaoTest</div>
-      <Container ref={place}>카카오프렌즈</Container>
-      <div>KakaoTest</div>
-
-      <div ref={clickLatlng}>이게뭐야</div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          searchPlaces(place.current);
-        }}
-      >
-        <input type="text" ref={keywords} placeholder="검색어를 입력하세요."></input>
-      </form>
-
-      <div>KakaoTest</div> */}
-    </>
+    <div className="h-[90vh] pt-20 max-w-md w-full m-auto p-2">
+      <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">주변 도서 목록</h1>
+      <Container ref={place}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <SearchInput
+            type="text"
+            onChange={(e) => {
+              e.preventDefault();
+              searchPlaces(place.current);
+            }}
+            ref={keywords}
+            placeholder="검색어를 입력하세요."
+          />
+        </form>
+        <SearchBox>
+          {searchPlace.map((el: any, idx: number) => {
+            return <SearchList key={idx}>{el.address_name}</SearchList>;
+          })}
+        </SearchBox>
+      </Container>
+    </div>
   );
 };
