@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import styled from "styled-components";
 import { BookInfo } from "../../state/typeDefs";
+import Loading from "../Loading";
 import Booklist from "./BookList";
 
 const Container = styled.section`
@@ -11,7 +11,8 @@ const Container = styled.section`
   justify-content: center;
   margin: 0 auto;
   padding-top: 30px;
-  height: 100vh;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const BookListContainer = styled.div`
@@ -23,8 +24,7 @@ const BookListContainer = styled.div`
   grid-gap: 20px;
 `;
 
-const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
-  useEffect(() => {}, [allProductList]);
+const BookList = ({ allProductList, loading }: { allProductList: BookInfo[]; loading: boolean }) => {
   return (
     <Container>
       <BookListContainer>
@@ -32,6 +32,7 @@ const BookList = ({ allProductList }: { allProductList: BookInfo[] }) => {
           return <Booklist key={idx} list={list} />;
         })}
       </BookListContainer>
+      {loading && <Loading />}
     </Container>
   );
 };
