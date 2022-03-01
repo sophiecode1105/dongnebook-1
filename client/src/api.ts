@@ -144,9 +144,9 @@ export const deleteContent = async (id: number | undefined) => {
 export const getBookList = async (page: number) => {
   try {
     const {
-      data: { allProductList },
+      data: { allProductList, pages },
     } = await axios.get(`${URL}/product/list?page=${page}`, { withCredentials: true });
-    return allProductList;
+    return { allProductList, pages };
   } catch (e) {
     throw e;
   }
