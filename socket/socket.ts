@@ -62,6 +62,8 @@ io.on("connection", (socket) => {
   });
   socket.on("notification", async () => {
     socket.join("notification");
+    console.log("몇명있나");
+    console.log(io.sockets.adapter.rooms);
   });
 
   socket.on("enter_room", async (productId: string, done: any) => {

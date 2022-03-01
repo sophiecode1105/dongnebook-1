@@ -41,7 +41,10 @@ const Header = () => {
           </div>
 
           <nav className="md:flex hidden justify-center items-center">
-            <Link to="/around" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
+            <Link
+              to="/around"
+              className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200"
+            >
               <span className="text-sm font-bold text-center">주변 도서 검색</span>
             </Link>
             <Link
@@ -70,6 +73,7 @@ const Header = () => {
                 if (login) {
                   localStorage.removeItem("token");
                   setLogin(null);
+                  window.location.href = "/";
                 }
               }}
               className="flex flex-col ml-10 text-center hover:text-green-600 cursor-pointer transition duration-200"
@@ -117,15 +121,17 @@ const Header = () => {
               <span className="text-sm font-bold">{login ? "내정보" : "회원가입"}</span>
             </Link>
             <Link
+              to={login ? "/" : "/signin"}
               onClick={() => {
                 if (login) {
                   localStorage.removeItem("token");
                   setLogin(null);
                   setUser({} as UserState);
+
+                  window.location.href = "/";
                 }
                 setClick((prev) => !prev);
               }}
-              to={login ? "/" : "/signin"}
               className="flex flex-col text-center hover:text-green-600 cursor-pointer transition duration-200"
             >
               <span className="text-sm font-bold">{login ? "로그아웃" : "로그인"}</span>

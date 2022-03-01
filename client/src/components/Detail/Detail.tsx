@@ -10,10 +10,22 @@ import {
   socket,
   getMemberInfo,
 } from "../../api";
-import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
+import {
+  BookInfo,
+  ChatRoomFrameType,
+  CurrentImgProps,
+  isWriterProps,
+  UserState,
+} from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
-import { chatRoomFrame, chatRoomVisible, loginState, storeContentId, userState } from "../../state/state";
+import {
+  chatRoomFrame,
+  chatRoomVisible,
+  loginState,
+  storeContentId,
+  userState,
+} from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 
@@ -353,7 +365,8 @@ const Details = () => {
   const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo as BookInfo;
+  const { title, images, content, quality, createdAt, locations, nickname, visit, users } =
+    bookDetailInfo as BookInfo;
 
   const onChangeContent = (pageDelta: any) => {
     const lastImgPageNum = images.length - 1;
@@ -529,9 +542,19 @@ const Details = () => {
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
                       <StatusCheck>
-                        <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="can"
+                          name="status"
+                          onClick={handleClickExchange}
+                        ></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status" defaultChecked></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="cannot"
+                          name="status"
+                          defaultChecked
+                        ></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
@@ -581,7 +604,11 @@ const Details = () => {
             ) : (
               <>
                 <HeartButton onClick={handleClickHeart}>
-                  {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
+                  {isHeartPressed ? (
+                    <i className="fas fa-heart"></i>
+                  ) : (
+                    <i className="far fa-heart"></i>
+                  )}
                 </HeartButton>
                 <TouchButton isWriter={isWriter} onClick={handleClickChat}>
                   연락하기

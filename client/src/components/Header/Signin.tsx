@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useForm, ValidationRule } from "react-hook-form";
-import { postSignin, postSocialLogin } from "../../api";
+import { postSignin, postSocialLogin, socket } from "../../api";
 import { useSetRecoilState } from "recoil";
 import { loginState, userState } from "../../state/state";
 import { ErrorProps } from "../../state/typeDefs";
@@ -162,6 +162,7 @@ const Signin = () => {
       setLogin(token);
       localStorage.setItem("token", token);
       navigate("/");
+      window.location.reload();
     } catch (e) {
       setInfoCheck("이메일 혹은 비밀번호가 일치하지 않습니다");
       setInvalid(false);
@@ -187,6 +188,7 @@ const Signin = () => {
     setLogin(data.data.token);
     localStorage.setItem("token", data.data["token"]);
     navigate("/");
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -232,7 +234,11 @@ const Signin = () => {
             },
           })}
         />
-        {invalid ? <Errorbox>{errors.password?.message}</Errorbox> : <Errorbox>{infoCheck}</Errorbox>}
+        {invalid ? (
+          <Errorbox>{errors.password?.message}</Errorbox>
+        ) : (
+          <Errorbox>{infoCheck}</Errorbox>
+        )}
         <LoginState check={keep}>
           <i onClick={handleCheckChange} className="far fa-check-circle"></i>
           &nbsp; 로그인 상태 유지

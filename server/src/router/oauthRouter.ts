@@ -1,6 +1,6 @@
 import express from "express";
-import { githubLogin } from "../controllers/oauth/githubController";
-import { googleLogin } from "../controllers/oauth/googleController";
+import { githubLogin } from "../controllers/oauth/githubcontroller";
+import { googleLogin } from "../controllers/oauth/googlecontroller";
 
 const oauthRotuer = express.Router();
 
