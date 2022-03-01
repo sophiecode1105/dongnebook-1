@@ -17,13 +17,14 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
     if (target.length === 0) {
       return res.status(200).json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
     }
+    const take = 12;
     const allProductList = await client.product.findMany({
       where: {
         exchanged: false,
       },
-      take: 4,
+      take,
       cursor: {
-        id: target[0].id - (Number(page) - 1) * 4,
+        id: target[0].id - (Number(page) - 1) * take,
       },
       orderBy: {
         id: "desc",
@@ -34,11 +35,13 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
       },
     });
 
+    const pages = Math.ceil(target.length / take);
+
     if (allProductList.length === 0) {
-      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList, state: false });
+      return res.status(200).json({ message: "빈 페이지 입니다.", allProductList, state: false, pages });
     }
 
-    return res.status(200).json({ message: "도서 목록 조회 성공", allProductList, state: true });
+    return res.status(200).json({ message: "도서 목록 조회 성공", allProductList, state: true, pages });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
