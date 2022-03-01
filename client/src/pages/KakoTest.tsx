@@ -14,6 +14,11 @@ declare global {
 }
 
 export const KakaoTest = () => {
+<<<<<<< HEAD
+  const Container = styled.div`
+    width: 320px;
+    height: 320px;
+=======
   const Padding = styled.div`
     padding: 30px 0px;
   `;
@@ -37,6 +42,7 @@ export const KakaoTest = () => {
     border-bottom: 2px solid rgba(0, 0, 0, 0.5);
     padding-bottom: 10px;
     justify-content: center;
+>>>>>>> b7f35a23ae11cde3dc1cd506ee8fea81f1428706
   `;
 
   const Title = styled.div`
@@ -103,6 +109,10 @@ export const KakaoTest = () => {
         bounds.extend(placePosition);
       }
       map.setBounds(bounds);
+<<<<<<< HEAD
+
+=======
+>>>>>>> b7f35a23ae11cde3dc1cd506ee8fea81f1428706
       markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
     });
   }

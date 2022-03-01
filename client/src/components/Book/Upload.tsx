@@ -461,7 +461,7 @@ const Upload = () => {
           setCurrentLocation({ x: position.coords.longitude, y: position.coords.latitude });
         });
       } else {
-        setCurrentLocation({ x: userInfo.locations.lat, y: userInfo.locations.lon });
+        setCurrentLocation({ y: userInfo.locations.lat, x: userInfo.locations.lon });
       }
     })();
 
