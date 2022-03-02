@@ -90,7 +90,7 @@ export const KakaoTest = () => {
     var ps = new window.kakao.maps.services.Places();
 
     if (!keyword?.replace(/^\s+|\s+$/g, "")) {
-      // alert("키워드를 입력해주세요!");
+      searchList([]);
       return false;
     }
 
@@ -99,31 +99,39 @@ export const KakaoTest = () => {
       const bounds = new window.kakao.maps.LatLngBounds();
 
       searchList(data);
-      // setSearchList(data);
+      for (let i = 0; i < data.length; i++) {
+        let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
+        bounds.extend(placePosition);
+      }
+    });
+  }
+
+  function moveLocation(clickEl: any) {
+    const keyword = clickEl ? clickEl : keywords.current?.value;
+    var ps = new window.kakao.maps.services.Places();
+    ps.keywordSearch(keyword, (data: any, status: any, pagination: any) => {
+      const bounds = new window.kakao.maps.LatLngBounds();
+
       for (let i = 0; i < data.length; i++) {
         let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
         bounds.extend(placePosition);
       }
 
       // moveLocation();
+      place.current.setBounds(bounds);
     });
+
+    markers.current = getTarget(
+      place.current.getCenter(),
+      place.current,
+      markers.current,
+      markered.current,
+      productLocations.current
+    );
   }
-
-  // function moveLocation() {
-  //   place.current.setBounds(bounds);
-
-  //   markers.current = getTarget(
-  //     place.current.getCenter(),
-  //     place.current,
-  //     markers.current,
-  //     markered.current,
-  //     productLocations.current
-  //   );
-  // }
 
   const getTarget = useCallback(
     (qa: any, map: any, markers: any, marker: any, productLocation: any) => {
-      console.log("겟타겟실행");
       for (let i = 0; i < markers.length; i++) {
         markers[i].marker.setMap(null);
       }
@@ -291,7 +299,7 @@ export const KakaoTest = () => {
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
         <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">주변 도서 목록</h1>
 
-        <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
+        <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} moveLocation={moveLocation} />
         <Map ref={place} />
         <form
           onSubmit={(e) => {
