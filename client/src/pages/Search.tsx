@@ -29,14 +29,12 @@ const Search = () => {
   };
 
   const infiniteScroll = () => {
-    const elementScrollTop = HTML?.scrollTop; // 현재 스크롤 위치
+    const currentScrollTop = HTML?.scrollTop; // 현재 스크롤 위치
     const windowInner = window.innerHeight; // 브라우저의 스크롤 높이
     const fullHeight = HTML?.scrollHeight; // HTML의 높이
-    if (elementScrollTop + windowInner >= fullHeight) {
+    if (currentScrollTop + windowInner > fullHeight) {
       if (pages > page) {
         page++;
-        console.log(page);
-        console.log("마지막페이지다");
         setChange((prev) => prev + 1);
       }
     }
@@ -50,7 +48,10 @@ const Search = () => {
 
   useEffect(() => {
     window.addEventListener("scroll", infiniteScroll);
-    return () => window.removeEventListener("scroll", infiniteScroll);
+    return () => {
+      window.removeEventListener("scroll", infiniteScroll);
+      page = 1;
+    };
   }, []);
 
   return (
