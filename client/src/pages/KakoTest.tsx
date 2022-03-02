@@ -207,8 +207,13 @@ export const KakaoTest = () => {
     return await getLocationList(token);
   }, []);
 
+  function naviInfo() {
+    return new Promise((resolve, rejected) => {
+      navigator.geolocation.getCurrentPosition(resolve, rejected);
+    });
+  }
+
   const getData = async () => {
-    console.log("겟데이타 실행");
     let userLocation: any;
     let productLocation: any;
     await setInfo.then((res: any) => {
@@ -217,9 +222,18 @@ export const KakaoTest = () => {
     });
 
     productLocations.current = productLocation;
+    let center;
+    try {
+      const allowLocation: any = await naviInfo();
 
+      if (allowLocation) {
+        center = new window.kakao.maps.LatLng(allowLocation.coords.latitude, allowLocation.coords.longitude);
+      }
+    } catch (e) {
+      center = new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon);
+    }
     const options = {
-      center: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon), //지도의 중심좌표.
+      center, //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
     };
 
@@ -273,7 +287,7 @@ export const KakaoTest = () => {
             //   e.preventDefault();
             // }}
             ref={keywords}
-            placeholder="검색어를 입력하세요."
+            placeholder="장소를 검색해보세요."
           />
         </form>
         {/* <SearchBox> */}
