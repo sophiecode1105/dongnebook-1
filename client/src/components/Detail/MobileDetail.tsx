@@ -266,7 +266,7 @@ const MobileDetail = ({
 
   useEffect(() => {
     getUserInfo();
-  }, [isHeartPressed]);
+  }, []);
 
   return (
     <Container>
