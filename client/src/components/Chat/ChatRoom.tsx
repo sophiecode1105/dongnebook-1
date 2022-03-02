@@ -22,6 +22,16 @@ const ChatRoom = () => {
     });
   };
 
+  const deleteRoom = () => {
+    socket.emit("delete_room", frame.productId, () => {
+      setVisible(false);
+      socket.emit("notification");
+      socket.emit("get_rooms", (data: any) => {
+        setChatRooms(data);
+      });
+    });
+  };
+
   const submitMessage = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -56,7 +66,7 @@ const ChatRoom = () => {
           <div className="flex justify-between mb-3 text-xl">
             <i onClick={outRoom} className="fas fa-arrow-left cursor-pointer "></i>
             <h1 className="font-bold">{frame.nickname}</h1>
-            <i className="fas fa-sign-out-alt cursor-pointer"></i>
+            <i onClick={deleteRoom} className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>
           <div className="flex">
             <img src={frame.bookImg} alt={frame.title} className="w-28 h-32 mr-3" />
