@@ -29,7 +29,7 @@ const Title = styled.div`
 
 const ImageSlide = styled.div`
   position: relative;
-  width: 300px;
+  width: 280px;
   margin: 20px 0px;
 `;
 
@@ -46,7 +46,7 @@ const SlideList = styled.div<CurrentImgProps>`
   transition: all 30ms ease 0s;
   overflow: hidden;
   transition: all 0.3s;
-  transform: translate3d(${(props) => props.Cm * -300}px, 0px, 0px);
+  transform: translate3d(${(props) => props.Cm * -280}px, 0px, 0px);
   animation: smoothslide 0.3s ease-in-out;
   @keyframes smoothslide {
     0% {
@@ -61,17 +61,19 @@ const SlideList = styled.div<CurrentImgProps>`
 const SlideContent = styled.div`
   display: table;
   float: left;
-  width: 300px;
+  width: 280px;
   height: 100%;
   text-align: center;
 `;
+
+const Button = styled.div``;
 
 const ButtonProps = styled.div`
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
-  top: 200px;
+  top: 170px;
   width: 50px;
   height: 50px;
   padding: 15px;
@@ -81,17 +83,17 @@ const ButtonProps = styled.div`
 `;
 
 const ButtonPrev = styled(ButtonProps)`
-  left: -50px; ;
+  left: -45px; ;
 `;
 const ButtonNext = styled(ButtonProps)`
-  right: -50px;
+  right: -45px;
 `;
 
 const BookImg = styled.img`
   display: table-cell;
   vertical-align: middle;
   text-align: center;
-  width: 300px;
+  width: 280px;
   height: 350px;
   object-fit: fill;
 `;
@@ -287,20 +289,22 @@ const MobileDetail = ({
           </SlideList>
         </SlideBox>
         {images?.length >= 2 ? (
-          <>
+          <Button>
             <ButtonPrev
               onClick={() => {
                 onChangeContent(-1);
-              }}>
+              }}
+            >
               <i className="fas fa-chevron-left"></i>
             </ButtonPrev>
             <ButtonNext
               onClick={() => {
                 onChangeContent(+1);
-              }}>
+              }}
+            >
               <i className="fas fa-chevron-right"></i>
             </ButtonNext>
-          </>
+          </Button>
         ) : null}
       </ImageSlide>
       <UserBox>

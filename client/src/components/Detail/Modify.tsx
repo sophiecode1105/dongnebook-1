@@ -43,8 +43,8 @@ const Wrap = styled.div`
 const Container = styled(DisplayColumn)`
   justify-content: center;
   width: 100%;
+  padding-top: 66px;
   max-width: 1400px;
-  padding: 66px 10px 10px 10px;
 `;
 
 const Form = styled.form`
@@ -52,8 +52,8 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  width: 100%;
-  overflow: hidden;
+  width: 80%;
+  height: 100%;
 `;
 
 const TitleBox = styled.div`
@@ -78,6 +78,7 @@ const UploadInform = styled.div`
 
 const InformBox = styled.div`
   display: flex;
+  width: 20%;
 `;
 
 const InformTitle = styled.div`
@@ -89,26 +90,28 @@ const InformTitle = styled.div`
 
 const Uploads = styled.div`
   display: flex;
-  width: 100%;
-  overflow-x: scroll;
+  align-items: center;
+  width: 80%;
 `;
 
 const InputBox = styled.div`
-  display: flex;
   width: 100%;
-  flex-direction: column;
-`;
-
-const Label = styled.div`
-  position: relative;
-  float: left;
   display: flex;
   flex-direction: column;
   justify-content: center;
+`;
+
+const Label = styled.label`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 1;
   width: 150px;
   height: 150px;
   border: 1px solid #dcdbe3;
+  background-color: #fafafd;
   i {
     font-size: 30px;
     color: #dcdbe3;
@@ -116,17 +119,25 @@ const Label = styled.div`
 `;
 
 const ImgFile = styled.input`
+  text-decoration: none;
   width: 100%;
   height: 100%;
-  opacity: 0;
+  top: 0;
+  left: 0;
   position: absolute;
+  font-size: 0;
+  opacity: 0;
 `;
 
 const ImgMapList = styled.div`
+  display: flex;
   border: 1px solid #dcdbe3;
-  float: left;
   width: 150px;
   height: 150px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
 `;
 
 interface ErrorProps {
@@ -171,7 +182,7 @@ const ButtonBox = styled(DisplayRow)`
 
 const BookImg = styled.img`
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   object-fit: contain;
 `;
 
@@ -235,12 +246,13 @@ const LocationWrap = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: reltative;
 `;
 
 const SearchBar = styled.input`
-  width: 100%;
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  width: 60%;
   padding: 8px;
   &:focus {
     outline-color: green;
@@ -273,9 +285,13 @@ const SearchContainer = styled.div`
 
 const CheckBoxWrap = styled.div``;
 
+const SearchBox = styled.div`
+  display: flex;
+  width: 100%;
+`;
 const SearchResultBox = styled.div`
   position: absolute;
-  width: 100%;
+  width: 60%;
   z-index: 20;
   border: 1px solid rgba(0, 0, 0, 0.2);
 `;
@@ -351,31 +367,28 @@ const Modify = () => {
     }
   };
 
-  const getSingleData = useCallback(
-    async (id: number) => {
-      const { productInfo } = await getSingleBookInfo(id, token);
-      setValue("title", productInfo.title);
-      setValue("content", productInfo.content);
-      const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
-      radiobuttonValue.checked = true;
-      setModifyQuality(productInfo.quality);
-      let modifyImg = productInfo.images;
-      let imgData: any[] = [];
-      for (let i = 0; i < modifyImg.length; i++) {
-        imgData.push(modifyImg[i].url);
-      }
+  const getSingleData = async (id: number) => {
+    const { productInfo } = await getSingleBookInfo(id, token);
+    setValue("title", productInfo.title);
+    setValue("content", productInfo.content);
+    const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
+    radiobuttonValue.checked = true;
+    setModifyQuality(productInfo.quality);
+    let modifyImg = productInfo.images;
+    let imgData: any[] = [];
+    for (let i = 0; i < modifyImg.length; i++) {
+      imgData.push(modifyImg[i].url);
+    }
 
-      setPatchImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      setImageUrls((prev) => {
-        return [...prev, ...imgData];
-      });
-      setModifyLatitu(productInfo.locations.lat);
-      setModifyLongtitu(productInfo.locations.lon);
-    },
-    [setValue, token]
-  );
+    setPatchImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setImageUrls((prev) => {
+      return [...prev, ...imgData];
+    });
+    setModifyLatitu(productInfo.locations.lat);
+    setModifyLongtitu(productInfo.locations.lon);
+  };
 
   const patchData = async () => {
     return new Promise(async (res, rej) => {
@@ -403,7 +416,7 @@ const Modify = () => {
       formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
 
-      let status = await patchContent(Number(localStorage.getItem("modify_id")), formData, token || "token");
+      let status = await patchContent(Number(id), formData, token || "token");
       if (Number(status) < 300) {
         res(true);
       } else {
@@ -423,8 +436,7 @@ const Modify = () => {
     }
   };
 
-  const searchPlace = async (e: any) => {
-    e.preventDefault();
+  const searchPlace = async () => {
     setIsOpen(!isOpen);
     const { location } = getValues();
     setLocation(location);
@@ -455,13 +467,13 @@ const Modify = () => {
     return () => {
       localStorage.removeItem("modify_id");
     };
-  }, [getSingleData, id]);
+  }, [id]);
 
   useEffect(() => {
     return () => {
       setCurrentLocation({ addressName: "", x: 0, y: 0 });
     };
-  }, [setCurrentLocation]);
+  }, []);
 
   return (
     <Container>
@@ -513,46 +525,51 @@ const Modify = () => {
           </InformBox>
           <Uploads>
             <InputBox>
-              <div className="overflow-x-scroll h-[150px]">
-                <div className="w-[600px] h-full">
-                  <Label>
-                    <i className="fas fa-camera"></i>
-                    <ImgTitle>이미지 업로드</ImgTitle>
-                    <ImgFile
-                      id="input_file"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      {...register("img", {
-                        onChange: async (event) => {
-                          let files = event.target.files;
-                          if (files && files.length) {
-                            if (imageUrls.length > 2) {
-                              return Swal.fire({
-                                text: "사진첨부는 최대 3장까지 가능합니다",
-                                confirmButtonText: "확인",
-                                confirmButtonColor: "#2f6218",
-                                icon: "warning",
-                              });
-                            }
-                            let urls = await convertManyFilesToURL(files);
-                            setImageUrls((prev) => {
-                              return [...prev, ...urls];
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+              >
+                <Label htmlFor="input_file">
+                  <i className="fas fa-camera"></i>
+                  <ImgTitle>이미지 업로드</ImgTitle>
+                  <ImgFile
+                    id="input_file"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    {...register("img", {
+                      onChange: async (event) => {
+                        let files = event.target.files;
+                        if (files && files.length) {
+                          if (imageUrls.length > 2) {
+                            return Swal.fire({
+                              text: "사진첨부는 최대 3장까지 가능합니다",
+                              confirmButtonText: "확인",
+                              confirmButtonColor: "#2f6218",
+                              icon: "warning",
                             });
-                            setImageStore([...imageStore, ...files]);
                           }
-                        },
-                      })}
-                    />
-                  </Label>
-                  {imageUrls.map((url, key) => {
-                    return (
-                      <ImgMapList key={key}>
-                        <BookImg src={url}></BookImg>
-                      </ImgMapList>
-                    );
-                  })}
-                </div>
+                          let urls = await convertManyFilesToURL(files);
+                          setImageUrls((prev) => {
+                            return [...prev, ...urls];
+                          });
+                          setImageStore([...imageStore, ...files]);
+                        }
+                      },
+                    })}
+                  />
+                </Label>
+                {imageUrls.map((url, key) => {
+                  return (
+                    <ImgMapList key={key}>
+                      <BookImg src={url}></BookImg>
+                    </ImgMapList>
+                  );
+                })}
               </div>
               <Errorbox>{errors.img?.message}</Errorbox>
             </InputBox>
@@ -580,42 +597,43 @@ const Modify = () => {
             </InputBox>
           </Uploads>
         </UploadInform>
-        <div className="w-full pt-5">
-          <div className="flex items-center w-full">
+        <UploadInform>
+          <InformBox>
             <InformTitle>위치</InformTitle>
-            <SearchContainer>
-              <div className="flex w-full">
-                <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
-                <SearchButton type="submit" onClick={searchPlace}>
-                  <i className="fas fa-search"></i>
-                </SearchButton>
-              </div>
-              {isOpen ? (
-                <SearchResultBox ref={side}>
-                  {mapSearchResults.map((searchResult: any, key) => {
-                    return (
-                      <SearchResult
-                        key={key}
-                        onClick={() => {
-                          setIsOpen(!isOpen);
-                          setCurrentLocation(searchResult);
-                          setModifyLatitu(searchResult.y);
-                          setModifyLongtitu(searchResult.x);
-                        }}>
-                        {searchResult?.address_name}
-                      </SearchResult>
-                    );
-                  })}
-                </SearchResultBox>
-              ) : null}
-            </SearchContainer>
-          </div>
+          </InformBox>
           <Uploads>
             <LocationWrap>
+              <SearchContainer>
+                <SearchBox>
+                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchButton type="button" onClick={searchPlace}>
+                    <i className="fas fa-search"></i>
+                  </SearchButton>
+                </SearchBox>
+                {isOpen ? (
+                  <SearchResultBox ref={side}>
+                    {mapSearchResults.map((searchResult: any, key) => {
+                      return (
+                        <SearchResult
+                          key={key}
+                          onClick={() => {
+                            setIsOpen(!isOpen);
+                            setCurrentLocation(searchResult);
+                            setModifyLatitu(searchResult.y);
+                            setModifyLongtitu(searchResult.x);
+                          }}
+                        >
+                          {searchResult?.address_name}
+                        </SearchResult>
+                      );
+                    })}
+                  </SearchResultBox>
+                ) : null}
+              </SearchContainer>
               {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
             </LocationWrap>
           </Uploads>
-        </div>
+        </UploadInform>
         <ButtonBox>
           <CancelButton to={`/search/${pageChange}`}>취소</CancelButton>
           <RegisterButton type="submit">수정</RegisterButton>
