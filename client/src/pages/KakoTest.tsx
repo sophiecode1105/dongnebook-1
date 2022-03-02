@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { getLocationList } from "../api";
-import { loginState } from "../state/state";
+import { loginState, searchData } from "../state/state";
 import iconblack from "../img/iconblack.png";
 import iconcolor from "../img/iconred.png";
+import LocationSearchBar from "../components/Search/LocationSearchBar";
 declare global {
   interface Window {
     kakao: any;
@@ -20,111 +20,91 @@ const Containter = styled.div`
 `;
 
 const Map = styled.div`
-  border: 1px blue solid;
+  border-radius: 10px;
+  border: 1px green solid;
   width: 100%;
   height: 500px;
   display: flex;
   margin: auto;
 `;
-
-const SearchInput = styled.input`
-  display: flex;
-  z-index: 60;
-  opacity: 70%;
-  left: 10px;
-  width: 45%;
-  left: 10px;
-  top: 20px;
-  padding: 10px 0px;
+const LockPosition = styled.div`
+  position: relative;
 `;
 
 export const KakaoTest = () => {
-  let place = useRef(null);
-
+  let place: any = useRef(null);
   const keywords = useRef<HTMLInputElement>(null);
   const markers = useRef([]);
   const markered = useRef(null);
-  const productLocations = useRef(null);
+  const productLocations: any = useRef(null);
+  const searchList = useSetRecoilState(searchData);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
 
-  function searchPlaces(map: any) {
-    const keyword = keywords.current?.value;
-    var ps = new window.kakao.maps.services.Places();
+  function searchPlaces(type: any, clickEl: any) {
+    const keyword = clickEl ? clickEl : keywords.current?.value;
+    const ps = new window.kakao.maps.services.Places();
+
     if (!keyword?.replace(/^\s+|\s+$/g, "")) {
-      alert("키워드를 입력해주세요!");
+      searchList([]);
       return false;
     }
 
-    // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
-    ps.keywordSearch(keyword, (data: any, status: any, pagination: any) => {
+    ps.keywordSearch(keyword, (data: any) => {
+      // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
       const bounds = new window.kakao.maps.LatLngBounds();
+      searchList(data);
       for (let i = 0; i < data.length; i++) {
         let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
         bounds.extend(placePosition);
       }
-      map.setBounds(bounds);
-      markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
+      if (type) {
+        place.current.setBounds(bounds);
+        markers.current = getTarget(place.current.getCenter(), place.current, markers.current, markered.current);
+      }
     });
   }
+
   const getTarget = useCallback(
-    (qa: any, map: any, markers: any, marker: any, productLocation: any) => {
+    (centerPosition: any, map: any, markers: any, marker: any) => {
       for (let i = 0; i < markers.length; i++) {
         markers[i].marker.setMap(null);
       }
 
       markers = [];
-
-      // 원이 그려질 중심좌표를 클릭한 위치로 설정합니다
-      var drawingLine = new window.kakao.maps.Polyline(); // 그려지고 있는 원의 반지름을 표시할 선 객체입니다
-
-      //
-      let centerPosition = new window.kakao.maps.LatLng(qa.Ma, qa.La);
-
-      // 마커 위치를 클릭한 위치로 옮깁니다
-      marker.setPosition(qa);
-      // 그려지고 있는 원의 반경 정보를 표시할 커스텀오버레이를 생성합니다
-
-      // // 마커를 생성하고 지도위에 표시하는 함수입니다
-
-      for (let i = 0; i < productLocation.length; i++) {
-        const productImg = productLocation[i].images[0].url;
-
+      const drawingLine = new window.kakao.maps.Polyline(); // 그려지고 있는 원의 반지름을 표시할 선 객체입니다
+      marker.setPosition(centerPosition); // 마커 위치를 클릭한 위치로 옮깁니다
+      for (let i = 0; i < productLocations?.current.length; i++) {
+        const productImg = productLocations?.current[i].images[0].url;
         let productPosition = new window.kakao.maps.LatLng(
-          productLocation[i]["locations"]["lat"],
-          productLocation[i]["locations"]["lon"]
+          productLocations?.current[i]["locations"]["lat"],
+          productLocations?.current[i]["locations"]["lon"]
         );
-        // 그려지고 있는 선을 표시할 좌표 배열입니다. 클릭한 중심좌표와 마우스커서의 위치로 설정합니다
-        var linePath = [centerPosition, productPosition];
-        // 그려지고 있는 선을 표시할 선 객체에 좌표 배열을 설정합니다
-        drawingLine.setPath(linePath);
-        // 원의 반지름을 선 객체를 이용해서 얻어옵니다
-        var length = drawingLine.getLength();
 
-        const imageSize = new window.kakao.maps.Size(80, 80);
-        //   마커 이미지를 생성합니다
+        const linePath = [centerPosition, productPosition]; // 그려지고 있는 선을 표시할 선 객체에 좌표 배열을 설정합니다
+        drawingLine.setPath(linePath);
+        const length = drawingLine.getLength();
+        const imageSize = new window.kakao.maps.Size(65, 65); //   마커 이미지를 생성합니다
         const markerImage = new window.kakao.maps.MarkerImage(iconblack, imageSize);
 
         if (length < 400) {
           let marker = new window.kakao.maps.Marker({
             map, // 마커를 표시할 지도
             position: productPosition, // 마커를 표시할 위치
-            title: productLocation[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+            title: productLocations?.current[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
             image: markerImage,
           });
-          const productInfo = productLocation[i];
+          const productInfo = productLocations?.current[i];
 
-          var iwContent = ` <img width=150px height = 300px src = "${productImg}"/><div style="padding:5px;" >${productInfo.title}</div><div style="padding:5px;" >${productInfo.locations.address}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+          const iwContent = ` <img width=150px height = 300px src = "${productImg}"/><div style="padding:5px;" >${productInfo.title}</div><div style="padding:5px;" >${productInfo.locations.address}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
 
-          // 인포윈도우를 생성합니다
-          var infowindow = new window.kakao.maps.InfoWindow({
+          const infowindow = new window.kakao.maps.InfoWindow({
+            // 인포윈도우를 생성합니다
             position: productPosition,
             content: iwContent,
           });
 
-          //   마커 위에 인포윈도우를 표시합니다. 두번째 파라미터인 marker를 넣어주지 않으면 지도 위에 표시됩니다
-
-          marker.setMap(map);
+          marker.setMap(map); //   마커 위에 인포윈도우를 표시합니다. 두번째 파라미터인 marker를 넣어주지 않으면 지도 위에 표시됩니다
           markers.push({ marker, infowindow, productInfo });
         }
 
@@ -132,7 +112,6 @@ export const KakaoTest = () => {
           drawingLine.setMap(null);
         }
       }
-      // 마커에 마우스오버 이벤트를 등록합니다
 
       markers.forEach((data: any) => {
         const { marker, infowindow, productInfo } = data;
@@ -143,11 +122,9 @@ export const KakaoTest = () => {
 
         window.kakao.maps.event.addListener(marker, "click", function () {
           //   마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
-
           Nav(`/search/${productInfo.id}`);
         });
 
-        //   마커에 마우스아웃 이벤트를 등록합니다
         window.kakao.maps.event.addListener(marker, "mouseout", function () {
           //   마커에 마우스아웃 이벤트가 발생하면 인포윈도우를 제거합니다
           infowindow.close();
@@ -163,26 +140,36 @@ export const KakaoTest = () => {
     return await getLocationList(token);
   }, [token]);
 
+  function naviInfo() {
+    return new Promise((resolve, rejected) => {
+      navigator.geolocation.getCurrentPosition(resolve, rejected);
+    });
+  }
+
   const getData = useCallback(async () => {
     let userLocation: any;
-    let productLocation: any;
+
     await setInfo.then((res: any) => {
       userLocation = res.userLocation;
-      productLocation = res.productLocation;
+      productLocations.current = res.productLocation;
     });
-
-    productLocations.current = productLocation;
-
+    let center;
+    try {
+      const allowLocation: any = await naviInfo();
+      if (allowLocation) {
+        center = new window.kakao.maps.LatLng(allowLocation.coords.latitude, allowLocation.coords.longitude);
+      }
+    } catch (e) {
+      center = new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon);
+    }
     const options = {
-      center: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon), //지도의 중심좌표.
+      center, //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
     };
     let map = new window.kakao.maps.Map(place.current, options);
     place.current = map;
-    const imageSize = new window.kakao.maps.Size(40, 40);
-    //   마커 이미지를 생성합니다
+    const imageSize = new window.kakao.maps.Size(40, 40); //   마커 이미지를 생성합니다
     const markerImage = new window.kakao.maps.MarkerImage(iconcolor, imageSize);
-
     const marker = new window.kakao.maps.Marker({
       // 지도 중심좌표에 마커를 생성합니다
       image: markerImage,
@@ -190,20 +177,10 @@ export const KakaoTest = () => {
     });
 
     markered.current = marker;
-
-    // 지도에 마커를 표시합니다
-    marker.setMap(map);
-    // 마커가 표시될 위치입니다
-
-    // 지도에 클릭 이벤트를 등록합니다
-
-    let qa = options.center;
-
-    markers.current = getTarget(qa, map, markers.current, marker, productLocation);
+    marker.setMap(map); // 지도에 마커를 표시합니다
+    markers.current = getTarget(center, map, markers.current, marker);
     window.kakao.maps.event.addListener(map, "click", function (mouseEvent: any) {
-      qa = mouseEvent.latLng;
-
-      markers.current = getTarget(qa, map, markers.current, marker, productLocation);
+      markers.current = getTarget(mouseEvent.latLng, map, markers.current, marker);
     });
   }, [getTarget, setInfo]);
 
@@ -214,15 +191,11 @@ export const KakaoTest = () => {
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
-        <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">주변 도서 목록</h1>
-        <Map ref={place} />
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            searchPlaces(place.current);
-          }}>
-          <SearchInput ref={keywords} placeholder="검색어를 입력하세요." />
-        </form>
+        <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
+        <LockPosition>
+          <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
+          <Map ref={place} />
+        </LockPosition>
       </div>
     </Containter>
   );

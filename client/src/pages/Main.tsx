@@ -1,5 +1,7 @@
+import Footer from "../components/Main/Footer";
+
 const Main = () => {
-  return <div className="text-3xl">Main</div>;
+  return <Footer></Footer>;
 };
 
 export default Main;
