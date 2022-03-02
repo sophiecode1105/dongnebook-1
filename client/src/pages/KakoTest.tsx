@@ -13,25 +13,25 @@ declare global {
   }
 }
 
+const Containter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Map = styled.div`
+  border-radius: 10px;
+  border: 1px green solid;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  margin: auto;
+`;
+const LockPosition = styled.div`
+  position: relative;
+`;
+
 export const KakaoTest = () => {
-  const Containter = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  `;
-
-  const Map = styled.div`
-    border-radius: 10px;
-    border: 1px green solid;
-    width: 100%;
-    height: 500px;
-    display: flex;
-    margin: auto;
-  `;
-  const LockPosition = styled.div`
-    position: relative;
-  `;
-
   let place: any = useRef(null);
   const keywords = useRef<HTMLInputElement>(null);
   const markers = useRef([]);
@@ -135,9 +135,10 @@ export const KakaoTest = () => {
     },
     [Nav]
   );
+
   const setInfo: any = useMemo(async () => {
     return await getLocationList(token);
-  }, []);
+  }, [token]);
 
   function naviInfo() {
     return new Promise((resolve, rejected) => {
@@ -145,7 +146,7 @@ export const KakaoTest = () => {
     });
   }
 
-  const getData = async () => {
+  const getData = useCallback(async () => {
     let userLocation: any;
 
     await setInfo.then((res: any) => {
@@ -165,7 +166,6 @@ export const KakaoTest = () => {
       center, //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
     };
-
     let map = new window.kakao.maps.Map(place.current, options);
     place.current = map;
     const imageSize = new window.kakao.maps.Size(40, 40); //   마커 이미지를 생성합니다
@@ -182,10 +182,12 @@ export const KakaoTest = () => {
     window.kakao.maps.event.addListener(map, "click", function (mouseEvent: any) {
       markers.current = getTarget(mouseEvent.latLng, map, markers.current, marker);
     });
-  };
+  }, [getTarget, setInfo]);
+
   useEffect(() => {
     getData();
   }, [getData]);
+
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
