@@ -119,3 +119,8 @@ export const chatRoomsState = atom<chatRooms[]>({
   key: "chatRoomsState",
   default: [],
 });
+
+export const searchData = atom<any>({
+  key: "searchData",
+  default: [],
+});

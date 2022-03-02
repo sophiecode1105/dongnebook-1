@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { getLocationList } from "../api";
-import { loginState } from "../state/state";
+import { loginState, searchData } from "../state/state";
 import iconblack from "../img/iconblack.png";
 import iconcolor from "../img/iconred.png";
+import LocationSearchBar from "../components/Search/LocationSearchBar";
 declare global {
   interface Window {
     kakao: any;
@@ -14,11 +15,6 @@ declare global {
 }
 
 export const KakaoTest = () => {
-<<<<<<< HEAD
-  const Container = styled.div`
-    width: 320px;
-    height: 320px;
-=======
   const Padding = styled.div`
     padding: 30px 0px;
   `;
@@ -42,7 +38,6 @@ export const KakaoTest = () => {
     border-bottom: 2px solid rgba(0, 0, 0, 0.5);
     padding-bottom: 10px;
     justify-content: center;
->>>>>>> b7f35a23ae11cde3dc1cd506ee8fea81f1428706
   `;
 
   const Title = styled.div`
@@ -76,46 +71,56 @@ export const KakaoTest = () => {
 
   //   background-color: white;
   // `;
-  // const SearchList = styled.div`
-  //   z-index: 60;
-  // `;
-  let place = useRef(null);
+
+  let place: any = useRef(null);
 
   const clickLatlng = useRef<HTMLInputElement>(null);
   const keywords = useRef<HTMLInputElement>(null);
   const markers = useRef([]);
   const markered = useRef(null);
   const productLocations = useRef(null);
-  // const [searchPlace, setSearchPlace] = useState([]);
+  // const [searchList, setSearchList] = useState([]);
+  const searchList = useSetRecoilState(searchData);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
 
-  function searchPlaces(map: any) {
+  function searchPlaces() {
     console.log("서치플레이스실행");
     const keyword = keywords.current?.value;
     var ps = new window.kakao.maps.services.Places();
+
     if (!keyword?.replace(/^\s+|\s+$/g, "")) {
-      alert("키워드를 입력해주세요!");
+      // alert("키워드를 입력해주세요!");
       return false;
     }
 
     // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
     ps.keywordSearch(keyword, (data: any, status: any, pagination: any) => {
       const bounds = new window.kakao.maps.LatLngBounds();
-      console.log("데이타", data);
-      // setSearchPlace(data);
+
+      searchList(data);
+      // setSearchList(data);
       for (let i = 0; i < data.length; i++) {
         let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
         bounds.extend(placePosition);
       }
-      map.setBounds(bounds);
-<<<<<<< HEAD
 
-=======
->>>>>>> b7f35a23ae11cde3dc1cd506ee8fea81f1428706
-      markers.current = getTarget(map.getCenter(), map, markers.current, markered.current, productLocations.current);
+      // moveLocation();
     });
   }
+
+  // function moveLocation() {
+  //   place.current.setBounds(bounds);
+
+  //   markers.current = getTarget(
+  //     place.current.getCenter(),
+  //     place.current,
+  //     markers.current,
+  //     markered.current,
+  //     productLocations.current
+  //   );
+  // }
+
   const getTarget = useCallback(
     (qa: any, map: any, markers: any, marker: any, productLocation: any) => {
       console.log("겟타겟실행");
@@ -285,21 +290,15 @@ export const KakaoTest = () => {
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
         <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">주변 도서 목록</h1>
+
+        <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
         <Map ref={place} />
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            searchPlaces(place.current);
+            searchPlaces();
           }}
-        >
-          <SearchInput
-            // onChange={(e) => {
-            //   e.preventDefault();
-            // }}
-            ref={keywords}
-            placeholder="장소를 검색해보세요."
-          />
-        </form>
+        ></form>
         {/* <SearchBox> */}
         {/* {searchPlace.map((el: any, idx: number) => {
             return <SearchList key={idx}>{el.address_name}</SearchList>;
