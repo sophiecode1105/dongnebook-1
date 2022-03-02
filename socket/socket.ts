@@ -251,14 +251,17 @@ io.on("connection", (socket) => {
     done();
   });
 
-  socket.on("delete_room", async (productId: string) => {
+  socket.on("delete_room", async (productId: string, done) => {
     const { token } = socket.handshake.auth;
     const userInfo: JwtPayload | any = verify(token);
 
     if (userInfo === undefined) {
       return console.log("토큰이 없습니다.");
     }
+
     socket.leave(productId);
+    count[productId] -= 1;
+
     try {
       let chatroomFind = await client.chatroom.findMany({
         where: {
@@ -276,7 +279,7 @@ io.on("connection", (socket) => {
           id: chatroomFind[0].id,
         },
       });
-
+      done();
       console.log("방 삭제");
     } catch (err) {
       console.log(err);
