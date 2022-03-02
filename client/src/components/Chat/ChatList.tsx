@@ -25,7 +25,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   return (
     <div className="h-[90vh] pt-20 max-w-md w-full m-auto p-2">
-      <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">채팅목록</h1>
+      <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">채팅목록</h1>
       <ul className="h-full overflow-y-scroll">
         {chatRooms?.map((chatRoom, idx) => {
           const { count, productId } = chatRoom;

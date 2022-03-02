@@ -41,7 +41,9 @@ const BookList = ({
       </BookListContainer>
       {loading && <Loading />}
       {change === pages && !loading && (
-        <div className="w-full h-60 flex justify-center items-center text-2xl font-bold">마지막 페이지 입니다.</div>
+        <div className="w-full h-60 flex justify-center items-center text-neutral-500 text-xl font-bold">
+          마지막 페이지 입니다.
+        </div>
       )}
     </Container>
   );

@@ -5,7 +5,9 @@ import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
+  currentLatitude,
   currentLocationStorage,
+  currentLongtitude,
   loginState,
   mapResultsStorage,
   searchLocation,
@@ -40,7 +42,7 @@ const DisplayColumn = styled.div`
 const Wrap = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 95%;
 `;
 
 const Container = styled(DisplayColumn)`
@@ -55,8 +57,8 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  padding: 10px;
-  width: 100%;
+  width: 80%;
+  height: 100%;
 `;
 
 const TitleBox = styled.div`
@@ -81,6 +83,7 @@ const UploadInform = styled.div`
 
 const InformBox = styled.div`
   display: flex;
+  width: 20%;
 `;
 
 const InformTitle = styled.div`
@@ -93,8 +96,7 @@ const InformTitle = styled.div`
 const Uploads = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
-  overflow: hidden;
+  width: 80%;
 `;
 
 const InputBox = styled.div`
@@ -102,11 +104,9 @@ const InputBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-x: scroll;
 `;
 
-const Label = styled.div`
-  float: left;
+const Label = styled.label`
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -124,8 +124,10 @@ const Label = styled.div`
 `;
 
 const LabelWrap = styled.div`
-  width: 600px;
-  overflow-x: scroll;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
 `;
 
 const ImgFile = styled.input`
@@ -168,7 +170,7 @@ const TitleLength = styled(DisplayRow)`
 
 const Textarea = styled.textarea<ErrorProps>`
   height: 200px;
-  width: 100%;
+  width: 95%;
   border: ${(props) => (props.error ? "2px solid red" : "1px solid rgba(0,0,0,0.2)")};
   &:focus {
     outline-color: ${(props) => (props.error ? "red" : "green")};
@@ -181,7 +183,8 @@ const ButtonBox = styled(DisplayRow)`
 
 const BookImg = styled.img`
   width: 100%;
-  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
 `;
 
 const ImgTitle = styled.div`
@@ -244,12 +247,13 @@ const LocationWrap = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: reltative;
 `;
 
 const SearchBar = styled.input`
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  width: 100%;
+  width: 60%;
   padding: 8px;
   &:focus {
     outline-color: green;
@@ -276,24 +280,30 @@ const SearchButton = styled.button`
 `;
 
 const ImgMapList = styled.div`
-  float: left;
+  display: flex;
+  border: 1px solid #dcdbe3;
   width: 150px;
   height: 150px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
 `;
 
 const SearchContainer = styled.div`
   width: 100%;
   position: relative;
-  display: flex;
-  justify-content: center;
 `;
 
 const CheckBoxWrap = styled.div``;
 
+const SearchBox = styled.div`
+  display: flex;
+  width: 100%;
+`;
 const SearchResultBox = styled.div`
   position: absolute;
-  top: 43px;
-  width: 100%;
+  width: 60%;
   z-index: 20;
   border: 1px solid rgba(0, 0, 0, 0.2);
 `;
@@ -337,6 +347,8 @@ const Upload = () => {
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const userInfo = useRecoilValue(userState);
+  const latitude = useRecoilValue(currentLatitude);
+  const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
 
@@ -396,8 +408,7 @@ const Upload = () => {
     }
   };
 
-  const searchPlace = async (e: any) => {
-    e.preventDefault();
+  const searchPlace = async () => {
     setIsOpen(!isOpen);
     const { location } = getValues();
     setLocation(location);
@@ -457,7 +468,7 @@ const Upload = () => {
     return () => {
       setCurrentLocation({ addressName: "", x: 0, y: 0 });
     };
-  }, [setCurrentLocation, userInfo.locations.lat, userInfo.locations.lon]);
+  }, []);
 
   return (
     <Container>
@@ -489,17 +500,19 @@ const Upload = () => {
           <InformBox>
             <InformTitle>상태</InformTitle>
           </InformBox>
-          <InputBox>
-            <CheckBoxWrap>
-              <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
-              <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-              <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
-              <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-              <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
-              <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
-            </CheckBoxWrap>
-            <Errorbox>{errors.quality?.message}</Errorbox>
-          </InputBox>
+          <Uploads>
+            <InputBox>
+              <CheckBoxWrap>
+                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
+                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
+                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
+              </CheckBoxWrap>
+              <Errorbox>{errors.quality?.message}</Errorbox>
+            </InputBox>
+          </Uploads>
         </UploadInform>
         <UploadInform>
           <InformBox>
@@ -508,7 +521,7 @@ const Upload = () => {
           <Uploads>
             <InputBox>
               <LabelWrap>
-                <Label>
+                <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
                   <ImgFile
@@ -573,36 +586,37 @@ const Upload = () => {
             </InputBox>
           </Uploads>
         </UploadInform>
-        <div className="w-full pt-5">
-          <div className="flex items-center">
+        <UploadInform>
+          <InformBox>
             <InformTitle>위치</InformTitle>
-            <SearchContainer>
-              <div className="flex w-full">
-                <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
-                <SearchButton type="submit" onClick={searchPlace}>
-                  <i className="fas fa-search"></i>
-                </SearchButton>
-              </div>
-              {isOpen ? (
-                <SearchResultBox ref={side}>
-                  {mapSearchResults.map((searchResult: { address_name: string }, key) => {
-                    return (
-                      <SearchResult
-                        key={key}
-                        onClick={() => {
-                          setIsOpen(!isOpen);
-                          setCurrentLocation(searchResult);
-                        }}>
-                        {searchResult?.address_name}
-                      </SearchResult>
-                    );
-                  })}
-                </SearchResultBox>
-              ) : null}
-            </SearchContainer>
-          </div>
+          </InformBox>
           <Uploads>
             <LocationWrap>
+              <SearchContainer>
+                <SearchBox>
+                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchButton type="button" onClick={searchPlace}>
+                    <i className="fas fa-search"></i>
+                  </SearchButton>
+                </SearchBox>
+                {isOpen ? (
+                  <SearchResultBox ref={side}>
+                    {mapSearchResults.map((searchResult: { address_name: string }, key) => {
+                      return (
+                        <SearchResult
+                          key={key}
+                          onClick={() => {
+                            setIsOpen(!isOpen);
+                            setCurrentLocation(searchResult);
+                          }}
+                        >
+                          {searchResult?.address_name}
+                        </SearchResult>
+                      );
+                    })}
+                  </SearchResultBox>
+                ) : null}
+              </SearchContainer>
               {currentLocation.x && currentLocation.y ? (
                 <Map mapLat={currentLocation?.y} mapLong={currentLocation?.x} />
               ) : (
@@ -613,7 +627,7 @@ const Upload = () => {
               )}
             </LocationWrap>
           </Uploads>
-        </div>
+        </UploadInform>
         <ButtonBox>
           <CancelButton to="/search">취소</CancelButton>
           <RegisterButton type="submit">등록</RegisterButton>

@@ -57,6 +57,7 @@ const Role = styled.div`
 
 const Copyright = styled.div`
   margin: 10px;
+  font-size: 13px;
 `;
 
 const Footer = () => {

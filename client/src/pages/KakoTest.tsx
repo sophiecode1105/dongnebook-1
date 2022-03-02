@@ -191,7 +191,7 @@ export const KakaoTest = () => {
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
-        <h1 className="text-3xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
+        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
         <LockPosition>
           <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
           <Map ref={place} />
