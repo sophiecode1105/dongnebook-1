@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { bookSearch, loginState, searchData } from "../../state/state";
 import { useEffect, useState } from "react";
 
@@ -16,16 +16,13 @@ const SearchBox = styled.form`
 const SearchInput = styled.input`
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  /* border-radius: 10px; */
   width: 80%;
   padding: 8px;
   &:focus {
     outline-color: green;
-    /* border-bottom: 2px solid rgba(0, 0, 0, 0.2); */
   }
 `;
 const SearchButton = styled.button`
-  /* height: 40px; */
   cursor: pointer;
   background-color: #2f6218;
   border: 0;
@@ -54,15 +51,17 @@ const SearchList = styled.div`
 `;
 
 const LocationSearchBar = ({ keywords, searchPlaces, moveLocation }: any) => {
-  //   console.log("서치리스트", searchList);
-  //   useEffect(() => {}, [searchList]);
   const [searchList, setSearchList] = useRecoilState(searchData);
+  function sideClick(e: any) {
+    if (e.target.classList[2] !== "side") {
+      setSearchList([]);
+    }
+  }
   useEffect(() => {
-    window.addEventListener("click", (e: any) => {
-      if (e.target.classList[2] !== "abc") {
-        setSearchList([]);
-      }
-    });
+    window.addEventListener("click", sideClick);
+    return () => {
+      window.removeEventListener("click", sideClick);
+    };
   }, []);
   return (
     <Container>
@@ -93,7 +92,7 @@ const LocationSearchBar = ({ keywords, searchPlaces, moveLocation }: any) => {
         {searchList.map((el: any, idx: number) => {
           return (
             <SearchList
-              className="abc"
+              className="side"
               key={idx}
               onClick={(e) => {
                 moveLocation(el.place_name);
