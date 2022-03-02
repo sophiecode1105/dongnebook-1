@@ -41,11 +41,8 @@ const Header = () => {
           </div>
 
           <nav className="md:flex hidden justify-center items-center">
-            <Link
-              to="/around"
-              className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200"
-            >
-              <span className="text-sm font-bold text-center">주변 도서 검색</span>
+            <Link to="/around" className="flex flex-col hover:text-green-600 cursor-pointer transition duration-200">
+              <span className="text-sm font-bold text-center">내 주변 도서 찾기</span>
             </Link>
             <Link
               to="/search"
@@ -95,7 +92,7 @@ const Header = () => {
               onClick={() => setClick((prev) => !prev)}
               className="flex flex-col hover:text-green-600 text-center cursor-pointer transition duration-200 mb-3"
             >
-              <span className="text-sm font-bold ">주변 도서 검색</span>
+              <span className="text-sm font-bold ">내 주변 도서 찾기</span>
             </Link>
             <Link
               onClick={() => setClick((prev) => !prev)}
