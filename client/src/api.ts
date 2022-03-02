@@ -141,12 +141,12 @@ export const deleteContent = async (id: number | undefined) => {
   }
 };
 
-export const getBookList = async () => {
+export const getBookList = async (page: number) => {
   try {
     const {
-      data: { allProductList },
-    } = await axios.get(`${URL}/product/list?page=1`, { withCredentials: true });
-    return allProductList;
+      data: { allProductList, pages },
+    } = await axios.get(`${URL}/product/list?page=${page}`, { withCredentials: true });
+    return { allProductList, pages };
   } catch (e) {
     throw e;
   }
@@ -158,9 +158,7 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
       data,
       data: { productInfo, likeCount },
     } = await axios.get(`${URL}/product/${id}`, {
-      headers: token
-        ? { Authorization: `jwt ${token}`, withCredentials: true }
-        : { withCredentials: true },
+      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
     });
     return { productInfo, likeCount };
   } catch (e) {
@@ -181,11 +179,7 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(
-      `${URL}/product/${id?.toString()}`,
-      {},
-      { headers: { Authorization: `jwt ${token}` } }
-    );
+    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
   } catch (e) {
     throw e;
   }

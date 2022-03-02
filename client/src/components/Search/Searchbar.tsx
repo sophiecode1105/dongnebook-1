@@ -2,31 +2,20 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { bookSearch, loginState } from "../../state/state";
-import { useState } from "react";
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-  justify-content: center;
+  max-width: 1100px;
   width: 100%;
-  padding: 66px 0px 20px 0px;
-  max-width: 1200px;
-  position: relative;
+  padding-top: 70px;
+  margin: 0 auto;
 `;
 
-const TitleBox = styled.div`
-  width: 85%;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
-  padding-bottom: 10px;
-`;
-
-const Title = styled.div`
+const Title = styled.h1`
   color: black;
   font-weight: bold;
   font-size: 23px;
-  padding-left: 5px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+  padding-bottom: 12px;
 `;
 
 const SearchBox = styled.div`
@@ -39,16 +28,13 @@ const SearchBox = styled.div`
 const SearchInput = styled.input`
   text-decoration: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  /* border-radius: 10px; */
   width: 60%;
   padding: 8px;
   &:focus {
     outline-color: green;
-    /* border-bottom: 2px solid rgba(0, 0, 0, 0.2); */
   }
 `;
 const SearchButton = styled.button`
-  /* height: 40px; */
   cursor: pointer;
   background-color: #2f6218;
   border: 0;
@@ -106,17 +92,14 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
   };
 
   return (
-    <Container>
-      <TitleBox>
-        <Title>도서 검색</Title>
-      </TitleBox>
+    <Container className="px-[10px]">
+      <Title>도서 검색</Title>
       <SearchBox>
         <SearchInput
           type="text"
           placeholder="찾고싶은 도서를 검색해보세요"
           onKeyPress={handleKeyPress}
-          onChange={handleChange}
-        ></SearchInput>
+          onChange={handleChange}></SearchInput>
         <SearchButton type="button" onClick={handleSearchClick}>
           <i className="fas fa-search"></i>
         </SearchButton>

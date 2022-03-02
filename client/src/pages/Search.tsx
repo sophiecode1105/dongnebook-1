@@ -7,29 +7,58 @@ import { useEffect } from "react";
 import { BookInfo } from "../state/typeDefs";
 import { bookSearch } from "../state/state";
 
+const HTML: any = document.querySelector("html");
+export let pages: number;
+let page: number = 1;
+
 const Search = () => {
   const [allProductList, setAllProductList] = useState<BookInfo[]>([]);
   const searchText = useRecoilValue(bookSearch);
+  const [change, setChange] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const getData = async () => {
-    const bookList = await getBookList();
-    setAllProductList(bookList);
+  const getData = async (change: number) => {
+    const { allProductList: bookList, pages: pagesNumber } = await getBookList(change);
+    setAllProductList((prev) => [...prev, ...bookList]);
+    pages = pagesNumber;
   };
 
   const handleSearchClick = async () => {
-    const data = await searchBook("title", searchText);
+    const { result: data } = await searchBook("title", searchText);
     setAllProductList(data);
   };
 
+  const infiniteScroll = () => {
+    const currentScrollTop = HTML?.scrollTop; // 현재 스크롤 위치
+    const windowInner = window.innerHeight; // 브라우저의 스크롤 높이
+    const fullHeight = HTML?.scrollHeight; // HTML의 높이
+    if (currentScrollTop + windowInner > fullHeight) {
+      if (pages > page) {
+        page++;
+        setChange((prev) => prev + 1);
+      }
+    }
+  };
+
   useEffect(() => {
-    getData();
+    setLoading(true);
+    getData(change);
+    setLoading(false);
+  }, [change]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", infiniteScroll);
+    return () => {
+      window.removeEventListener("scroll", infiniteScroll);
+      page = 1;
+    };
   }, []);
 
   return (
-    <>
+    <div>
       <SearchBar handleSearchClick={handleSearchClick} />
-      <List allProductList={allProductList} />
-    </>
+      <List allProductList={allProductList} loading={loading} change={change} />
+    </div>
   );
 };
 export default Search;
