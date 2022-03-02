@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
-import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps, UserState } from "../../state/typeDefs";
+import { useState, useEffect, useCallback } from "react";
+import { CurrentImgProps } from "../../state/typeDefs";
 import { timeForToday, postHeart, getMemberInfo } from "../../api";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Container = styled.div`
   height: 100%;
@@ -248,10 +248,10 @@ const MobileDetail = ({
     }
   };
 
-  const getUserInfo = async () => {
+  const getUserInfo = useCallback(async () => {
     const { userInfo } = await getMemberInfo(token || "token");
     setUserInfo(userInfo);
-  };
+  }, [setUserInfo, token]);
 
   useEffect(() => {
     try {
@@ -266,7 +266,7 @@ const MobileDetail = ({
 
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [getUserInfo]);
 
   return (
     <Container>
@@ -291,15 +291,13 @@ const MobileDetail = ({
             <ButtonPrev
               onClick={() => {
                 onChangeContent(-1);
-              }}
-            >
+              }}>
               <i className="fas fa-chevron-left"></i>
             </ButtonPrev>
             <ButtonNext
               onClick={() => {
                 onChangeContent(+1);
-              }}
-            >
+              }}>
               <i className="fas fa-chevron-right"></i>
             </ButtonNext>
           </>

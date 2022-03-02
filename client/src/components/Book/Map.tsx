@@ -1,15 +1,8 @@
 import styled from "styled-components";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import iconblack from "../../img/iconblack.png";
-import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import {
-  searchLocation,
-  mapResultsStorage,
-  currentLatitude,
-  currentLongtitude,
-  currentaddress,
-  currentLocationStorage,
-} from "../../state/state";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { searchLocation, mapResultsStorage, currentaddress, currentLocationStorage } from "../../state/state";
 import { KakaoMap } from "../../state/typeDefs";
 
 declare global {
@@ -20,23 +13,18 @@ declare global {
 
 const ExchangeLocation = styled.div`
   margin-top: 10px;
-  width: 95%;
+  width: 100%;
   height: 400px;
 `;
 
 const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
   const place = useRef(null);
-  // const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [marker, setMarker] = useState<any>(null);
-  const [infowindow, setInfoWindow] = useState<any>(
-    useCallback(() => new window.kakao.maps.InfoWindow({ zindex: 1 }), [])
-  );
-  const [geocoder, setGeocoder] = useState<any>(useCallback(() => new window.kakao.maps.services.Geocoder(), []));
-  // const setLatitude = useSetRecoilState(currentLatitude);
-  // const setLongitude = useSetRecoilState(currentLongtitude);
+  const [infowindow] = useState<any>(useCallback(() => new window.kakao.maps.InfoWindow({ zindex: 1 }), []));
+  const [geocoder] = useState<any>(useCallback(() => new window.kakao.maps.services.Geocoder(), []));
   const storeaddress = useSetRecoilState(currentaddress);
-  const [currentLocation, setCurrentLocation] = useRecoilState(currentLocationStorage);
+  const setCurrentLocation = useSetRecoilState(currentLocationStorage);
   const searchContent = useRecoilValue(searchLocation);
   const setMapSearchResults = useSetRecoilState(mapResultsStorage);
   const imageSrc = iconblack;
@@ -49,40 +37,9 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
     [imageOption, imageSize, imageSrc]
   );
 
-  const displayMarker = (map: KakaoMap, marker: any, locPosition: any) => {
-    geocoder.coord2Address(locPosition.getLng(), locPosition.getLat(), (result: any, status: any) => {
-      storeaddress(
-        result[0]?.address.region_1depth_name +
-          " " +
-          result[0]?.address.region_2depth_name +
-          " " +
-          result[0]?.address.region_3depth_name
-      );
-
-      let detailAddr = !!result[0]?.road_address
-        ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"
-        : "";
-      detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
-
-      let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
-
-      marker.setPosition(locPosition);
-      marker.setMap(map);
-
-      infowindow.setContent(content);
-      infowindow.open(map, marker);
-    });
-  };
-
-  const addClickListener = (map: KakaoMap, marker: any) => {
-    window.kakao.maps.event.removeListener(map, "click");
-    window.kakao.maps.event.addListener(map, "click", (mouseEvent: any) => {
-      // 클릭한 위도, 경도 정보를 가져옵니다
-      let mouseLat = mouseEvent.latLng.getLat();
-      let mouseLon = mouseEvent.latLng.getLng();
-
-      geocoder.coord2Address(mouseLon, mouseLat, (result: any, status: any) => {
-        if (!result) return;
+  const displayMarker = useCallback(
+    (map: KakaoMap, marker: any, locPosition: any) => {
+      geocoder.coord2Address(locPosition.getLng(), locPosition.getLat(), (result: any, status: any) => {
         storeaddress(
           result[0]?.address.region_1depth_name +
             " " +
@@ -90,6 +47,7 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
             " " +
             result[0]?.address.region_3depth_name
         );
+
         let detailAddr = !!result[0]?.road_address
           ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"
           : "";
@@ -97,23 +55,56 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
 
         let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
 
-        map?.setCenter(mouseEvent.latLng);
-        marker.setPosition(mouseEvent.latLng);
+        marker.setPosition(locPosition);
         marker.setMap(map);
-
-        setCurrentLocation({
-          y: mouseEvent.latLng?.getLat(),
-          x: mouseEvent.latLng?.getLng(),
-        });
-
-        // setLatitude(mouseEvent.latLng?.getLat());
-        // setLongitude(mouseEvent.latLng?.getLng());
 
         infowindow.setContent(content);
         infowindow.open(map, marker);
       });
-    });
-  };
+    },
+    [geocoder, infowindow, storeaddress]
+  );
+
+  const addClickListener = useCallback(
+    (map: KakaoMap, marker: any) => {
+      window.kakao.maps.event.removeListener(map, "click");
+      window.kakao.maps.event.addListener(map, "click", (mouseEvent: any) => {
+        // 클릭한 위도, 경도 정보를 가져옵니다
+        let mouseLat = mouseEvent.latLng.getLat();
+        let mouseLon = mouseEvent.latLng.getLng();
+
+        geocoder.coord2Address(mouseLon, mouseLat, (result: any, status: any) => {
+          if (!result) return;
+          storeaddress(
+            result[0]?.address.region_1depth_name +
+              " " +
+              result[0]?.address.region_2depth_name +
+              " " +
+              result[0]?.address.region_3depth_name
+          );
+          let detailAddr = !!result[0]?.road_address
+            ? "<div>도로명주소 : " + result[0]?.road_address.address_name + "</div>"
+            : "";
+          detailAddr += "<div>지번 주소 : " + result[0]?.address.address_name + "</div>";
+
+          let content = '<div class="bAddr" style="width:250px; padding:5px">' + detailAddr + "</div>";
+
+          map?.setCenter(mouseEvent.latLng);
+          marker.setPosition(mouseEvent.latLng);
+          marker.setMap(map);
+
+          setCurrentLocation({
+            y: mouseEvent.latLng?.getLat(),
+            x: mouseEvent.latLng?.getLng(),
+          });
+
+          infowindow.setContent(content);
+          infowindow.open(map, marker);
+        });
+      });
+    },
+    [geocoder, infowindow, setCurrentLocation, storeaddress]
+  );
 
   useEffect(() => {
     let locPosition = new window.kakao.maps.LatLng(mapLat, mapLong);
@@ -121,7 +112,7 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
       displayMarker(map, marker, locPosition);
       map.panTo(locPosition);
     }
-  }, [mapLat, mapLong]);
+  }, [mapLat, mapLong, displayMarker, map, marker]);
 
   useEffect(() => {
     const container = place.current;
@@ -147,14 +138,12 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
     addClickListener(kakaoMap, newMarker);
     setMarker(newMarker);
     setMap(kakaoMap);
-    // setLatitude(lat);
-    // setLongitude(lon);
 
     return () => {
       setMap(null);
       setMarker(null);
     };
-  }, []);
+  }, [addClickListener, displayMarker, makerImage, map, mapLat, mapLong]);
 
   useEffect(() => {
     const places = new window.kakao.maps.services.Places();

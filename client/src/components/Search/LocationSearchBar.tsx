@@ -1,8 +1,7 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { bookSearch, loginState, searchData } from "../../state/state";
-import { useEffect, useState } from "react";
+import { searchData } from "../../state/state";
+import { useCallback, useEffect } from "react";
 
 const Container = styled.div``;
 
@@ -58,39 +57,40 @@ const SearchList = styled.div`
 
 const LocationSearchBar = ({ keywords, searchPlaces }: any) => {
   const [searchList, setSearchList] = useRecoilState(searchData);
-  function sideClick(e: any) {
-    if (e.target.classList[2] !== "side") {
-      setSearchList([]);
-    }
-  }
+  const sideClick = useCallback(
+    (e: any) => {
+      if (e.target.classList[2] !== "side") {
+        setSearchList([]);
+      }
+    },
+    [setSearchList]
+  );
   useEffect(() => {
     window.addEventListener("click", sideClick);
     return () => {
       window.removeEventListener("click", sideClick);
     };
-  }, []);
+  }, [sideClick]);
+
   return (
     <Container>
       <SearchBox
         onSubmit={(e) => {
           e.preventDefault();
           searchPlaces(true);
-        }}
-      >
+        }}>
         <SearchInput
           ref={keywords}
           onChange={() => {
             searchPlaces();
           }}
           type="text"
-          placeholder="찾고싶은 장소를 검색해보세요"
-        ></SearchInput>
+          placeholder="찾고싶은 장소를 검색해보세요"></SearchInput>
         <SearchButton
           onClick={() => {
             searchPlaces(true);
           }}
-          type="button"
-        >
+          type="button">
           <i className="fas fa-search"></i>
         </SearchButton>
       </SearchBox>
@@ -102,8 +102,7 @@ const LocationSearchBar = ({ keywords, searchPlaces }: any) => {
               key={idx}
               onClick={(e) => {
                 searchPlaces(true, el.place_name);
-              }}
-            >
+              }}>
               {el.place_name}
             </SearchList>
           );
