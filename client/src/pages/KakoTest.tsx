@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useRecoilValue } from "recoil";
@@ -13,79 +13,42 @@ declare global {
   }
 }
 
+const Containter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Map = styled.div`
+  border: 1px blue solid;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  margin: auto;
+`;
+
+const SearchInput = styled.input`
+  display: flex;
+  z-index: 60;
+  opacity: 70%;
+  left: 10px;
+  width: 45%;
+  left: 10px;
+  top: 20px;
+  padding: 10px 0px;
+`;
+
 export const KakaoTest = () => {
-  const Padding = styled.div`
-    padding: 30px 0px;
-  `;
-  const Containter = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  `;
-
-  const Map = styled.div`
-    border: 1px blue solid;
-    width: 100%;
-    height: 500px;
-    display: flex;
-    margin: auto;
-
-    /* position: relative; */
-  `;
-  const TitleBox = styled.div`
-    width: 85%;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.5);
-    padding-bottom: 10px;
-    justify-content: center;
-  `;
-
-  const Title = styled.div`
-    color: black;
-    font-weight: bold;
-    font-size: 23px;
-    padding-left: 5px;
-  `;
-  const Public = styled.div`
-    display: flex;
-    z-index: 60;
-    opacity: 70%;
-    left: 10px;
-    width: 45%;
-    left: 10px;
-  `;
-  const SearchInput = styled.input`
-    display: flex;
-    z-index: 60;
-    opacity: 70%;
-    left: 10px;
-    width: 45%;
-    left: 10px;
-    top: 20px;
-    padding: 10px 0px;
-  `;
-  // const SearchBox = styled(Public)`
-  //   flex-direction: column;
-  //   top: 40px;
-  //   position: relative;
-
-  //   background-color: white;
-  // `;
-  // const SearchList = styled.div`
-  //   z-index: 60;
-  // `;
   let place = useRef(null);
 
-  const clickLatlng = useRef<HTMLInputElement>(null);
   const keywords = useRef<HTMLInputElement>(null);
   const markers = useRef([]);
   const markered = useRef(null);
   const productLocations = useRef(null);
-  // const [searchPlace, setSearchPlace] = useState([]);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
 
   function searchPlaces(map: any) {
-    console.log("서치플레이스실행");
     const keyword = keywords.current?.value;
     var ps = new window.kakao.maps.services.Places();
     if (!keyword?.replace(/^\s+|\s+$/g, "")) {
@@ -96,8 +59,6 @@ export const KakaoTest = () => {
     // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
     ps.keywordSearch(keyword, (data: any, status: any, pagination: any) => {
       const bounds = new window.kakao.maps.LatLngBounds();
-      console.log("데이타", data);
-      // setSearchPlace(data);
       for (let i = 0; i < data.length; i++) {
         let placePosition = new window.kakao.maps.LatLng(data[i].y, data[i].x);
         bounds.extend(placePosition);
@@ -108,7 +69,6 @@ export const KakaoTest = () => {
   }
   const getTarget = useCallback(
     (qa: any, map: any, markers: any, marker: any, productLocation: any) => {
-      console.log("겟타겟실행");
       for (let i = 0; i < markers.length; i++) {
         markers[i].marker.setMap(null);
       }
@@ -156,8 +116,6 @@ export const KakaoTest = () => {
 
           var iwContent = ` <img width=150px height = 300px src = "${productImg}"/><div style="padding:5px;" >${productInfo.title}</div><div style="padding:5px;" >${productInfo.locations.address}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
 
-          //   iwPosition = new window.kakao.maps.LatLng(37.496590501605496, 127.02469765019322); //인포윈도우 표시 위치입니다
-
           // 인포윈도우를 생성합니다
           var infowindow = new window.kakao.maps.InfoWindow({
             position: productPosition,
@@ -196,19 +154,16 @@ export const KakaoTest = () => {
         });
       });
 
-      // console.log("@@@@@@2");
-      // console.log(markers);
-
       return markers;
     },
     [Nav]
   );
+
   const setInfo: any = useMemo(async () => {
     return await getLocationList(token);
-  }, []);
+  }, [token]);
 
-  const getData = async () => {
-    console.log("겟데이타 실행");
+  const getData = useCallback(async () => {
     let userLocation: any;
     let productLocation: any;
     await setInfo.then((res: any) => {
@@ -222,8 +177,6 @@ export const KakaoTest = () => {
       center: new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon), //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
     };
-
-    // if (place.current) {
     let map = new window.kakao.maps.Map(place.current, options);
     place.current = map;
     const imageSize = new window.kakao.maps.Size(40, 40);
@@ -252,11 +205,12 @@ export const KakaoTest = () => {
 
       markers.current = getTarget(qa, map, markers.current, marker, productLocation);
     });
-    // }
-  };
+  }, [getTarget, setInfo]);
+
   useEffect(() => {
     getData();
   }, [getData]);
+
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
@@ -266,21 +220,9 @@ export const KakaoTest = () => {
           onSubmit={(e) => {
             e.preventDefault();
             searchPlaces(place.current);
-          }}
-        >
-          <SearchInput
-            // onChange={(e) => {
-            //   e.preventDefault();
-            // }}
-            ref={keywords}
-            placeholder="검색어를 입력하세요."
-          />
+          }}>
+          <SearchInput ref={keywords} placeholder="검색어를 입력하세요." />
         </form>
-        {/* <SearchBox> */}
-        {/* {searchPlace.map((el: any, idx: number) => {
-            return <SearchList key={idx}>{el.address_name}</SearchList>;
-          })} */}
-        {/* </SearchBox> */}
       </div>
     </Containter>
   );
