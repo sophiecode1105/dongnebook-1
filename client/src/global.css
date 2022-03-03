@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* body,
+html,
+#root {
+  font-family: "Do Hyeon", sans-serif;
+  width: 100%;
+} */
+
 * {
   box-sizing: border-box;
 }
