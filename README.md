@@ -1,6 +1,6 @@
 <h1> 📚 잠들어있던 상상력을 두드려보세요!, 동네북 📖</h1>
 
-<img src= "https://github.com/StrummingDown/dongnebook/blob/socketBackup/client/src/img/logo.png"  width = "500 " height = "250" />
+<img src= "https://github.com/StrummingDown/dongnebook/blob/socketBackup/client/src/img/logo.png"  width = "450" height = "200" />
 
 <!-- <h3><a href=http://ssokbeer-bucket-depoly.s3-website.ap-northeast-2.amazonaws.com/>동네북 바로가기</a></h3> -->
 
@@ -30,7 +30,7 @@
 
 </br>
 <h2> 🧬흐름도 </h2>
-<img src="https://github.com/codestates/ssokbeer/blob/main/ssokbeer_stack_architecture.png?raw=true" width = "800 " height = "600"/>
+<!-- <img src="https://github.com/codestates/ssokbeer/blob/main/ssokbeer_stack_architecture.png?raw=true" width = "800 " height = "600"/> -->
 
 
 </br>
