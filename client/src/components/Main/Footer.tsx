@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Contianer = styled.div`
   box-shadow: 0px 1px 7px 0px rgb(0, 0, 0, 0.1);
   background-color: white;
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
