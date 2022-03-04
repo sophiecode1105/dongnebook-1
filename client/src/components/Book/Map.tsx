@@ -118,6 +118,10 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
     const container = place.current;
     let lat = mapLat;
     let lon = mapLong;
+    setCurrentLocation({
+      y: lat,
+      x: lon,
+    });
     let locPosition = new window.kakao.maps.LatLng(lat, lon);
     let kakaoMap;
     if (map === null) {

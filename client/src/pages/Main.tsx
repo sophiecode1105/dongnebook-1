@@ -5,7 +5,7 @@ const Main = () => {
   return (
     <>
       <AnimationIcon />
-      <Footer />;
+      <Footer />
     </>
   );
 };
