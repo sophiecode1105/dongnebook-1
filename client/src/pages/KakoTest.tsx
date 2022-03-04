@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
@@ -6,6 +6,7 @@ import { getLocationList } from "../api";
 import { loginState, searchData } from "../state/state";
 import iconblack from "../img/iconblack.png";
 import iconcolor from "../img/iconred.png";
+import greenbook from "../img/greenbook.gif";
 import LocationSearchBar from "../components/Search/LocationSearchBar";
 declare global {
   interface Window {
@@ -19,13 +20,14 @@ const Containter = styled.div`
   align-items: center;
 `;
 
-const Map = styled.div`
+const Map = styled.div<{ isLoading: boolean }>`
   border-radius: 10px;
   border: 1px green solid;
   width: 100%;
   height: 500px;
   display: flex;
   margin: auto;
+  visibility: ${(props) => (props.isLoading ? "collapse" : "visible")};
 `;
 const LockPosition = styled.div`
   position: relative;
@@ -40,6 +42,7 @@ export const KakaoTest = () => {
   const searchList = useSetRecoilState(searchData);
   const Nav = useNavigate();
   const token = useRecoilValue(loginState);
+  const [isLoading, setIsLoading] = useState(true);
 
   function searchPlaces(type: any, clickEl: any) {
     const keyword = clickEl ? clickEl : keywords.current?.value;
@@ -60,7 +63,12 @@ export const KakaoTest = () => {
       }
       if (type) {
         place.current.setBounds(bounds);
-        markers.current = getTarget(place.current.getCenter(), place.current, markers.current, markered.current);
+        markers.current = getTarget(
+          place.current.getCenter(),
+          place.current,
+          markers.current,
+          markered.current
+        );
       }
     });
   }
@@ -157,7 +165,10 @@ export const KakaoTest = () => {
     try {
       const allowLocation: any = await naviInfo();
       if (allowLocation) {
-        center = new window.kakao.maps.LatLng(allowLocation.coords.latitude, allowLocation.coords.longitude);
+        center = new window.kakao.maps.LatLng(
+          allowLocation.coords.latitude,
+          allowLocation.coords.longitude
+        );
       }
     } catch (e) {
       center = new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon);
@@ -166,8 +177,10 @@ export const KakaoTest = () => {
       center, //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
     };
+
     let map = new window.kakao.maps.Map(place.current, options);
     place.current = map;
+
     const imageSize = new window.kakao.maps.Size(40, 40); //   마커 이미지를 생성합니다
     const markerImage = new window.kakao.maps.MarkerImage(iconcolor, imageSize);
     const marker = new window.kakao.maps.Marker({
@@ -178,23 +191,29 @@ export const KakaoTest = () => {
 
     markered.current = marker;
     marker.setMap(map); // 지도에 마커를 표시합니다
+
     markers.current = getTarget(center, map, markers.current, marker);
+
     window.kakao.maps.event.addListener(map, "click", function (mouseEvent: any) {
       markers.current = getTarget(mouseEvent.latLng, map, markers.current, marker);
     });
+    setIsLoading(false);
   }, [getTarget, setInfo]);
 
   useEffect(() => {
     getData();
   }, [getData]);
-
+  console.log(isLoading);
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
-        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
+        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">
+          내 주변 도서 찾기
+        </h1>
         <LockPosition>
           <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
-          <Map ref={place} />
+          {isLoading && <img src={greenbook} alt="" />}
+          <Map ref={place} isLoading={isLoading} />
         </LockPosition>
       </div>
     </Containter>
