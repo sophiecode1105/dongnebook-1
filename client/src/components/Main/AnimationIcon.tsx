@@ -4,22 +4,33 @@ import { ReactComponent as ExchangeSvg } from "../../svg/Exchange.svg";
 import { ReactComponent as ChatSvg } from "../../svg/Chat.svg";
 
 const Container = styled.section`
-  padding: 66px 15px;
   max-width: 1200px;
   display: flex;
   justify-content: center;
-  margin: 0 auto;
+  margin: 200px auto;
   flex-direction: column;
   align-items: center;
 `;
 
-const Line = styled.div`
-  width: 10px;
-  height: 10px;
-  background-color: grey;
+const Introduce = styled.h2`
+  font-size: 20px;
+  font-family: "Montserrat", "NotoSansKR", sans-serif;
+  color: #aaaaaa;
+  font-weight: 900;
+  margin: 5px;
+`;
+
+const KeyPlatform = styled.h3`
+  font-size: 28px;
+  text-align: center;
+  font-family: "Montserrat", "NotoSansKR", sans-serif;
+  font-weight: 700;
+  margin: 15px auto;
+  padding: 10px;
 `;
 
 const List = styled.div`
+  padding: 0px 15px;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-auto-rows: 330px;
   width: 100%;
@@ -42,21 +53,21 @@ const ChatWrap = styled.div`
 
 const Title = styled.div`
   font-size: 25px;
-  font-weight: 900;
+  font-weight: 700;
   font-family: "Montserrat", sans-serif;
   margin-bottom: 20px;
 `;
 
 const LocTitle = styled.div`
   font-size: 25px;
-  font-weight: 900;
+  font-weight: 700;
   font-family: "Montserrat", sans-serif;
   margin: 20px 0px 20px 0px;
 `;
 
 const ChatTitle = styled.div`
   font-size: 25px;
-  font-weight: 900;
+  font-weight: 700;
   font-family: "Montserrat", sans-serif;
   margin-bottom: 22px;
 `;
@@ -73,6 +84,8 @@ const Content = styled.div``;
 const AnimationIcon = () => {
   return (
     <Container>
+      <Introduce>PLATFORM STORY</Introduce>
+      <KeyPlatform>EXCHANGE LOCATION AND CHATTING</KeyPlatform>
       <List>
         <Box>
           <ExchangeWrap>

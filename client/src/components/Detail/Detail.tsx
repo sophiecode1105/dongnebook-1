@@ -317,7 +317,6 @@ const HeartButton = styled.button`
   font-weight: 500;
   color: rgb(242, 242, 242, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
-
   i {
     color: red;
     font-size: 20px;
