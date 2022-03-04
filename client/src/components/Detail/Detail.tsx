@@ -13,7 +13,14 @@ import {
 import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
-import { chatRoomFrame, chatRoomVisible, loginState, storeContentId, userState } from "../../state/state";
+import {
+  ableExchange,
+  chatRoomFrame,
+  chatRoomVisible,
+  loginState,
+  storeContentId,
+  userState,
+} from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 
@@ -352,8 +359,9 @@ const Details = () => {
   const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo as BookInfo;
-
+  const { title, images, content, quality, createdAt, locations, nickname, visit, users } =
+    bookDetailInfo as BookInfo;
+  let { exchanged } = bookDetailInfo as BookInfo;
   const onChangeContent = (pageDelta: any) => {
     const lastImgPageNum = images.length - 1;
     const newCurrentPageNum = currentImg + pageDelta;
@@ -413,14 +421,20 @@ const Details = () => {
     }
   };
 
-  const handleClickExchange = async (e: any) => {
-    await patchExchange(Number(id));
-    Swal.fire({
-      text: "교환완료로 변경되었습니다.",
-      confirmButtonText: "확인",
-      confirmButtonColor: "#2f6218",
-      icon: "success",
-    });
+  const handleClickExchange = async (e: any, state: boolean) => {
+    console.log(state);
+    console.log(exchanged);
+
+    if (state !== exchanged) {
+      await patchExchange(Number(id));
+      exchanged = !exchanged;
+      Swal.fire({
+        text: "교환 상태가 변경되었습니다.",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#2f6218",
+        icon: "success",
+      });
+    }
   };
 
   const handleClickChat = () => {
@@ -527,10 +541,27 @@ const Details = () => {
                   <BookStatusBox>
                     <BookStatusChangeBox>
                       <BooksStatusChange>상태 변경</BooksStatusChange>
+
                       <StatusCheck>
-                        <CheckList type="radio" id="can" name="status" onClick={handleClickExchange}></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="can"
+                          name="status"
+                          onClick={(e) => {
+                            handleClickExchange(e, true);
+                          }}
+                          defaultChecked={exchanged}
+                        ></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
-                        <CheckList type="radio" id="cannot" name="status" defaultChecked></CheckList>
+                        <CheckList
+                          type="radio"
+                          id="cannot"
+                          name="status"
+                          onClick={(e) => {
+                            handleClickExchange(e, false);
+                          }}
+                          defaultChecked={!exchanged}
+                        ></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
@@ -580,7 +611,11 @@ const Details = () => {
             ) : (
               <>
                 <HeartButton onClick={handleClickHeart}>
-                  {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
+                  {isHeartPressed ? (
+                    <i className="fas fa-heart"></i>
+                  ) : (
+                    <i className="far fa-heart"></i>
+                  )}
                 </HeartButton>
                 <TouchButton isWriter={isWriter} onClick={handleClickChat}>
                   연락하기

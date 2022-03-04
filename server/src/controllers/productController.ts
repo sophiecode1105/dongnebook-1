@@ -155,7 +155,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       });
 
       return res
-        .status(201)
+        .status(200)
         .json({ message: "도서 상세보기 성공", productInfo, isLike, likeCount });
     } else {
       return res.status(400).json({ message: "해당도서가 없습니다." });
@@ -164,6 +164,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
+
 export const putProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { productId } = req.params;
@@ -255,6 +256,7 @@ export const putProduct = async (req: express.Request, res: express.Response) =>
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }
 };
+
 export const exchangedProduct = async (req: express.Request, res: express.Response) => {
   try {
     const { productId } = req.params;
@@ -374,7 +376,7 @@ export const searchProduct = async (req: express.Request, res: express.Response)
     const result = searcher.search(value as string);
     const pages = Math.ceil(result.length / 12);
 
-    return res.status(200).json({ message: "도서 찾기 성공", result, pages, status: true });
+    return res.status(200).json({ message: "도서 찾기 성공", pages, result, status: true });
   } catch (err) {
     return res.status(500).json({ message: "마이그레이션 또는 서버 오류입니다.", err });
   }

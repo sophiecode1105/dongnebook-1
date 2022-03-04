@@ -30,7 +30,7 @@ export type BookInfo = {
   content: string;
   visit: number;
   quality: string;
-  exchanged: Boolean;
+  exchanged: boolean;
   userId: number;
   nickname: string;
   createdAt: Date;
