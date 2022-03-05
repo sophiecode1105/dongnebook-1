@@ -367,28 +367,31 @@ const Modify = () => {
     }
   };
 
-  const getSingleData = async (id: number) => {
-    const { productInfo } = await getSingleBookInfo(id, token);
-    setValue("title", productInfo.title);
-    setValue("content", productInfo.content);
-    const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
-    radiobuttonValue.checked = true;
-    setModifyQuality(productInfo.quality);
-    let modifyImg = productInfo.images;
-    let imgData: any[] = [];
-    for (let i = 0; i < modifyImg.length; i++) {
-      imgData.push(modifyImg[i].url);
-    }
+  const getSingleData = useCallback(
+    async (id: number) => {
+      const { productInfo } = await getSingleBookInfo(id, token);
+      setValue("title", productInfo.title);
+      setValue("content", productInfo.content);
+      const radiobuttonValue = document.getElementById(productInfo.quality) as HTMLInputElement;
+      radiobuttonValue.checked = true;
+      setModifyQuality(productInfo.quality);
+      let modifyImg = productInfo.images;
+      let imgData: any[] = [];
+      for (let i = 0; i < modifyImg.length; i++) {
+        imgData.push(modifyImg[i].url);
+      }
 
-    setPatchImageUrls((prev) => {
-      return [...prev, ...imgData];
-    });
-    setImageUrls((prev) => {
-      return [...prev, ...imgData];
-    });
-    setModifyLatitu(productInfo.locations.lat);
-    setModifyLongtitu(productInfo.locations.lon);
-  };
+      setPatchImageUrls((prev) => {
+        return [...prev, ...imgData];
+      });
+      setImageUrls((prev) => {
+        return [...prev, ...imgData];
+      });
+      setModifyLatitu(productInfo.locations.lat);
+      setModifyLongtitu(productInfo.locations.lon);
+    },
+    [setValue, token]
+  );
 
   const patchData = async () => {
     return new Promise(async (res, rej) => {
@@ -467,13 +470,13 @@ const Modify = () => {
     return () => {
       localStorage.removeItem("modify_id");
     };
-  }, [id]);
+  }, [getSingleData, id]);
 
   useEffect(() => {
     return () => {
       setCurrentLocation({ addressName: "", x: 0, y: 0 });
     };
-  }, []);
+  }, [setCurrentLocation]);
 
   return (
     <Container>
@@ -531,8 +534,7 @@ const Modify = () => {
                   alignItems: "stretch",
                   justifyContent: "flex-start",
                   width: "100%",
-                }}
-              >
+                }}>
                 <Label htmlFor="input_file">
                   <i className="fas fa-camera"></i>
                   <ImgTitle>이미지 업로드</ImgTitle>
@@ -621,8 +623,7 @@ const Modify = () => {
                             setCurrentLocation(searchResult);
                             setModifyLatitu(searchResult.y);
                             setModifyLongtitu(searchResult.x);
-                          }}
-                        >
+                          }}>
                           {searchResult?.address_name}
                         </SearchResult>
                       );
