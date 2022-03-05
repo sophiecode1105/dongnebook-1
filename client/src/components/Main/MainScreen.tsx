@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import bookImg from "../../img/book.png";
 import { ReactComponent as SecondLogo } from "../../svg/Dongnebook.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Wrap = styled.div`
   width: 100%;
