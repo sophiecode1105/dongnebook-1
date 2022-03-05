@@ -16,6 +16,7 @@ const Search = () => {
   const searchText = useRecoilValue(bookSearch);
   const [change, setChange] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [choice, setChoice] = useState("title");
 
   const getData = async (change: number) => {
     const { allProductList: bookList, pages: pagesNumber } = await getBookList(change);
@@ -24,7 +25,7 @@ const Search = () => {
   };
 
   const handleSearchClick = async () => {
-    const { result: data } = await searchBook("title", searchText);
+    const { result: data } = await searchBook(choice, searchText);
     setAllProductList(data);
   };
 
@@ -56,7 +57,7 @@ const Search = () => {
 
   return (
     <div>
-      <SearchBar handleSearchClick={handleSearchClick} />
+      <SearchBar setChoice={setChoice} handleSearchClick={handleSearchClick} />
       <List allProductList={allProductList} loading={loading} change={change} />
     </div>
   );
