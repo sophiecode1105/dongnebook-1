@@ -5,9 +5,7 @@ import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
-  currentLatitude,
   currentLocationStorage,
-  currentLongtitude,
   loginState,
   mapResultsStorage,
   searchLocation,
@@ -347,8 +345,6 @@ const Upload = () => {
   const mapSearchResults = useRecoilValue(mapResultsStorage);
   const token = useRecoilValue(loginState);
   const userInfo = useRecoilValue(userState);
-  const latitude = useRecoilValue(currentLatitude);
-  const longtitude = useRecoilValue(currentLongtitude);
   const address = useRecoilValue(currentaddress);
   const navigate = useNavigate();
 
@@ -468,7 +464,7 @@ const Upload = () => {
     return () => {
       setCurrentLocation({ addressName: "", x: 0, y: 0 });
     };
-  }, []);
+  }, [setCurrentLocation, userInfo.locations.lat, userInfo.locations.lon]);
 
   return (
     <Container>
@@ -608,8 +604,7 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}
-                        >
+                          }}>
                           {searchResult?.address_name}
                         </SearchResult>
                       );
