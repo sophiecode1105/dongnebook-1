@@ -7,7 +7,7 @@ const Container = styled.section`
   max-width: 1200px;
   display: flex;
   justify-content: center;
-  margin: 200px auto;
+  margin: 300px auto;
   flex-direction: column;
   align-items: center;
 `;

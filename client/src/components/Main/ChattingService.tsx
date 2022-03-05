@@ -4,7 +4,7 @@ import IphoneDetail from "../../img/detail.png";
 
 const Wrap = styled.div`
   width: 100%;
-  background-color: #f1f5f0;
+  /* background-color: #f1f5f0; */
   padding: 50px 0px 50px 0px;
 `;
 

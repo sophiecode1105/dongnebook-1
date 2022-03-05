@@ -8,7 +8,7 @@ const Contianer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 200px;
+  height: 250px;
 `;
 
 const AboutUsBox = styled.div`
