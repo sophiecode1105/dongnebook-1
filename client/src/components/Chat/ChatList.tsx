@@ -2,7 +2,7 @@ import { useSetRecoilState } from "recoil";
 import { timeForToday, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
-import found from "../../img/found.jpg";
+import EmtyChatRoom from "./EmtyChatRoom";
 
 const ChatList = ({ chatRooms }: ChatListComponentProps) => {
   const setVisible = useSetRecoilState(chatRoomVisible);
@@ -60,10 +60,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
             );
           })
         ) : (
-          <div className="w-full h-full bg-slate-600 flex justify-center items-center bg">
-            <img src={found} alt="robot" className="w-full h-full" />
-            <p className="absolute text-white font-bold text-3xl">아무도 없네 ...</p>
-          </div>
+          <EmtyChatRoom />
         )}
       </ul>
     </div>
