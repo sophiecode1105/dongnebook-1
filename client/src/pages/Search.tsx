@@ -19,13 +19,15 @@ const Search = () => {
   const [choice, setChoice] = useState("title");
 
   const getData = async (change: number) => {
+    setLoading(true);
     const { allProductList: bookList, pages: pagesNumber } = await getBookList(change);
     setAllProductList((prev) => [...prev, ...bookList]);
     pages = pagesNumber;
+    setLoading(false);
   };
 
   const handleSearchClick = async () => {
-    const { result: data } = await searchBook(choice, searchText);
+    const data = await searchBook(choice, searchText);
     setAllProductList(data);
   };
 
@@ -42,9 +44,7 @@ const Search = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
     getData(change);
-    setLoading(false);
   }, [change]);
 
   useEffect(() => {

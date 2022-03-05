@@ -18,6 +18,7 @@ export const socket = io("http://localhost:5000", {
 });
 
 type Nick = { nickname: string };
+
 export const postNickcheck = async (body: Nick) => {
   try {
     const {
@@ -146,6 +147,7 @@ export const getBookList = async (page: number) => {
     const {
       data: { allProductList, pages },
     } = await axios.get(`${URL}/product/list?page=${page}`, { withCredentials: true });
+
     return { allProductList, pages };
   } catch (e) {
     throw e;
