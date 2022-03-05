@@ -78,19 +78,22 @@ const LocationSearchBar = ({ keywords, searchPlaces }: any) => {
         onSubmit={(e) => {
           e.preventDefault();
           searchPlaces(true);
-        }}>
+        }}
+      >
         <SearchInput
           ref={keywords}
           onChange={() => {
             searchPlaces();
           }}
           type="text"
-          placeholder="찾고싶은 장소를 검색해보세요"></SearchInput>
+          placeholder="찾고싶은 장소를 검색해보세요"
+        ></SearchInput>
         <SearchButton
           onClick={() => {
             searchPlaces(true);
           }}
-          type="button">
+          type="button"
+        >
           <i className="fas fa-search"></i>
         </SearchButton>
       </SearchBox>
@@ -102,7 +105,8 @@ const LocationSearchBar = ({ keywords, searchPlaces }: any) => {
               key={idx}
               onClick={(e) => {
                 searchPlaces(true, el.place_name);
-              }}>
+              }}
+            >
               {el.place_name}
             </SearchList>
           );

@@ -33,7 +33,7 @@ const Search = () => {
     const currentScrollTop = HTML?.scrollTop; // 현재 스크롤 위치
     const windowInner = window.innerHeight; // 브라우저의 스크롤 높이
     const fullHeight = HTML?.scrollHeight; // HTML의 높이
-    if (currentScrollTop + windowInner > fullHeight) {
+    if (currentScrollTop + windowInner >= fullHeight) {
       if (pages > page) {
         page++;
         setChange((prev) => prev + 1);

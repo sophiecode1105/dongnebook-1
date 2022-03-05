@@ -19,6 +19,7 @@ const Chat = () => {
     socket.on("receive_message", () => {
       fetchData();
     });
+
     socket.emit("notification");
     fetchData();
     setIsLoading(false);

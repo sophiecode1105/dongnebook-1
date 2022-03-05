@@ -16,6 +16,7 @@ const ChatRoom = () => {
     socket.emit("out_room", frame.productId, () => {
       setVisible(false);
       socket.emit("notification");
+
       socket.emit("get_rooms", (data: any) => {
         setChatRooms(data);
       });
@@ -26,6 +27,7 @@ const ChatRoom = () => {
     socket.emit("delete_room", frame.productId, () => {
       setVisible(false);
       socket.emit("notification");
+
       socket.emit("get_rooms", (data: any) => {
         setChatRooms(data);
       });
@@ -45,6 +47,13 @@ const ChatRoom = () => {
   };
 
   useEffect(() => {
+    socket.on("delete_room", () => {
+      setVisible(false);
+      socket.emit("notification");
+      socket.emit("get_rooms", (data: any) => {
+        setChatRooms(data);
+      });
+    });
     socket.on("receive_message", (data: any) => {
       setChats(data.chats);
       const ul: any = document.querySelector("#chat__list");

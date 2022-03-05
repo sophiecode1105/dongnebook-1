@@ -19,14 +19,19 @@ export const getAllProduct = async (req: express.Request, res: express.Response)
         .status(200)
         .json({ message: "빈 페이지 입니다.", allProductList: target, state: false });
     }
+
     const take = 12;
+    const filterd = target.filter((el, id) => {
+      return id === 0 + (Number(page) - 1) * take;
+    });
+
     const allProductList = await client.product.findMany({
       where: {
         exchanged: false,
       },
       take,
       cursor: {
-        id: target[0].id - (Number(page) - 1) * take,
+        id: filterd[0].id,
       },
       orderBy: {
         id: "desc",
@@ -112,6 +117,7 @@ export const getOneProduct = async (req: express.Request, res: express.Response)
       } catch (err) {
         return res.status(401).json({ message: "로그인을 다시해주세요", err });
       }
+
       const checkLike = await client.product.findMany({
         where: {
           id: findId,
