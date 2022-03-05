@@ -61,7 +61,12 @@ export const KakaoTest = () => {
       }
       if (type) {
         place.current.setBounds(bounds);
-        markers.current = getTarget(place.current.getCenter(), place.current, markers.current, markered.current);
+        markers.current = getTarget(
+          place.current.getCenter(),
+          place.current,
+          markers.current,
+          markered.current
+        );
       }
     });
   }
@@ -97,7 +102,7 @@ export const KakaoTest = () => {
           });
           const productInfo = productLocations?.current[i];
 
-          const iwContent = ` <img width=150px height = 300px src = "${productImg}"/><div style="padding:5px;" >${productInfo.title}</div><div style="padding:5px;" >${productInfo.locations.address}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+          const iwContent = `<div class="w-[160px] p-2 "><img src = "${productImg}"/><div >${productInfo.title}</div><div  >${productInfo.locations.address}</div></div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
 
           const infowindow = new window.kakao.maps.InfoWindow({
             // 인포윈도우를 생성합니다
@@ -154,15 +159,21 @@ export const KakaoTest = () => {
       userLocation = res.userLocation;
       productLocations.current = res.productLocation;
     });
+
     let center;
+
     try {
       const allowLocation: any = await naviInfo();
       if (allowLocation) {
-        center = new window.kakao.maps.LatLng(allowLocation.coords.latitude, allowLocation.coords.longitude);
+        center = new window.kakao.maps.LatLng(
+          allowLocation.coords.latitude,
+          allowLocation.coords.longitude
+        );
       }
     } catch (e) {
       center = new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon);
     }
+
     const options = {
       center, //지도의 중심좌표.
       level: 4, //지도의 레벨(확대, 축소 정도)
@@ -192,12 +203,17 @@ export const KakaoTest = () => {
 
   useEffect(() => {
     getData();
+
+    return () => {
+      getData();
+    };
   }, [getData]);
-  console.log(isLoading);
   return (
     <Containter>
       <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
-        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
+        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">
+          내 주변 도서 찾기
+        </h1>
         <LockPosition>
           <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
           {isLoading && <img src={greenbook} alt="" />}

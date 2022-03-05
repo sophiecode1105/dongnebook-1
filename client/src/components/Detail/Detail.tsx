@@ -14,7 +14,6 @@ import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps } from "../
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
 import {
-  ableExchange,
   chatRoomFrame,
   chatRoomVisible,
   loginState,
@@ -422,9 +421,6 @@ const Details = () => {
   };
 
   const handleClickExchange = async (e: any, state: boolean) => {
-    console.log(state);
-    console.log(exchanged);
-
     if (state !== exchanged) {
       await patchExchange(Number(id));
       exchanged = !exchanged;
@@ -445,6 +441,7 @@ const Details = () => {
           title: data.title,
           bookImg: data.images[0].url,
           productId: data.id,
+          img: users?.img,
         } as ChatRoomFrameType);
 
         if (chat) {

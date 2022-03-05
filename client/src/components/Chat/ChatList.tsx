@@ -2,7 +2,6 @@ import { useSetRecoilState } from "recoil";
 import { timeForToday, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
-import found from "../../img/found.jpg";
 import EmtyChatRoom from "./EmtyChatRoom";
 
 const ChatList = ({ chatRooms }: ChatListComponentProps) => {
@@ -11,6 +10,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   const fetchData = (id: number) => {
     socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
+      setVisible(true);
       setChatroomFrame({
         nickname: chat.users[0].users.nickname,
         userId: chat.users[0].users.id,
@@ -21,7 +21,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chatroomId: chat.id,
         chats: chat.chats,
       } as ChatRoomFrameType);
-      setVisible(true);
     });
   };
 
