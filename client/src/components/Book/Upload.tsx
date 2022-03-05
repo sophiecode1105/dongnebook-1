@@ -375,7 +375,9 @@ const Upload = () => {
       formData.append("lat", String(currentLocation.y));
       formData.append("lon", String(currentLocation.x));
       formData.append("address", address);
+
       let status = await postContent(formData, token || "token");
+
       if (Number(status) < 300) {
         res(true);
       } else {
@@ -499,11 +501,26 @@ const Upload = () => {
           <Uploads>
             <InputBox>
               <CheckBoxWrap>
-                <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="새상품같음"
+                  value="새상품같음"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
-                <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="약간헌책"
+                  value="약간헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
-                <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                <CheckBox
+                  type="radio"
+                  id="많이헌책"
+                  value="많이헌책"
+                  {...register("quality")}
+                ></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
               </CheckBoxWrap>
               <Errorbox>{errors.quality?.message}</Errorbox>
@@ -590,7 +607,11 @@ const Upload = () => {
             <LocationWrap>
               <SearchContainer>
                 <SearchBox>
-                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                  <SearchBar
+                    type="text"
+                    placeholder="건물,지역 검색"
+                    {...register("location")}
+                  ></SearchBar>
                   <SearchButton type="button" onClick={searchPlace}>
                     <i className="fas fa-search"></i>
                   </SearchButton>
@@ -604,7 +625,8 @@ const Upload = () => {
                           onClick={() => {
                             setIsOpen(!isOpen);
                             setCurrentLocation(searchResult);
-                          }}>
+                          }}
+                        >
                           {searchResult?.address_name}
                         </SearchResult>
                       );

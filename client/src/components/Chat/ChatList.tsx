@@ -10,6 +10,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   const fetchData = (id: number) => {
     socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
+      setVisible(true);
       setChatroomFrame({
         nickname: chat.users[0].users.nickname,
         userId: chat.users[0].users.id,
@@ -20,7 +21,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chatroomId: chat.id,
         chats: chat.chats,
       } as ChatRoomFrameType);
-      setVisible(true);
     });
   };
 
@@ -38,7 +38,8 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
               <li
                 key={idx}
                 onClick={() => fetchData(productId)}
-                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
+                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer"
+              >
                 <div className="rounded-full flex items-center justify-center p-1">
                   <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
                 </div>
