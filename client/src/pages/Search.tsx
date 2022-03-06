@@ -19,7 +19,10 @@ const Search = () => {
 
   const getData = async (change: number) => {
     const { allProductList: bookList, pages: pagesNumber } = await getBookList(change);
-    setAllProductList((prev) => [...prev, ...bookList]);
+    setAllProductList((prev) => {
+      return [...prev, ...bookList];
+    });
+
     pages = pagesNumber;
   };
 

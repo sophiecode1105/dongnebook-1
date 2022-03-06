@@ -96,7 +96,7 @@ export const postJoin = async (req: express.Request, res: express.Response) => {
             admin: false,
             password: hashPassword,
             email,
-            img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/31644921016560.png",
+            img: "https://practice0210.s3.ap-northeast-2.amazonaws.com/5451646380205023.png",
           },
         },
       },
