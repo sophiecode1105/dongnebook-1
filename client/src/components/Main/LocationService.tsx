@@ -5,6 +5,7 @@ const Wrap = styled.div`
   width: 100%;
   background-color: white;
   padding: 50px 0px 50px 0px;
+  overflow: hidden;
 `;
 
 const Container = styled.div`
@@ -17,13 +18,14 @@ const Container = styled.div`
 
 const Title = styled.div`
   color: green;
-  font-size: 28px;
+  font-size: 30px;
   margin-bottom: 20px;
+  font-weight: bold;
 `;
 
 const Explain = styled.div`
   color: black;
-  font-size: 33px;
+  font-size: 26px;
   font-weight: 400;
 `;
 
@@ -43,13 +45,14 @@ const LocationService = () => {
   return (
     <Wrap>
       <Container>
-        <Title>위치 서비스</Title>
-        <Explain>내 위치를 확인하고</Explain>
-        <Explain className="mb-6">주변 도서를 찾아보세요</Explain>
-        <ImgBox>
+        <Title className="sa sa-up">위치 서비스</Title>
+        <Explain className="sa sa-up mb-6">
+          내 위치를 확인하고 <br /> 주변 도서를 찾아보세요
+        </Explain>
+        <ImgBox className="sa sa-left">
           <Img src={mapImg}></Img>
         </ImgBox>
-        <p className="text-right text-xl">
+        <p className="text-right text-xl sa sa-left mt-5">
           굳이 서점을 갈 필요가 있을까요? <br /> 내 주위 먼저 둘러보세요
         </p>
       </Container>

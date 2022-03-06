@@ -2,7 +2,9 @@ import styled from "styled-components";
 import { useState, useEffect, useCallback } from "react";
 import { CurrentImgProps } from "../../state/typeDefs";
 import { timeForToday, postHeart, getMemberInfo } from "../../api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../../state/state";
 
 const Container = styled.div`
   height: 100%;
@@ -240,11 +242,16 @@ const MobileDetail = ({
   const [isHeartPressed, setIsHeartPressed] = useState(false);
   const isWriter = userInfo?.nickname === nickname;
   const date = timeForToday(createdAt);
+  const navigate = useNavigate();
 
   const handleClickHeart = async () => {
-    setIsHeartPressed(!isHeartPressed);
     try {
-      await postHeart(Number(id), token);
+      if (token) {
+        await postHeart(Number(id), token);
+        setIsHeartPressed(!isHeartPressed);
+      } else {
+        navigate("/signin");
+      }
     } catch (e) {
       console.error(e);
     }
@@ -293,15 +300,13 @@ const MobileDetail = ({
             <ButtonPrev
               onClick={() => {
                 onChangeContent(-1);
-              }}
-            >
+              }}>
               <i className="fas fa-chevron-left"></i>
             </ButtonPrev>
             <ButtonNext
               onClick={() => {
                 onChangeContent(+1);
-              }}
-            >
+              }}>
               <i className="fas fa-chevron-right"></i>
             </ButtonNext>
           </Button>

@@ -13,13 +13,7 @@ import {
 import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps } from "../../state/typeDefs";
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
-import {
-  chatRoomFrame,
-  chatRoomVisible,
-  loginState,
-  storeContentId,
-  userState,
-} from "../../state/state";
+import { chatRoomFrame, chatRoomVisible, loginState, storeContentId, userState } from "../../state/state";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Swal from "sweetalert2";
 
@@ -345,7 +339,6 @@ const Div = styled.div`
 
 const Details = () => {
   let { id } = useParams();
-
   const [bookDetailInfo, setBookDetailInfo] = useState<BookInfo | {}>({});
   const [isHeartPressed, setIsHeartPressed] = useState(false);
   const [userInfo, setUserInfo] = useRecoilState(userState);
@@ -358,9 +351,12 @@ const Details = () => {
   const token = useRecoilValue(loginState);
 
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
-  const { title, images, content, quality, createdAt, locations, nickname, visit, users } =
-    bookDetailInfo as BookInfo;
+  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo as BookInfo;
   let { exchanged } = bookDetailInfo as BookInfo;
+  const date = timeForToday(createdAt);
+  const navigate = useNavigate();
+  const isWriter = userInfo?.nickname === nickname;
+
   const onChangeContent = (pageDelta: any) => {
     const lastImgPageNum = images.length - 1;
     const newCurrentPageNum = currentImg + pageDelta;
@@ -374,10 +370,6 @@ const Details = () => {
     }
   };
 
-  const date = timeForToday(createdAt);
-  const navigate = useNavigate();
-  const isWriter = userInfo?.nickname === nickname;
-
   const getSingleData = useCallback(async () => {
     const { productInfo, likeCount } = await getSingleBookInfo(Number(id), token);
 
@@ -386,9 +378,13 @@ const Details = () => {
   }, [id, token]);
 
   const handleClickHeart = async () => {
-    setIsHeartPressed(!isHeartPressed);
     try {
-      await postHeart(Number(id), token);
+      if (token) {
+        await postHeart(Number(id), token);
+        setIsHeartPressed(!isHeartPressed);
+      } else {
+        navigate("/signin");
+      }
     } catch (e) {
       console.error(e);
     }
@@ -509,15 +505,13 @@ const Details = () => {
               <ButtonPrev
                 onClick={() => {
                   onChangeContent(-1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-left"></i>
               </ButtonPrev>
               <ButtonNext
                 onClick={() => {
                   onChangeContent(+1);
-                }}
-              >
+                }}>
                 <i className="fas fa-chevron-right"></i>
               </ButtonNext>
             </>
@@ -547,8 +541,7 @@ const Details = () => {
                           onClick={(e) => {
                             handleClickExchange(e, true);
                           }}
-                          defaultChecked={exchanged}
-                        ></CheckList>
+                          defaultChecked={exchanged}></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
                         <CheckList
                           type="radio"
@@ -557,8 +550,7 @@ const Details = () => {
                           onClick={(e) => {
                             handleClickExchange(e, false);
                           }}
-                          defaultChecked={!exchanged}
-                        ></CheckList>
+                          defaultChecked={!exchanged}></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>
@@ -608,11 +600,7 @@ const Details = () => {
             ) : (
               <>
                 <HeartButton onClick={handleClickHeart}>
-                  {isHeartPressed ? (
-                    <i className="fas fa-heart"></i>
-                  ) : (
-                    <i className="far fa-heart"></i>
-                  )}
+                  {isHeartPressed ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}
                 </HeartButton>
                 <TouchButton isWriter={isWriter} onClick={handleClickChat}>
                   연락하기
