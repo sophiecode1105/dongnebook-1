@@ -14,7 +14,6 @@ import { BookInfo, ChatRoomFrameType, CurrentImgProps, isWriterProps } from "../
 import { useMediaQuery } from "react-responsive";
 import MobileDetail from "./MobileDetail";
 import {
-  ableExchange,
   chatRoomFrame,
   chatRoomVisible,
   loginState,
@@ -317,7 +316,6 @@ const HeartButton = styled.button`
   font-weight: 500;
   color: rgb(242, 242, 242, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
-
   i {
     color: red;
     font-size: 20px;
@@ -423,9 +421,6 @@ const Details = () => {
   };
 
   const handleClickExchange = async (e: any, state: boolean) => {
-    console.log(state);
-    console.log(exchanged);
-
     if (state !== exchanged) {
       await patchExchange(Number(id));
       exchanged = !exchanged;
@@ -446,6 +441,7 @@ const Details = () => {
           title: data.title,
           bookImg: data.images[0].url,
           productId: data.id,
+          img: users?.img,
         } as ChatRoomFrameType);
 
         if (chat) {

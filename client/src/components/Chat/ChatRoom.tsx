@@ -1,31 +1,40 @@
-import { FormEvent, useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { timeStamp, socket } from "../../api";
 import { chatRoomFrame, chatRoomsState, chatRoomVisible, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
-  const setVisible = useSetRecoilState(chatRoomVisible);
+  const [visible, setVisible] = useRecoilState(chatRoomVisible);
   const frame = useRecoilValue(chatRoomFrame);
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
   const setChatRooms = useSetRecoilState(chatRoomsState);
 
-  const outRoom = () => {
+  const scroll = () => {
+    const ul: Element | null = document.querySelector("#chat__list");
+    if (ul) {
+      const height = ul.scrollHeight;
+      ul.scrollTo({ top: height });
+    }
+  };
+
+  const outRoom = useCallback(() => {
     socket.emit("out_room", frame.productId, () => {
-      setVisible(false);
       socket.emit("notification");
+
       socket.emit("get_rooms", (data: any) => {
         setChatRooms(data);
       });
     });
-  };
+  }, [frame.productId, setChatRooms]);
 
   const deleteRoom = () => {
     socket.emit("delete_room", frame.productId, () => {
       setVisible(false);
       socket.emit("notification");
+
       socket.emit("get_rooms", (data: any) => {
         setChatRooms(data);
       });
@@ -36,35 +45,37 @@ const ChatRoom = () => {
     e.preventDefault();
 
     socket.emit("new_message", frame.productId, myInfo.nickname, message, (data: any) => {
-      setChats(data.chats);
-      setMessage("");
-      const ul: any = document.querySelector("#chat__list");
-      const height = ul.scrollHeight;
-      ul.scrollTo({ top: height });
+      if (visible) {
+        setChats(data.chats);
+        setMessage("");
+        scroll();
+      }
     });
   };
 
   useEffect(() => {
+    socket.on("delete_room", () => {
+      setVisible(false);
+      socket.emit("notification");
+      socket.emit("get_rooms", (data: any) => {
+        setChatRooms(data);
+      });
+    });
     socket.on("receive_message", (data: any) => {
       setChats(data.chats);
-      const ul: any = document.querySelector("#chat__list");
-      if (ul) {
-        const height = ul.scrollHeight;
-        ul.scrollTo({ top: height });
-      }
+      scroll();
     });
-    const ul: any = document.querySelector("#chat__list");
-    const height = ul.scrollHeight;
-    ul.scrollTo({ top: height });
-  }, []);
+    scroll();
+    return () => outRoom();
+  }, [outRoom, setChatRooms, setVisible]);
 
   return (
     <div className="fixed left-0 top-0 z-[51] w-full h-screen bg-opacity-20 bg-black flex justify-center items-center">
-      <div onClick={outRoom} className="w-screen h-screen"></div>
+      <div onClick={() => setVisible(false)} className="w-screen h-screen"></div>
       <div className="max-w-md w-full h-screen md:h-[80vh] bg-white z-[52] absolute flex flex-col justify-between">
         <div className="p-3 chatroom--shadow">
           <div className="flex justify-between mb-3 text-xl">
-            <i onClick={outRoom} className="fas fa-arrow-left cursor-pointer "></i>
+            <i onClick={() => setVisible(false)} className="fas fa-arrow-left cursor-pointer "></i>
             <h1 className="font-bold">{frame.nickname}</h1>
             <i onClick={deleteRoom} className="fas fa-sign-out-alt cursor-pointer"></i>
           </div>

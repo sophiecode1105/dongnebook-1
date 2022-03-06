@@ -16,18 +16,21 @@ const Search = () => {
   const searchText = useRecoilValue(bookSearch);
   const [change, setChange] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [choice, setChoice] = useState("title");
 
   const getData = async (change: number) => {
+    setLoading(true);
     const { allProductList: bookList, pages: pagesNumber } = await getBookList(change);
     setAllProductList((prev) => {
       return [...prev, ...bookList];
     });
 
     pages = pagesNumber;
+    setLoading(false);
   };
 
   const handleSearchClick = async () => {
-    const { result: data } = await searchBook("title", searchText);
+    const data = await searchBook(choice, searchText);
     setAllProductList(data);
   };
 
@@ -35,7 +38,7 @@ const Search = () => {
     const currentScrollTop = HTML?.scrollTop; // 현재 스크롤 위치
     const windowInner = window.innerHeight; // 브라우저의 스크롤 높이
     const fullHeight = HTML?.scrollHeight; // HTML의 높이
-    if (currentScrollTop + windowInner > fullHeight) {
+    if (currentScrollTop + windowInner >= fullHeight) {
       if (pages > page) {
         page++;
         setChange((prev) => prev + 1);
@@ -44,9 +47,7 @@ const Search = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
     getData(change);
-    setLoading(false);
   }, [change]);
 
   useEffect(() => {
@@ -59,7 +60,7 @@ const Search = () => {
 
   return (
     <div>
-      <SearchBar handleSearchClick={handleSearchClick} />
+      <SearchBar setChoice={setChoice} handleSearchClick={handleSearchClick} />
       <List allProductList={allProductList} loading={loading} change={change} />
     </div>
   );

@@ -2,7 +2,7 @@ import { useSetRecoilState } from "recoil";
 import { timeForToday, socket } from "../../api";
 import { chatRoomFrame, chatRoomVisible } from "../../state/state";
 import { ChatListComponentProps, ChatRoomFrameType, chatRooms } from "../../state/typeDefs";
-import found from "../../img/found.jpg";
+import EmtyChatRoom from "./EmtyChatRoom";
 
 const ChatList = ({ chatRooms }: ChatListComponentProps) => {
   const setVisible = useSetRecoilState(chatRoomVisible);
@@ -10,6 +10,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   const fetchData = (id: number) => {
     socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
+      setVisible(true);
       setChatroomFrame({
         nickname: chat.users[0].users.nickname,
         userId: chat.users[0].users.id,
@@ -20,7 +21,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chatroomId: chat.id,
         chats: chat.chats,
       } as ChatRoomFrameType);
-      setVisible(true);
     });
   };
 
@@ -38,7 +38,8 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
               <li
                 key={idx}
                 onClick={() => fetchData(productId)}
-                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
+                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer"
+              >
                 <div className="rounded-full flex items-center justify-center p-1">
                   <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
                 </div>
@@ -60,10 +61,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
             );
           })
         ) : (
-          <div className="w-full h-full bg-slate-600 flex justify-center items-center bg">
-            <img src={found} alt="robot" className="w-full h-full" />
-            <p className="absolute text-white font-bold text-3xl">아무도 없네 ...</p>
-          </div>
+          <EmtyChatRoom />
         )}
       </ul>
     </div>

@@ -10,6 +10,17 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
+const SelectBox = styled.select`
+  width: 5.5rem;
+  padding: 0.8em 0.5em;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: black;
+  font-weight: bold;
+  &:focus {
+    outline: none;
+  }
+`;
+
 const Title = styled.h1`
   color: black;
   font-weight: bold;
@@ -67,10 +78,21 @@ const IconBox = styled.div`
   }
 `;
 
-const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
+const SearchBar = ({ handleSearchClick, setChoice }: { handleSearchClick: any; setChoice: any }) => {
   const isLogin = useRecoilValue(loginState);
   const navigate = useNavigate();
   const search = useSetRecoilState(bookSearch);
+
+  const lists = ["제목", "글쓴이", "내용"];
+  const EngList = ["title", "nickname", "content"];
+
+  const options = lists.map((list, i) => {
+    return (
+      <option key={i} value={EngList[i]}>
+        {list}
+      </option>
+    );
+  });
 
   const handleCheckLogin = () => {
     if (isLogin) {
@@ -79,6 +101,10 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
     } else {
       navigate("/signin");
     }
+  };
+
+  const handleList = (e: any) => {
+    setChoice(e.target.value);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -95,11 +121,13 @@ const SearchBar = ({ handleSearchClick }: { handleSearchClick: any }) => {
     <Container className="px-[10px]">
       <Title>도서 검색</Title>
       <SearchBox>
+        <SelectBox onInput={handleList}>{options}</SelectBox>
         <SearchInput
           type="text"
           placeholder="찾고싶은 도서를 검색해보세요"
           onKeyPress={handleKeyPress}
-          onChange={handleChange}></SearchInput>
+          onChange={handleChange}
+        ></SearchInput>
         <SearchButton type="button" onClick={handleSearchClick}>
           <i className="fas fa-search"></i>
         </SearchButton>

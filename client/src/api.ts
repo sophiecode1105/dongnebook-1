@@ -18,6 +18,7 @@ export const socket = io("https://dongnebooksocket.herokuapp.com", {
 // });
 
 type Nick = { nickname: string };
+
 export const postNickcheck = async (body: Nick) => {
   try {
     const {
@@ -146,6 +147,7 @@ export const getBookList = async (page: number) => {
     const {
       data: { allProductList, pages },
     } = await axios.get(`${URL}/product/list?page=${page}`, { withCredentials: true });
+
     return { allProductList, pages };
   } catch (e) {
     throw e;
@@ -157,7 +159,9 @@ export const getSingleBookInfo = async (id: number | undefined, token: string | 
     const {
       data: { productInfo, likeCount },
     } = await axios.get(`${URL}/product/${id}`, {
-      headers: token ? { Authorization: `jwt ${token}`, withCredentials: true } : { withCredentials: true },
+      headers: token
+        ? { Authorization: `jwt ${token}`, withCredentials: true }
+        : { withCredentials: true },
     });
     return { productInfo, likeCount };
   } catch (e) {
@@ -170,6 +174,7 @@ export const searchBook = async (type: string, value: string) => {
     const {
       data: { result },
     } = await axios.get(`${URL}/product/search?type=${type}&value=${value}`);
+
     return result;
   } catch (e) {
     throw e;
@@ -178,7 +183,11 @@ export const searchBook = async (type: string, value: string) => {
 
 export const postHeart = async (id: number | undefined, token: string | null) => {
   try {
-    await axios.post(`${URL}/product/${id?.toString()}`, {}, { headers: { Authorization: `jwt ${token}` } });
+    await axios.post(
+      `${URL}/product/${id?.toString()}`,
+      {},
+      { headers: { Authorization: `jwt ${token}` } }
+    );
   } catch (e) {
     throw e;
   }

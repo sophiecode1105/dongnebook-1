@@ -23,7 +23,6 @@ const BookImg = styled.img`
 
 const Title = styled.div`
   font-size: 19px;
-  font-weight: bold;
 `;
 const Location = styled.div`
   font-size: 15px;

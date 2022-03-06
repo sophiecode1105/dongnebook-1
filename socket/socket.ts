@@ -156,6 +156,7 @@ io.on("connection", (socket) => {
     if (userInfo === undefined) {
       return console.log("토큰이 없습니다.");
     }
+
     const otherInfo = await client.user.findMany({
       where: {
         products: {
@@ -279,7 +280,11 @@ io.on("connection", (socket) => {
           id: chatroomFind[0].id,
         },
       });
+
+      socket.to("notification").emit("receive_message");
+      socket.to(productId).emit("delete_room");
       done();
+
       console.log("방 삭제");
     } catch (err) {
       console.log(err);

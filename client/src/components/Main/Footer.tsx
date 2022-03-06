@@ -1,16 +1,14 @@
 import styled from "styled-components";
 
 const Contianer = styled.div`
-  box-shadow: 0px 1px 7px 0px rgb(0, 0, 0, 0.1);
+  box-shadow: 0px 1px 7px 0px rgba(0, 0, 0, 0.1);
   background-color: white;
-  position: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 200px;
-  bottom: 0px;
+  height: 250px;
 `;
 
 const AboutUsBox = styled.div`

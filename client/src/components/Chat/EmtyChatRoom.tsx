@@ -6,8 +6,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  max-width: 360px;
-  margin: 300px auto 0 auto;
+  height: 100%;
 `;
 
 const AlertContent = styled.div`
