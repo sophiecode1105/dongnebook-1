@@ -32,10 +32,15 @@ const TitleBox = styled.div`
   justify-content: start;
   flex-direction: column;
   width: 100%;
+  padding-left: 60px;
+  @media screen and (max-width: 767px) {
+    align-items: center;
+    padding: 0;
+  }
 `;
 
 const Title = styled.div`
-  font-size: 30px;
+  font-size: 29px;
   font-weight: bold;
 `;
 
@@ -60,7 +65,6 @@ const Div = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-left: 30px;
 `;
 
 const MainScreen = () => {

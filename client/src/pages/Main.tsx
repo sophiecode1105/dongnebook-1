@@ -10,7 +10,7 @@ import { useEffect } from "react";
 const Main = () => {
   useEffect(() => {
     // Scroll Animation (sa, 스크롤 애니메이션)
-    const saTriggerMargin = 350; // 언제쯤 이 요소를 보이게 할 것인지 정하는 장치
+    const saTriggerMargin = 300; // 언제쯤 이 요소를 보이게 할 것인지 정하는 장치
     const saElementList = document.querySelectorAll(".sa");
 
     const saFunc = function () {
