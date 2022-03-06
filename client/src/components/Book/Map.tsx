@@ -147,7 +147,7 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
       setMap(null);
       setMarker(null);
     };
-  }, [addClickListener, displayMarker, makerImage, map, mapLat, mapLong]);
+  }, [addClickListener, displayMarker, makerImage, map, mapLat, mapLong, setCurrentLocation]);
 
   useEffect(() => {
     const places = new window.kakao.maps.services.Places();
