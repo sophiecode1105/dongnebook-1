@@ -15,43 +15,42 @@
 }
 
 @keyframes center{
-   from{
-stroke-dashoffset: 10228.6923828125;
-
-   }
-   to{
-       stroke-dashoffset: 0;
-       
-        
-   }
+    from {
+        stroke-dashoffset: 10228.6923828125;
+    }
+    to {
+        stroke-dashoffset: 0;     
+    }
 }
+
 #fuck{
-     stroke:  rgba(232,67,84);
-     stroke-width: 200;
-     stroke-dasharray: 38895.34375;
-      stroke-dashoffset: 0;
-     fill: white;
-     animation: outer-ani 5s;
+    <!-- display: none; -->
+    stroke:  rgba(232,67,84);
+    stroke-width: 200;
+    stroke-dasharray: 38895.34375;
+    stroke-dashoffset: 0;
+    fill: white;
+    animation: outer-ani 5s;
 }
 
 #round{
-     stroke:    rgba(232,67,84);
+    <!-- display: none; -->
+    stroke:    rgba(232,67,84);
     stroke-width: 200;
-     stroke-dasharray: 10228.6923828125;
-      stroke-dashoffset: 0;
-     fill: white;
-     animation: center 3s;
- 
+    stroke-dasharray: 10228.6923828125;
+    stroke-dashoffset: 0;
+    fill: white;
+    animation: center 3s;
 }
 
 #tell {
-      stroke:   rgba(232,67,84);
+    <!-- display: none; -->
+    stroke:   rgba(232,67,84);
     stroke-width: 200;
-     stroke-dasharray:  21325.056640625;
-      stroke-dashoffset: 0;
-     fill: white;
-     animation: center 3s;
-   
+    stroke-dasharray:  21325.056640625;
+    stroke-dashoffset: 0;
+    fill: white;
+    animation: center 3s;
 }
 
 </style>
