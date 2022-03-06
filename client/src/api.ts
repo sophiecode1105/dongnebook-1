@@ -2,20 +2,20 @@ import axios from "axios";
 import { UserState } from "./state/typeDefs";
 import { io } from "socket.io-client";
 
-export const URL = "http://localhost:4000";
-// export const URL = "https://dongnebook.herokuapp.com";
+// export const URL = "http://localhost:4000";
+export const URL = "https://dongnebooks.herokuapp.com";
 
 const token = localStorage.getItem("token");
 
-// export const socket = io("https://dongnebooksocket.herokuapp.com", {
-//   transports: ["websocket"],
-//   auth: { token },
-// });
-
-export const socket = io("http://localhost:5000", {
+export const socket = io("https://dongnebooksocket.herokuapp.com", {
   transports: ["websocket"],
   auth: { token },
 });
+
+// export const socket = io("http://localhost:5000", {
+//   transports: ["websocket"],
+//   auth: { token },
+// });
 
 type Nick = { nickname: string };
 
