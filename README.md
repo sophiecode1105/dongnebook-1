@@ -1,6 +1,6 @@
 <h1> 📚 잠들어있던 상상력을 두드려보세요!, 동네북 📖</h1>
 
-<img src= "https://github.com/StrummingDown/dongnebook/blob/socketBackup/client/src/img/logo.png"  width = "450" height = "200" />
+<img src= "https://github.com/codestates/dongnebook/blob/dev/client/src/img/logo.png?raw=true"  width = "450" height = "200" />
 
 <!-- <h3><a href=http://ssokbeer-bucket-depoly.s3-website.ap-northeast-2.amazonaws.com/>동네북 바로가기</a></h3> -->
 
