@@ -84,9 +84,9 @@ const Content = styled.div``;
 const AnimationIcon = () => {
   return (
     <Container>
-      <Introduce>PLATFORM STORY</Introduce>
-      <KeyPlatform>EXCHANGE LOCATION AND CHATTING</KeyPlatform>
-      <List>
+      <Introduce className="sa sa-up">PLATFORM STORY</Introduce>
+      <KeyPlatform className="sa sa-up">EXCHANGE LOCATION AND CHATTING</KeyPlatform>
+      <List className="sa sa-right">
         <Box>
           <ExchangeWrap>
             <ExchangeSvg />

@@ -79,16 +79,16 @@ const Content = styled.div`
 const ChattingService = () => {
   return (
     <Wrap>
-      <TitleBox>
+      <TitleBox className="sa sa-up">
         <Title>채팅 서비스</Title>
         <Explain>게시글을 확인하고 </Explain>
         <Explain>교환 약속을 잡으세요</Explain>
       </TitleBox>
       <Container>
-        <ScreenBoxOne>
+        <ScreenBoxOne className="sa sa-up">
           <ScreenShot src={IphoneDetail} />
         </ScreenBoxOne>
-        <ScreenBoxTwo>
+        <ScreenBoxTwo className="sa sa-up">
           <ScreenShot src={IphoneChat} />
           <ContentBox>
             <Content>중고교환은 타이밍!</Content>
