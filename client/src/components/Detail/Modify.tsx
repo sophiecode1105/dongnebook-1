@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
+import { useMediaQuery } from "react-responsive";
 import { Link, useNavigate } from "react-router-dom";
 import {
   currentaddress,
@@ -14,6 +15,7 @@ import {
 import Swal from "sweetalert2";
 import Map from "../Book/Map";
 import { getSingleBookInfo, patchContent } from "../../api";
+import MobileModify from "./MobileModify";
 
 declare global {
   interface Window {
@@ -47,12 +49,17 @@ const Container = styled(DisplayColumn)`
   max-width: 1400px;
 `;
 
-const Form = styled.form`
+type isPcProps = {
+  isPc: boolean;
+};
+
+const Form = styled.form<isPcProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  width: 80%;
+  height: 100%;
+  width: ${(props) => (props.isPc ? "80%" : "100%")};
   height: 100%;
 `;
 
@@ -332,6 +339,8 @@ const Modify = () => {
   const pageChange = Number(localStorage.getItem("modify_id"));
 
   const side = useRef<HTMLDivElement>(null);
+  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
+
   const {
     register,
     getValues,
@@ -480,165 +489,230 @@ const Modify = () => {
 
   return (
     <Container>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <TitleBox>
-          <Title>게시글 수정</Title>
-        </TitleBox>
-        <UploadInform>
-          <InformBox>
-            <InformTitle>제목</InformTitle>
-          </InformBox>
-          <Uploads>
-            <InputBox>
-              <Input
-                type="text"
-                placeholder="도서명을 입력해주세요."
-                error={errors.title?.message}
-                {...register("title", {
-                  required: "제목을 입력해주세요",
-                  maxLength: { value: 20, message: "최대 20자 이하로 입력해주세요" },
-                })}
-              />
-              <Errorbox>{errors.title?.message}</Errorbox>
-            </InputBox>
-            <TitleLength>{title === undefined ? "0/20" : `${title.length}/20`}</TitleLength>
-          </Uploads>
-        </UploadInform>
-        <UploadInform>
-          <InformBox>
-            <InformTitle>상태</InformTitle>
-          </InformBox>
-          <Uploads>
-            <InputBox>
-              <CheckBoxWrap>
+      <Form isPc={isPc} onSubmit={handleSubmit(onSubmit)}>
+        {isPc ? (
+          <>
+            {" "}
+            <TitleBox>
+              <Title>게시글 수정</Title>
+            </TitleBox>
+            <UploadInform>
+              <InformBox>
+                <InformTitle>제목</InformTitle>
+              </InformBox>
+              <Uploads>
+                <InputBox>
+                  <Input
+                    type="text"
+                    placeholder="도서명을 입력해주세요."
+                    error={errors.title?.message}
+                    {...register("title", {
+                      required: "제목을 입력해주세요",
+                      maxLength: { value: 20, message: "최대 20자 이하로 입력해주세요" },
+                    })}
+                  />
+                  <Errorbox>{errors.title?.message}</Errorbox>
+                </InputBox>
+                <TitleLength>{title === undefined ? "0/20" : `${title.length}/20`}</TitleLength>
+              </Uploads>
+            </UploadInform>
+            <UploadInform>
+              <InformBox>
+                <InformTitle>상태</InformTitle>
+              </InformBox>
+              <Uploads>
+                <InputBox>
+                  <CheckBoxWrap>
+                    <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
+                    <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
+                    <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
+                    <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
+                    <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
+                    <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
+                  </CheckBoxWrap>
+                  <Errorbox>{errors.quality?.message}</Errorbox>
+                </InputBox>
+              </Uploads>
+            </UploadInform>
+            <UploadInform>
+              <InformBox>
+                <InformTitle>사진</InformTitle>
+              </InformBox>
+              <Uploads>
+                <InputBox>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      justifyContent: "flex-start",
+                      width: "100%",
+                    }}
+                  >
+                    <Label htmlFor="input_file">
+                      <i className="fas fa-camera"></i>
+                      <ImgTitle>이미지 업로드</ImgTitle>
+                      <ImgFile
+                        id="input_file"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        {...register("img", {
+                          onChange: async (event) => {
+                            let files = event.target.files;
+                            if (files && files.length) {
+                              if (imageUrls.length > 2) {
+                                return Swal.fire({
+                                  text: "사진첨부는 최대 3장까지 가능합니다",
+                                  confirmButtonText: "확인",
+                                  confirmButtonColor: "#2f6218",
+                                  icon: "warning",
+                                });
+                              }
+                              let urls = await convertManyFilesToURL(files);
+                              setImageUrls((prev) => {
+                                return [...prev, ...urls];
+                              });
+                              setImageStore([...imageStore, ...files]);
+                            }
+                          },
+                        })}
+                      />
+                    </Label>
+                    {imageUrls.map((url, key) => {
+                      return (
+                        <ImgMapList key={key}>
+                          <BookImg src={url}></BookImg>
+                        </ImgMapList>
+                      );
+                    })}
+                  </div>
+                  <Errorbox>{errors.img?.message}</Errorbox>
+                </InputBox>
+              </Uploads>
+            </UploadInform>
+            <UploadInform>
+              <InformBox>
+                <InformTitle>설명</InformTitle>
+              </InformBox>
+              <Uploads>
+                <InputBox>
+                  <Textarea
+                    placeholder="상품 설명을 입력해주세요.(10글자이상)"
+                    error={errors.content?.message}
+                    {...register("content", {
+                      required: "상품 설명을 입력해주세요.",
+                      minLength: { value: 10, message: "상품 설명을 10자 이상 입력해주세요" },
+                      maxLength: { value: 500, message: "상품 설명을 500자 이하 입력해주세요" },
+                    })}
+                  />
+                  <Wrap>
+                    <Errorbox>{errors.content?.message}</Errorbox>
+                    <Count>{content === undefined ? "0/200" : `${content.length}/500`}</Count>
+                  </Wrap>
+                </InputBox>
+              </Uploads>
+            </UploadInform>
+            <UploadInform>
+              <InformBox>
+                <InformTitle>위치</InformTitle>
+              </InformBox>
+              <Uploads>
+                <LocationWrap>
+                  <SearchContainer>
+                    <SearchBox>
+                      <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                      <SearchButton type="button" onClick={searchPlace}>
+                        <i className="fas fa-search"></i>
+                      </SearchButton>
+                    </SearchBox>
+                    {isOpen ? (
+                      <SearchResultBox ref={side}>
+                        {mapSearchResults.map((searchResult: any, key) => {
+                          return (
+                            <SearchResult
+                              key={key}
+                              onClick={() => {
+                                setIsOpen(!isOpen);
+                                setCurrentLocation(searchResult);
+                                setModifyLatitu(searchResult.y);
+                                setModifyLongtitu(searchResult.x);
+                              }}
+                            >
+                              {searchResult?.address_name}
+                            </SearchResult>
+                          );
+                        })}
+                      </SearchResultBox>
+                    ) : null}
+                  </SearchContainer>
+                  {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
+                </LocationWrap>
+              </Uploads>
+            </UploadInform>
+            <ButtonBox>
+              <CancelButton to={`/search/${pageChange}`}>취소</CancelButton>
+              <RegisterButton type="submit">수정</RegisterButton>
+            </ButtonBox>
+          </>
+        ) : (
+          <MobileModify
+            imageUrls={imageUrls}
+            setImageUrls={setImageUrls}
+            convertManyFilesToURL={convertManyFilesToURL}
+            register={register}
+            imageStore={imageStore}
+            setImageStore={setImageStore}
+            errors={errors}
+            radio={
+              <>
                 <CheckBox type="radio" id="새상품같음" value="새상품같음" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="새상품같음">새상품같음</Checklabel>
                 <CheckBox type="radio" id="약간헌책" value="약간헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="약간헌책w">약간헌책</Checklabel>
                 <CheckBox type="radio" id="많이헌책" value="많이헌책" {...register("quality")}></CheckBox>
                 <Checklabel htmlFor="많이헌책">많이헌책</Checklabel>
-              </CheckBoxWrap>
-              <Errorbox>{errors.quality?.message}</Errorbox>
-            </InputBox>
-          </Uploads>
-        </UploadInform>
-        <UploadInform>
-          <InformBox>
-            <InformTitle>사진</InformTitle>
-          </InformBox>
-          <Uploads>
-            <InputBox>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "stretch",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}>
-                <Label htmlFor="input_file">
-                  <i className="fas fa-camera"></i>
-                  <ImgTitle>이미지 업로드</ImgTitle>
-                  <ImgFile
-                    id="input_file"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    {...register("img", {
-                      onChange: async (event) => {
-                        let files = event.target.files;
-                        if (files && files.length) {
-                          if (imageUrls.length > 2) {
-                            return Swal.fire({
-                              text: "사진첨부는 최대 3장까지 가능합니다",
-                              confirmButtonText: "확인",
-                              confirmButtonColor: "#2f6218",
-                              icon: "warning",
-                            });
-                          }
-                          let urls = await convertManyFilesToURL(files);
-                          setImageUrls((prev) => {
-                            return [...prev, ...urls];
-                          });
-                          setImageStore([...imageStore, ...files]);
-                        }
-                      },
-                    })}
-                  />
-                </Label>
-                {imageUrls.map((url, key) => {
-                  return (
-                    <ImgMapList key={key}>
-                      <BookImg src={url}></BookImg>
-                    </ImgMapList>
-                  );
-                })}
-              </div>
-              <Errorbox>{errors.img?.message}</Errorbox>
-            </InputBox>
-          </Uploads>
-        </UploadInform>
-        <UploadInform>
-          <InformBox>
-            <InformTitle>설명</InformTitle>
-          </InformBox>
-          <Uploads>
-            <InputBox>
-              <Textarea
-                placeholder="상품 설명을 입력해주세요.(10글자이상)"
-                error={errors.content?.message}
-                {...register("content", {
-                  required: "상품 설명을 입력해주세요.",
-                  minLength: { value: 10, message: "상품 설명을 10자 이상 입력해주세요" },
-                  maxLength: { value: 500, message: "상품 설명을 500자 이하 입력해주세요" },
-                })}
-              />
-              <Wrap>
-                <Errorbox>{errors.content?.message}</Errorbox>
-                <Count>{content === undefined ? "0/200" : `${content.length}/500`}</Count>
-              </Wrap>
-            </InputBox>
-          </Uploads>
-        </UploadInform>
-        <UploadInform>
-          <InformBox>
-            <InformTitle>위치</InformTitle>
-          </InformBox>
-          <Uploads>
-            <LocationWrap>
-              <SearchContainer>
-                <SearchBox>
-                  <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
-                  <SearchButton type="button" onClick={searchPlace}>
-                    <i className="fas fa-search"></i>
-                  </SearchButton>
-                </SearchBox>
-                {isOpen ? (
-                  <SearchResultBox ref={side}>
-                    {mapSearchResults.map((searchResult: any, key) => {
-                      return (
-                        <SearchResult
-                          key={key}
-                          onClick={() => {
-                            setIsOpen(!isOpen);
-                            setCurrentLocation(searchResult);
-                            setModifyLatitu(searchResult.y);
-                            setModifyLongtitu(searchResult.x);
-                          }}>
-                          {searchResult?.address_name}
-                        </SearchResult>
-                      );
-                    })}
-                  </SearchResultBox>
-                ) : null}
-              </SearchContainer>
-              {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
-            </LocationWrap>
-          </Uploads>
-        </UploadInform>
-        <ButtonBox>
-          <CancelButton to={`/search/${pageChange}`}>취소</CancelButton>
-          <RegisterButton type="submit">수정</RegisterButton>
-        </ButtonBox>
+              </>
+            }
+            mapProps={
+              <LocationWrap>
+                <SearchContainer>
+                  <SearchBox>
+                    <SearchBar type="text" placeholder="건물,지역 검색" {...register("location")}></SearchBar>
+                    <SearchButton type="button" onClick={searchPlace}>
+                      <i className="fas fa-search"></i>
+                    </SearchButton>
+                  </SearchBox>
+                  {isOpen ? (
+                    <SearchResultBox ref={side}>
+                      {mapSearchResults.map((searchResult: any, key) => {
+                        return (
+                          <SearchResult
+                            key={key}
+                            onClick={() => {
+                              setIsOpen(!isOpen);
+                              setCurrentLocation(searchResult);
+                              setModifyLatitu(searchResult.y);
+                              setModifyLongtitu(searchResult.x);
+                            }}
+                          >
+                            {searchResult?.address_name}
+                          </SearchResult>
+                        );
+                      })}
+                    </SearchResultBox>
+                  ) : null}
+                </SearchContainer>
+                {modifyLatitu && modifyLongtitu ? <Map mapLat={modifyLatitu} mapLong={modifyLongtitu} /> : null}
+              </LocationWrap>
+            }
+            button={
+              <ButtonBox>
+                <CancelButton to="/search">취소</CancelButton>
+                <RegisterButton type="submit">등록</RegisterButton>
+              </ButtonBox>
+            }
+          ></MobileModify>
+        )}
       </Form>
     </Container>
   );

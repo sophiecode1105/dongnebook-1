@@ -69,7 +69,7 @@ const IconBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 20px;
+  margin: 0px 5px 0px 20px;
   i {
     font-size: 35px;
     &:hover {
