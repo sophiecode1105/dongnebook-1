@@ -82,6 +82,7 @@ const Box = styled.div`
 const Content = styled.div``;
 
 const AnimationIcon = () => {
+  console.log("애니메이션", window.scrollY);
   return (
     <Container>
       <Introduce className="sa sa-up">PLATFORM STORY</Introduce>
