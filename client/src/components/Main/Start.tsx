@@ -24,7 +24,7 @@ const Button = styled(Link)`
 const Start = () => {
   return (
     <Container>
-      <Button to="/search">시작하기</Button>
+      <Button to="/search">시작 해볼까요?</Button>
     </Container>
   );
 };

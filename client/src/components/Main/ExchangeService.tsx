@@ -1,19 +1,18 @@
 import styled from "styled-components";
-import mapImg from "../../img/map.png";
+import swap from "../../img/swap.png";
+import swap2 from "../../img/swap2.png";
 import { useMediaQuery } from "react-responsive";
 
 const Wrap = styled.div`
   width: 100%;
-  background-color: white;
+  background-color: #f1f5f0;
   padding: 80px 0px;
-  overflow: hidden;
 `;
 
 const Container = styled.div`
   max-width: 1200px;
   width: 100%;
-  /* height: 700px; */
-  margin: 0 auto;
+  margin: 0px auto;
   padding: 0 35px;
 `;
 
@@ -30,48 +29,50 @@ const Explain = styled.div`
   font-weight: 400;
 `;
 
-const ImgBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 500px;
-  margin: 0 auto;
-`;
-
-type pcProps = {
-  isPc: boolean;
-};
-
 const Content = styled.p<pcProps>`
   font-size: ${(props) => (props.isPc ? "1.4rem" : "18px")};
   font-family: "Montserrat", "NotoSansKR", sans-serif;
   font-weight: 500;
   color: rgba(0, 0, 0, 0.8);
   text-align: right;
+  margin-bottom: 20px;
 `;
 
-const Img = styled.img`
-  filter: drop-shadow(5px 5px 5px grey);
+const ImgBox = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  align-items: center;
+  width: 100%;
+`;
+type pcProps = {
+  isPc: boolean;
+};
+const SwapImage = styled.img<pcProps>`
+  width: 80%;
+  height: ${(props) => (props.isPc ? "500px" : "300px")};
 `;
 
-const LocationService = () => {
+const ExchangeService = () => {
   const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
 
   return (
     <Wrap>
       <Container>
-        <Title className="sa sa-up">위치</Title>
+        <Title className="sa sa-up">교환</Title>
         <Explain className="sa sa-up mb-6">
-          내 위치를 확인하고 <br /> 주변 도서를 찾아보세요
+          비용은 제로 <br /> 환경을 보호 할 수 있어요
         </Explain>
-        <ImgBox className="sa sa-left">
-          <Img src={mapImg}></Img>
+        <ImgBox className="sa sa-right">
+          <SwapImage isPc={isPc} src={isPc ? `${swap}` : `${swap2}`} />
         </ImgBox>
         <Content isPc={isPc}>
-          굳이 서점을 갈 필요가 있을까요? <br /> 내 주위 먼저 둘러보세요
+          도서 교환에 참여함으로써
+          <br />
+          물건의 수명을 늘리는 주체가 되어 보세요
         </Content>
       </Container>
     </Wrap>
   );
 };
-export default LocationService;
+export default ExchangeService;

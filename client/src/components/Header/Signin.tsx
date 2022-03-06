@@ -248,7 +248,8 @@ const Signin = () => {
           onClick={() => {
             localStorage.setItem("socialType", "google");
           }}
-          href="https://accounts.google.com/o/oauth2/v2/auth?client_id=849456230902-bbj8hno72k1hhlciunde3nc0knp6i28m.apps.googleusercontent.com&redirect_uri=http://localhost:3000/signin&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email">
+          href="https://accounts.google.com/o/oauth2/v2/auth?client_id=849456230902-bbj8hno72k1hhlciunde3nc0knp6i28m.apps.googleusercontent.com&redirect_uri=http://localhost:3000/signin&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email"
+        >
           <i className="fab fa-google"></i>
           Google로 로그인
         </OauthButton>
@@ -256,7 +257,8 @@ const Signin = () => {
           onClick={() => {
             localStorage.setItem("socialType", "github");
           }}
-          href="https://github.com/login/oauth/authorize?client_id=1caba106b0f779b40cc8&scope=user:email">
+          href="https://github.com/login/oauth/authorize?client_id=1caba106b0f779b40cc8&scope=user:email"
+        >
           <i className="fab fa-github"></i>
           Github로 로그인
         </OauthButton>

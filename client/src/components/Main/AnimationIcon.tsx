@@ -2,7 +2,8 @@ import styled from "styled-components";
 import { ReactComponent as LocationSvg } from "../../svg/Location.svg";
 import { ReactComponent as ExchangeSvg } from "../../svg/Exchange.svg";
 import { ReactComponent as ChatSvg } from "../../svg/Chat.svg";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { useMediaQuery } from "react-responsive";
 
 const ContainerWrap = styled.div`
   width: 100%;
@@ -92,6 +93,7 @@ const Content = styled.div``;
 
 const AnimationIcon = () => {
   const [show, setShow] = useState(false);
+  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
 
   return (
     <ContainerWrap
@@ -102,10 +104,16 @@ const AnimationIcon = () => {
       <Container>
         <Introduce className="sa sa-up">PLATFORM STORY</Introduce>
         <KeyPlatform className="sa sa-up">EXCHANGE LOCATION AND CHATTING</KeyPlatform>
-        <List className="sa sa-right">
+        <List className="sa sa-up">
           <Box>
             <ExchangeWrap>
-              {show ? <ExchangeSvg className="sa show" /> : <div style={{ width: "200px", height: "200px" }}></div>}
+              {isPc ? (
+                <>
+                  {show ? <ExchangeSvg className="sa show" /> : <div style={{ width: "200px", height: "200px" }}></div>}
+                </>
+              ) : (
+                <ExchangeSvg />
+              )}
             </ExchangeWrap>
             <Title>Exchange</Title>
             <Content>중고 도서 교환을 통하여</Content>
@@ -113,15 +121,21 @@ const AnimationIcon = () => {
           </Box>
           <Box>
             <Wrap>
-              {show ? (
-                <LocationSvg className="sa show" />
+              {isPc ? (
+                <>
+                  {show ? (
+                    <LocationSvg className="sa show" />
+                  ) : (
+                    <div
+                      style={{
+                        width: "120px",
+                        height: "110px",
+                      }}
+                    ></div>
+                  )}
+                </>
               ) : (
-                <div
-                  style={{
-                    width: "120px",
-                    height: "110px",
-                  }}
-                ></div>
+                <LocationSvg />
               )}
             </Wrap>
             <LocTitle>Location</LocTitle>
@@ -130,7 +144,11 @@ const AnimationIcon = () => {
           </Box>
           <Box>
             <ChatWrap>
-              {show ? <ChatSvg className="sa show" /> : <div style={{ width: "90px", height: "84px" }}></div>}
+              {isPc ? (
+                <>{show ? <ChatSvg className="sa show" /> : <div style={{ width: "90px", height: "84px" }}></div>}</>
+              ) : (
+                <ChatSvg />
+              )}
             </ChatWrap>
             <ChatTitle>Chatting</ChatTitle>
             <Content>회원들간의 실시간</Content>

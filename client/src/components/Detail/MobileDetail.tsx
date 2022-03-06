@@ -300,13 +300,15 @@ const MobileDetail = ({
             <ButtonPrev
               onClick={() => {
                 onChangeContent(-1);
-              }}>
+              }}
+            >
               <i className="fas fa-chevron-left"></i>
             </ButtonPrev>
             <ButtonNext
               onClick={() => {
                 onChangeContent(+1);
-              }}>
+              }}
+            >
               <i className="fas fa-chevron-right"></i>
             </ButtonNext>
           </Button>

@@ -8,30 +8,48 @@ import iconblack from "../img/iconblack.png";
 import iconcolor from "../img/iconred.png";
 import greenbook from "../img/greenbook.gif";
 import LocationSearchBar from "../components/Search/LocationSearchBar";
+import { useMediaQuery } from "react-responsive";
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
-const Containter = styled.div`
+type propsContainaer = {
+  isPc?: boolean;
+  isLoading?: boolean;
+};
+
+const Containter = styled.div<propsContainaer>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  max-width: 1000px;
+  width: ${(props) => (props.isPc ? "100%" : "360px")};
+  margin: 0 auto;
 `;
 
-const Map = styled.div<{ isLoading: boolean }>`
+const Map = styled.div<propsContainaer>`
   width: 100%;
-  height: 500px;
+  height: ${(props) => (props.isPc ? "600px;" : "450px")};
   display: flex;
-  margin: auto;
+  margin: 0 auto;
   visibility: ${(props) => (props.isLoading ? "collapse" : "visible")};
 `;
 const LockPosition = styled.div`
   position: relative;
 `;
 
+const LoadingImgBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: cetner;
+`;
+
 export const KakaoTest = () => {
+  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
+
   let place: any = useRef(null);
   const keywords = useRef<HTMLInputElement>(null);
   const markers = useRef([]);
@@ -61,12 +79,7 @@ export const KakaoTest = () => {
       }
       if (type) {
         place.current.setBounds(bounds);
-        markers.current = getTarget(
-          place.current.getCenter(),
-          place.current,
-          markers.current,
-          markered.current
-        );
+        markers.current = getTarget(place.current.getCenter(), place.current, markers.current, markered.current);
       }
     });
   }
@@ -165,10 +178,7 @@ export const KakaoTest = () => {
     try {
       const allowLocation: any = await naviInfo();
       if (allowLocation) {
-        center = new window.kakao.maps.LatLng(
-          allowLocation.coords.latitude,
-          allowLocation.coords.longitude
-        );
+        center = new window.kakao.maps.LatLng(allowLocation.coords.latitude, allowLocation.coords.longitude);
       }
     } catch (e) {
       center = new window.kakao.maps.LatLng(userLocation.lat, userLocation.lon);
@@ -209,15 +219,17 @@ export const KakaoTest = () => {
     };
   }, [getData]);
   return (
-    <Containter>
-      <div className="pt-20 max-w-md w-full m-auto p-2 h-full">
-        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">
-          내 주변 도서 찾기
-        </h1>
+    <Containter isPc={isPc}>
+      <div className="pt-20 w-full m-auto p-2 h-full">
+        <h1 className="text-2xl font-bold pb-3 border-b-2 border-[#7F7F7F] mb-3">내 주변 도서 찾기</h1>
         <LockPosition>
           <LocationSearchBar keywords={keywords} searchPlaces={searchPlaces} />
-          {isLoading && <img src={greenbook} alt="" />}
-          <Map ref={place} isLoading={isLoading} />
+          {isLoading && (
+            <LoadingImgBox>
+              <img src={greenbook} alt="" />
+            </LoadingImgBox>
+          )}
+          <Map ref={place} isLoading={isLoading} isPc={isPc} />
         </LockPosition>
       </div>
     </Containter>

@@ -505,13 +505,15 @@ const Details = () => {
               <ButtonPrev
                 onClick={() => {
                   onChangeContent(-1);
-                }}>
+                }}
+              >
                 <i className="fas fa-chevron-left"></i>
               </ButtonPrev>
               <ButtonNext
                 onClick={() => {
                   onChangeContent(+1);
-                }}>
+                }}
+              >
                 <i className="fas fa-chevron-right"></i>
               </ButtonNext>
             </>
@@ -541,7 +543,8 @@ const Details = () => {
                           onClick={(e) => {
                             handleClickExchange(e, true);
                           }}
-                          defaultChecked={exchanged}></CheckList>
+                          defaultChecked={exchanged}
+                        ></CheckList>
                         <Checklabel htmlFor="can">교환완료</Checklabel>
                         <CheckList
                           type="radio"
@@ -550,7 +553,8 @@ const Details = () => {
                           onClick={(e) => {
                             handleClickExchange(e, false);
                           }}
-                          defaultChecked={!exchanged}></CheckList>
+                          defaultChecked={!exchanged}
+                        ></CheckList>
                         <Checklabel htmlFor="cannot">교환가능</Checklabel>
                       </StatusCheck>
                     </BookStatusChangeBox>

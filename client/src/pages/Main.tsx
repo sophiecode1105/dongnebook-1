@@ -6,6 +6,7 @@ import Explain from "../components/Main/Explain";
 import LocationService from "../components/Main/LocationService";
 import Start from "../components/Main/Start";
 import { useEffect } from "react";
+import ExchangeService from "../components/Main/ExchangeService";
 
 const Main = () => {
   useEffect(() => {
@@ -49,6 +50,7 @@ const Main = () => {
       <MainScreen />
       <Explain />
       <AnimationIcon />
+      <ExchangeService />
       <LocationService />
       <ChatService />
       <Start />
