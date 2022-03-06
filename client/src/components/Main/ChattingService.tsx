@@ -22,6 +22,7 @@ const TitleBox = styled.div`
 const Title = styled.div`
   color: green;
   font-size: 28px;
+  font-weight: bold;
   margin-bottom: 20px;
 `;
 

@@ -14,7 +14,7 @@ const Button = styled(Link)`
   align-items: center;
   justify-content: center;
   margin-top: 30px;
-  width: 50%;
+  width: 40%;
   height: 50px;
   border-radius: 15px;
   font-weight: bold;
