@@ -10,7 +10,6 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
 
   const fetchData = (id: number) => {
     socket.emit("enter_room", id, (data: any, chat: chatRooms) => {
-      setVisible(true);
       setChatroomFrame({
         nickname: chat.users[0].users.nickname,
         userId: chat.users[0].users.id,
@@ -22,6 +21,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chats: chat.chats,
       } as ChatRoomFrameType);
     });
+    setVisible(true);
   };
 
   return (

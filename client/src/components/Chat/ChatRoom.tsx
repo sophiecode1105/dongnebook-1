@@ -45,11 +45,9 @@ const ChatRoom = () => {
     e.preventDefault();
 
     socket.emit("new_message", frame.productId, myInfo.nickname, message, (data: any) => {
-      if (visible) {
-        setChats(data.chats);
-        setMessage("");
-        scroll();
-      }
+      setChats(data.chats);
+      setMessage("");
+      scroll();
     });
   };
 
@@ -94,27 +92,18 @@ const ChatRoom = () => {
             ) : (
               <li className="flex flex-col items-start mb-2" key={idx}>
                 <div className="flex items-center">
-                  <img
-                    src={frame.img}
-                    alt={frame.nickname}
-                    className="w-10 h-10 rounded-full mb-2"
-                  />
+                  <img src={frame.img} alt={frame.nickname} className="w-10 h-10 rounded-full mb-2" />
                   <h1>{frame.nickname}</h1>
                 </div>
                 <div className="flex items-end">
-                  <p className="break bg-slate-200 rounded-b-lg rounded-tr-lg p-2">
-                    {chat.content}
-                  </p>
+                  <p className="break bg-slate-200 rounded-b-lg rounded-tr-lg p-2">{chat.content}</p>
                   <span className="ml-2">{timeStamp(chat.createdAt)}</span>
                 </div>
               </li>
             )
           )}
         </ul>
-        <form
-          className="bg-slate-100 w-full h-20 flex justify-center items-center px-2"
-          onSubmit={submitMessage}
-        >
+        <form className="bg-slate-100 w-full h-20 flex justify-center items-center px-2" onSubmit={submitMessage}>
           <input
             type="text"
             className="rounded-full w-4/5 h-3/4 p-2 placeholder:text-xs mr-2"

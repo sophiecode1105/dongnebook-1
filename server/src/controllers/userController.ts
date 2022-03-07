@@ -219,6 +219,9 @@ export const mypage = async (req: express.Request, res: express.Response) => {
         images: true,
         locations: true,
       },
+      orderBy: {
+        id: "desc",
+      },
     });
 
     delete userInfo.password;

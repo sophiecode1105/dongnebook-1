@@ -11,7 +11,7 @@ export const googleLogin = async (req: express.Request, res: express.Response) =
     const {
       data: { access_token },
     } = await axios.post(
-      `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_SECRET}&redirect_uri=https://youthful-ride-6b8f93.netlify.app/signin&grant_type=authorization_code`,
+      `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_SECRET}&redirect_uri=https://dongnebook.netlify.app/signin&grant_type=authorization_code`,
       {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       },

@@ -12,6 +12,7 @@ const Chat = () => {
   const fetchData = useCallback(() => {
     socket.emit("get_rooms", (data: any) => {
       setChatRooms(data);
+      setIsLoading(false);
     });
   }, [setChatRooms]);
 
@@ -22,7 +23,6 @@ const Chat = () => {
 
     socket.emit("notification");
     fetchData();
-    setIsLoading(false);
   }, [fetchData]);
 
   return isLoading ? <Loading /> : <ChatList chatRooms={chatRooms} />;

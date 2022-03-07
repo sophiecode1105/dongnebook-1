@@ -248,7 +248,7 @@ const Signin = () => {
           onClick={() => {
             localStorage.setItem("socialType", "google");
           }}
-          href="https://accounts.google.com/o/oauth2/v2/auth?client_id=828453292333-k9rhtk69gvclov44mklmp7thp4nor83m.apps.googleusercontent.com&redirect_uri=https://youthful-ride-6b8f93.netlify.app/signin&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email"
+          href="https://accounts.google.com/o/oauth2/v2/auth?client_id=828453292333-k9rhtk69gvclov44mklmp7thp4nor83m.apps.googleusercontent.com&redirect_uri=https://dongnebook.netlify.app/signin&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email"
         >
           <i className="fab fa-google"></i>
           Google로 로그인
