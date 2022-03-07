@@ -1,17 +1,18 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { timeStamp, socket } from "../../api";
 import { chatRoomFrame, chatRoomsState, chatRoomVisible, userState } from "../../state/state";
 import { Chat } from "../../state/typeDefs";
 
 const ChatRoom = () => {
-  const [visible, setVisible] = useRecoilState(chatRoomVisible);
+  const setVisible = useSetRecoilState(chatRoomVisible);
   const frame = useRecoilValue(chatRoomFrame);
   const myInfo = useRecoilValue(userState);
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>(frame.chats as Chat[]);
   const setChatRooms = useSetRecoilState(chatRoomsState);
-
+  console.log(chats);
+  console.log(frame);
   const scroll = () => {
     const ul: Element | null = document.querySelector("#chat__list");
     if (ul) {

@@ -4,6 +4,7 @@ import iconblack from "../../img/iconblack.png";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { searchLocation, mapResultsStorage, currentaddress, currentLocationStorage } from "../../state/state";
 import { KakaoMap } from "../../state/typeDefs";
+import { useMediaQuery } from "react-responsive";
 
 declare global {
   interface Window {
@@ -11,14 +12,20 @@ declare global {
   }
 }
 
-const ExchangeLocation = styled.div`
-  margin-top: 10px;
-  width: 100%;
-  height: 400px;
+interface isPcProps {
+  isPc: boolean;
+}
+
+const ExchangeLocation = styled.div<isPcProps>`
+  margin: 10px auto;
+  width: ${(props) => (props.isPc ? "100%" : "350px")};
+
+  height: ${(props) => (props.isPc ? "400px" : "300px")};
 `;
 
 const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
   const place = useRef(null);
+  const isPc = useMediaQuery({ query: "(min-width: 768px)" }, undefined);
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [marker, setMarker] = useState<any>(null);
   const [infowindow] = useState<any>(useCallback(() => new window.kakao.maps.InfoWindow({ zindex: 1 }), []));
@@ -161,7 +168,7 @@ const Map = ({ mapLat, mapLong }: { mapLat: any; mapLong: any }) => {
     });
   }, [setMapSearchResults, searchContent]);
 
-  return <ExchangeLocation ref={place} />;
+  return <ExchangeLocation isPc={isPc} ref={place} />;
 };
 
 export default Map;

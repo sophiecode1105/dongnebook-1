@@ -30,7 +30,7 @@ export type BookInfo = {
   content: string;
   visit: number;
   quality: string;
-  exchanged: boolean;
+  exchanged: boolean | undefined;
   userId: number;
   nickname: string;
   createdAt: Date;
@@ -49,7 +49,7 @@ export type ListProps = {
   title: string;
   content: string;
   quality: string;
-  exchanged: Boolean;
+  exchanged: boolean | undefined;
   userId: number;
   createdAt: Date;
   updatedAt: Date;

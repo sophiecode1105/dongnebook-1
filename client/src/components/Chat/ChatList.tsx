@@ -20,6 +20,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
         chatroomId: chat.id,
         chats: chat.chats,
       } as ChatRoomFrameType);
+      setVisible(true);
     });
     setVisible(true);
   };
@@ -38,8 +39,7 @@ const ChatList = ({ chatRooms }: ChatListComponentProps) => {
               <li
                 key={idx}
                 onClick={() => fetchData(productId)}
-                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer"
-              >
+                className="flex text-gray-600 bg-slate-50 h-20 cursor-pointer">
                 <div className="rounded-full flex items-center justify-center p-1">
                   <img src={img} alt={nickname} className="rounded-full w-12 h-12" />
                 </div>

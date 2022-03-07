@@ -88,3 +88,19 @@ body {
   opacity: 1;
   transform: none;
 }
+._paused {
+  animation-play-state: paused;
+}
+._running {
+  animation-play-state: running;
+  animation: dashi 2s;
+}
+
+@keyframes dashi {
+  from {
+    stroke-dashoffset: 385.65460205078125;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
