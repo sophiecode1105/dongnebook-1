@@ -1,10 +1,9 @@
 import styled from "styled-components";
 import { useState, useEffect, useCallback } from "react";
-import { CurrentImgProps } from "../../state/typeDefs";
+import { CurrentImgProps, UserState, BookInfo } from "../../state/typeDefs";
 import { timeForToday, postHeart, getMemberInfo } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { loginState } from "../../state/state";
+import { SetterOrUpdater } from "recoil";
 
 const Container = styled.div`
   height: 100%;
@@ -226,19 +225,19 @@ const MobileDetail = ({
   handleClickModify,
   handleClickDelete,
 }: {
-  bookDetailInfo: any;
+  bookDetailInfo: {} | BookInfo;
   likeCount: number;
-  onChangeContent: any;
-  currentImg: any;
-  userInfo: any;
-  setUserInfo: any;
+  onChangeContent: (pageDelta: any) => void;
+  currentImg: number;
+  userInfo: UserState;
+  setUserInfo: SetterOrUpdater<UserState>;
   token: string | null;
-  handleClickChat: any;
-  handleClickModify: any;
-  handleClickDelete: any;
+  handleClickChat: () => void;
+  handleClickModify: () => void;
+  handleClickDelete: () => Promise<void>;
 }) => {
   let { id } = useParams();
-  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo;
+  const { title, images, content, quality, createdAt, locations, nickname, visit, users } = bookDetailInfo as BookInfo;
   const [isHeartPressed, setIsHeartPressed] = useState(false);
   const isWriter = userInfo?.nickname === nickname;
   const date = timeForToday(createdAt);
